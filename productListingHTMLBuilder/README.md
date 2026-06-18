@@ -58,7 +58,7 @@ The app generates editable metadata suggestions locally in the browser. It does 
 
 Suggested Metadata includes:
 
-- SEO Title, limited to 60 characters with a live counter
+- SEO Title, copied directly from Product Name with a 60-character live counter
 - Meta Description, limited to 155 characters with a live counter
 - Search Keywords, generated as 10-20 natural comma-separated terms
 
@@ -81,7 +81,7 @@ Current categories are:
 - Clothing
 - Drinkware
 - Gift / General Merchandise
-- Decal / Sticker
+- Decals
 - School Supply
 - Tech / Accessory
 
@@ -131,6 +131,7 @@ Use these placeholders to insert product data into the description:
 - `{insulation}`
 - `{lidStraw}`
 - `{dimensions}`
+- `{decalSize}`
 - `{packCount}`
 - `{designFinish}`
 - `{useCase}`

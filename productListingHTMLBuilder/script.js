@@ -44,6 +44,7 @@ const fields = {
   insulation: document.querySelector("#insulation"),
   lidStraw: document.querySelector("#lidStraw"),
   dimensions: document.querySelector("#dimensions"),
+  decalSize: document.querySelector("#decalSize"),
   packCount: document.querySelector("#packCount"),
   designFinish: document.querySelector("#designFinish"),
   useCase: document.querySelector("#useCase"),
@@ -83,12 +84,12 @@ const categoryConfigs = {
     },
   },
   decal: {
-    variables: ["productName", "brand", "productType", "dimensions", "designFinish", "additional"],
+    variables: ["productName", "brand", "productType", "decalSize", "designFinish", "additional"],
     templates: {
-      standard: "{productName} adds school spirit to laptops, water bottles, notebooks, and more. {dimensions} {designFinish}",
-      outdoor: "{productName} is ready for bottles, coolers, car windows, or gear that goes with you. {dimensions}",
+      standard: "{productName} adds school spirit to laptops, water bottles, notebooks, and more. {decalSize} {designFinish}",
+      outdoor: "{productName} is ready for bottles, coolers, car windows, or gear that goes with you. {decalSize}",
       premium: "{productName} has a clean, giftable look that is easy to add to favorite everyday items. {designFinish}",
-      student: "{productName} is an easy way to personalize class gear, laptops, and water bottles. {dimensions}",
+      student: "{productName} is an easy way to personalize class gear, laptops, and water bottles. {decalSize}",
     },
   },
   schoolSupply: {
@@ -411,6 +412,7 @@ function buildRichDescription(data) {
     insulation: escapeHtml(data.insulation),
     lidStraw: escapeHtml(data.lidStraw),
     dimensions: escapeHtml(data.dimensions),
+    decalSize: escapeHtml(data.decalSize),
     packCount: escapeHtml(data.packCount),
     designFinish: escapeHtml(data.designFinish),
     useCase: escapeHtml(data.useCase),
@@ -420,7 +422,7 @@ function buildRichDescription(data) {
     productName: getProductNameHtml(data),
   };
   let withTokens = sanitizedTemplate.replace(
-    /\{(productName|brand|productType|color|material|fit|capacity|insulation|lidStraw|dimensions|packCount|designFinish|useCase|compatibility|batteries|care)\}/g,
+    /\{(productName|brand|productType|color|material|fit|capacity|insulation|lidStraw|dimensions|decalSize|packCount|designFinish|useCase|compatibility|batteries|care)\}/g,
     (match, token) => replacements[token] || ""
   );
 
@@ -450,6 +452,7 @@ function buildFeatures(data) {
     insulation: ["Insulation", data.insulation],
     lidStraw: ["Lid / straw", data.lidStraw],
     dimensions: ["Dimensions", data.dimensions],
+    decalSize: ["Decal size", data.decalSize],
     packCount: ["Pack count", data.packCount],
     designFinish: ["Design / finish", data.designFinish],
     useCase: ["Use", data.useCase],
@@ -613,9 +616,7 @@ function uniqueList(items) {
 }
 
 function buildSeoTitle(data) {
-  const categoryLabel = getCategoryLabel(data.category);
-  const pieces = [data.brand, data.productName || data.productType, data.color, data.productType, categoryLabel];
-  return truncateToLimit(uniqueList(pieces).join(" "), seoTitleLimit);
+  return data.productName;
 }
 
 function buildMetaDescription(data) {
@@ -635,6 +636,8 @@ function buildMetaDescription(data) {
     details = [data.compatibility ? `for ${data.compatibility}` : "", data.batteries || "", data.useCase || ""];
   } else if (category === "schoolSupply") {
     details = [data.packCount || "", data.useCase ? `for ${data.useCase}` : "", data.dimensions || ""];
+  } else if (category === "decal") {
+    details = [data.decalSize || "", data.designFinish || ""];
   } else {
     details = [data.dimensions || "", data.designFinish || ""];
   }
@@ -654,7 +657,7 @@ function buildSearchKeywords(data) {
     clothing: ["apparel", "campus apparel", "college clothing", data.fit, data.material],
     drinkware: ["drinkware", "tumbler", "water bottle", data.capacity, data.material, data.insulation, data.lidStraw, "lid", "straw", "insulated"],
     gift: ["gift", "college gift", "campus gift", data.useCase, data.designFinish],
-    decal: ["decal", "sticker", "laptop sticker", "water bottle sticker", data.dimensions],
+    decal: ["decal", "sticker", "laptop sticker", "water bottle sticker", data.decalSize],
     schoolSupply: ["school supply", "class supplies", "desk supplies", data.packCount, data.useCase, data.dimensions, "pack"],
     tech: ["tech accessory", "electronics", data.compatibility, data.batteries, data.useCase],
   };
@@ -670,6 +673,7 @@ function buildSearchKeywords(data) {
     data.insulation,
     data.lidStraw,
     data.dimensions,
+    data.decalSize,
     data.packCount,
     data.designFinish,
     data.useCase,
