@@ -316,6 +316,11 @@ textarea {
   resize: vertical;
 }
 
+.tox-tinymce {
+  border-color: #cbd5e1 !important;
+  border-radius: 6px !important;
+}
+
 .btn-primary {
   background: var(--accent);
   border-color: var(--accent);

@@ -21,9 +21,11 @@ The generated HTML uses only these approved tags:
 - `strong`
 - `em`
 - `br`
+- `a` with a safe `http`, `https`, `mailto`, or `tel` URL
 - `h4` for approved snippets
 - `span` only when it is exactly `<span class="productName">...</span>`
 - `ul` may include `class="prodFeatList"` for Product Features lists
+- `div` may include `class="csuProdDesc"` around the full listing
 - `div` only for approved snippet IDs and the Student Account Eligible snippet: `<div id="sa"></div>`
 
 The generator escapes typed notes so accidental HTML, styles, scripts, and unapproved tags do not get included in the output.
@@ -39,6 +41,14 @@ The app creates:
 - Optional approved code snippets appended at the end
 - The Student Account Eligible snippet when the checkbox is selected
 - Editable suggested metadata for SEO title, meta description, and search keywords
+
+The product description content is wrapped in:
+
+```html
+<div class="csuProdDesc">
+```
+
+This wrapper is reserved for future CSS updates.
 
 Tone presets fill the editable description text field. Students can revise that text before copying so product listings do not all sound the same.
 
@@ -101,6 +111,8 @@ Automatic attribute bullets use a consistent helper in `script.js`, so labels ar
 
 Student-entered feature bullets remain plain list items unless they are entered through a structured field.
 
+Feature notes split into separate bullets on new lines or semicolons. Commas remain inside the same bullet, so text like `Great for breakfast, lunch, or dinner` stays together.
+
 ## Tone Presets and Editable Description Text
 
 Tone preset starter copy lives inside each category in the `categoryConfigs` object in `script.js`.
@@ -125,7 +137,7 @@ Use these placeholders to insert product data into the description:
 - `{compatibility}`
 - `{batteries}`
 - `{care}`
-- `{additional}`
+- `{additional}` - renders as its own paragraph when filled in
 
 Example template:
 
@@ -136,6 +148,19 @@ Easy to wear for class and weekends, {productName} is a comfortable {productType
 If `{productName}` is removed from the editable text, the app appends the product name span to the end of the paragraph so the product name is still included.
 
 Pressing Enter in the editable description creates a new `<p>` paragraph. Pressing Shift+Enter creates a `<br>` line break inside the current paragraph.
+
+## Rich Text Editing
+
+The editable description uses TinyMCE 8, loaded through jsDelivr. Its toolbar supports:
+
+- Undo and redo
+- Bold and italic text
+- Adding and removing links
+- Removing formatting
+
+Rich text output is sanitized before it reaches the generated HTML. Only paragraphs, bold, italic, line breaks, and safe links are retained. Inline styles, scripts, images, and other markup are removed.
+
+If TinyMCE cannot load, the original textarea remains available as a plain-text fallback.
 
 ## Code Snippets
 

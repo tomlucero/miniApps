@@ -15,11 +15,12 @@ const seoTitleCounter = document.querySelector("#seoTitleCounter");
 const metaDescriptionCounter = document.querySelector("#metaDescriptionCounter");
 const metadataCopyStatus = document.querySelector("#metadataCopyStatus");
 const metadataCopyButtons = document.querySelectorAll(".metadata-copy");
+let descriptionEditor = null;
 
 const productNameLimit = 60;
 const seoTitleLimit = 60;
 const metaDescriptionLimit = 155;
-const appVersion = "0.7";
+const appVersion = "1.0";
 const metadataDirty = {
   seoTitle: false,
   metaDescription: false,
@@ -50,7 +51,6 @@ const fields = {
   batteries: document.querySelector("#batteries"),
   features: document.querySelector("#features"),
   care: document.querySelector("#care"),
-  limited: document.querySelector("#limited"),
   additional: document.querySelector("#additional"),
 };
 
@@ -285,7 +285,7 @@ function titleCase(value) {
 
 function splitListItems(value) {
   return value
-    .split(/\n|;|,/)
+    .split(/\n|;/)
     .map((item) => cleanValue(item))
     .filter(Boolean);
 }
@@ -298,9 +298,27 @@ function getProductNameHtml(data) {
   return `<span class="productName">${escapeHtml(data.productName)}</span>`;
 }
 
-function populateToneTemplate() {
+function getToneTemplateText() {
   const config = getCategoryConfig();
-  fields.descriptionTemplate.value = config.templates[fields.tone.value] || config.templates.standard;
+  return config.templates[fields.tone.value] || config.templates.standard;
+}
+
+function getToneTemplateHtml() {
+  return `<p>${escapeHtml(getToneTemplateText())}</p>`;
+}
+
+function setDescriptionEditorContent(html) {
+  fields.descriptionTemplate.value = html;
+
+  if (descriptionEditor) {
+    descriptionEditor.setContent(html);
+    descriptionEditor.save();
+  }
+}
+
+function populateToneTemplate() {
+  const content = descriptionEditor ? getToneTemplateHtml() : getToneTemplateText();
+  setDescriptionEditorContent(content);
 }
 
 function updateCategoryFields() {
@@ -319,16 +337,70 @@ function updateCategoryFields() {
   categoryVariableSummary.textContent = config.variables.map((variable) => `{${variable}}`).join(" ");
 }
 
-function cleanupGeneratedSentence(value) {
-  return value
-    .replace(/\s+([,.!?;:])/g, "$1")
-    .replace(/\s{2,}/g, " ")
-    .replace(/\s+<br>/g, "<br>")
-    .replace(/<br>\s+/g, "<br>")
-    .trim();
+function isSafeLink(href) {
+  try {
+    const url = new URL(href, window.location.href);
+    return ["http:", "https:", "mailto:", "tel:"].includes(url.protocol);
+  } catch (error) {
+    return false;
+  }
 }
 
-function applyDescriptionTemplate(data) {
+function sanitizeRichDescription(html) {
+  const source = document.createElement("template");
+  const output = document.createElement("div");
+  source.innerHTML = html;
+
+  function appendCleanNode(node, parent) {
+    if (node.nodeType === Node.TEXT_NODE) {
+      parent.appendChild(document.createTextNode(node.textContent));
+      return;
+    }
+
+    if (node.nodeType !== Node.ELEMENT_NODE) {
+      return;
+    }
+
+    const tagName = node.tagName.toLowerCase();
+    const allowedTags = ["p", "strong", "em", "br", "a"];
+
+    if (!allowedTags.includes(tagName)) {
+      node.childNodes.forEach((child) => appendCleanNode(child, parent));
+      return;
+    }
+
+    if (tagName === "a" && !isSafeLink(node.getAttribute("href") || "")) {
+      node.childNodes.forEach((child) => appendCleanNode(child, parent));
+      return;
+    }
+
+    const cleanElement = document.createElement(tagName);
+
+    if (tagName === "a") {
+      cleanElement.setAttribute("href", node.getAttribute("href"));
+
+      if (node.getAttribute("target") === "_blank") {
+        cleanElement.setAttribute("target", "_blank");
+        cleanElement.setAttribute("rel", "noopener noreferrer");
+      }
+    }
+
+    node.childNodes.forEach((child) => appendCleanNode(child, cleanElement));
+    parent.appendChild(cleanElement);
+  }
+
+  source.content.childNodes.forEach((node) => appendCleanNode(node, output));
+  return output.innerHTML;
+}
+
+function buildRichDescription(data) {
+  const rawTemplate = data.descriptionTemplate || getToneTemplateText();
+  const hasAdditionalToken = rawTemplate.includes("{additional}");
+  let sanitizedTemplate = sanitizeRichDescription(rawTemplate).replace(/\{additional\}/g, "");
+
+  if (!/<p\b/i.test(sanitizedTemplate)) {
+    sanitizedTemplate = `<p>${sanitizedTemplate}</p>`;
+  }
   const replacements = {
     brand: escapeHtml(data.brand),
     productType: escapeHtml(data.productType),
@@ -345,27 +417,22 @@ function applyDescriptionTemplate(data) {
     compatibility: escapeHtml(data.compatibility),
     batteries: escapeHtml(data.batteries),
     care: escapeHtml(data.care),
-    additional: escapeHtml(data.additional),
     productName: getProductNameHtml(data),
   };
-  const template = cleanTemplate(data.descriptionTemplate || getCategoryConfig().templates.standard);
-  const withTokens = template.replace(
-    /\{(productName|brand|productType|color|material|fit|capacity|insulation|lidStraw|dimensions|packCount|designFinish|useCase|compatibility|batteries|care|additional)\}/g,
+  let withTokens = sanitizedTemplate.replace(
+    /\{(productName|brand|productType|color|material|fit|capacity|insulation|lidStraw|dimensions|packCount|designFinish|useCase|compatibility|batteries|care)\}/g,
     (match, token) => replacements[token] || ""
   );
-  const withProductName = withTokens.includes(`class="productName"`)
-    ? withTokens
-    : `${withTokens} ${getProductNameHtml(data)}`;
 
-  return withProductName;
-}
+  if (!withTokens.includes(`class="productName"`)) {
+    withTokens += `<p>${getProductNameHtml(data)}</p>`;
+  }
 
-function buildDescriptionParagraphs(data) {
-  return applyDescriptionTemplate(data)
-    .split(/\n{2,}/)
-    .map((paragraph) => paragraph.replace(/\n/g, "<br>"))
-    .map(cleanupGeneratedSentence)
-    .filter(Boolean);
+  if (hasAdditionalToken && data.additional) {
+    withTokens += `<p>${escapeHtml(data.additional)}</p>`;
+  }
+
+  return withTokens;
 }
 
 function buildFeatures(data) {
@@ -402,14 +469,6 @@ function buildFeatures(data) {
         : "";
     })
     .filter(Boolean);
-
-  if (data.limited) {
-    automaticItems.push({
-      label: "Limited edition",
-      value: data.limited,
-      type: "attribute",
-    });
-  }
 
   if (data.studentAccountEligible) {
     automaticItems.push({
@@ -454,7 +513,7 @@ function buildHtml() {
   const data = getFormData();
 
   const employeeComment = sanitizeComment(data.employeeName);
-  const introParagraphs = buildDescriptionParagraphs(data);
+  const richDescription = buildRichDescription(data);
   const featureItems = buildFeatures(data);
   const html = [];
 
@@ -465,8 +524,12 @@ function buildHtml() {
   html.push(`<!-- Date Added: ${getDateAdded()} -->`);
   html.push(`<!--Version: ${appVersion} -->`);
 
-  html.push(
-    ...introParagraphs.map((paragraph) => `<p>${paragraph}</p>`),
+  const listingHtml = [
+    `<div class="csuProdDesc">`,
+  ];
+
+  listingHtml.push(
+    richDescription,
     `<h3>Product Features</h3>`,
     `<ul class="prodFeatList">`,
     ...featureItems.map(buildFeatureListItem),
@@ -474,15 +537,18 @@ function buildHtml() {
   );
 
   if (data.care) {
-    html.push(`<h3>Care Instructions</h3>`);
-    html.push(`<p>${escapeHtml(data.care)}</p>`);
+    listingHtml.push(`<h3>Care Instructions</h3>`);
+    listingHtml.push(`<p>${escapeHtml(data.care)}</p>`);
   }
 
-  html.push(...getSelectedSnippetHtmlList(data.snippet));
+  listingHtml.push(...getSelectedSnippetHtmlList(data.snippet));
 
   if (data.studentAccountEligible) {
-    html.push(`<div id="sa"></div>`);
+    listingHtml.push(`<div id="sa"></div>`);
   }
+
+  listingHtml.push(`</div>`);
+  html.push(...listingHtml);
 
   return html.join("\n");
 }
@@ -500,6 +566,10 @@ function getFormData() {
 
       if (input.multiple) {
         return [key, Array.from(input.selectedOptions).map((option) => option.value)];
+      }
+
+      if (key === "descriptionTemplate" && descriptionEditor) {
+        return [key, descriptionEditor.getContent()];
       }
 
       const preserveLineBreaks = key === "features" || key === "descriptionTemplate";
@@ -670,7 +740,25 @@ function validateApprovedOutput(html) {
       return attributes === `class="productName"`;
     }
 
+    if (tagName === "a") {
+      if (isClosingTag) {
+        return true;
+      }
+
+      const hrefMatch = attributes.match(/(?:^|\s)href="([^"]+)"/);
+      const allowedAttributes = attributes
+        .replace(/(?:^|\s)href="[^"]+"/g, "")
+        .replace(/(?:^|\s)target="_blank"/g, "")
+        .replace(/(?:^|\s)rel="noopener noreferrer"/g, "")
+        .trim();
+      return Boolean(hrefMatch && isSafeLink(hrefMatch[1]) && allowedAttributes === "");
+    }
+
     if (tagName === "div") {
+      if (attributes === `class="csuProdDesc"`) {
+        return true;
+      }
+
       const idMatch = attributes.match(/^id="([^"]+)"\s*\/?$/);
       return Boolean(idMatch && approvedSnippetDivIds.includes(idMatch[1]));
     }
@@ -740,22 +828,40 @@ function resetMetadataDirtyState() {
   });
 }
 
-function insertTextAtCursor(textarea, text) {
-  const start = textarea.selectionStart;
-  const end = textarea.selectionEnd;
-  textarea.value = `${textarea.value.slice(0, start)}${text}${textarea.value.slice(end)}`;
-  textarea.selectionStart = start + text.length;
-  textarea.selectionEnd = start + text.length;
+function initializeDescriptionEditor() {
+  if (!window.tinymce) {
+    return;
+  }
+
+  window.tinymce.init({
+    selector: "#descriptionTemplate",
+    license_key: "gpl",
+    menubar: false,
+    plugins: "autolink link",
+    toolbar: "undo redo | bold italic | link unlink | removeformat",
+    statusbar: false,
+    branding: false,
+    promotion: false,
+    height: 220,
+    convert_urls: false,
+    valid_elements: "p,strong,em,br,a[href|target|rel]",
+    setup(editor) {
+      editor.on("init", () => {
+        descriptionEditor = editor;
+        editor.setContent(getToneTemplateHtml());
+        editor.save();
+        updateOutput();
+      });
+
+      editor.on("change input undo redo", () => {
+        editor.save();
+        updateOutput();
+      });
+    },
+  });
 }
 
 form.addEventListener("input", updateOutput);
-fields.descriptionTemplate.addEventListener("keydown", (event) => {
-  if (event.key === "Enter" && !event.shiftKey) {
-    event.preventDefault();
-    insertTextAtCursor(fields.descriptionTemplate, "\n\n");
-    fields.descriptionTemplate.dispatchEvent(new Event("input", { bubbles: true }));
-  }
-});
 fields.category.addEventListener("change", () => {
   updateCategoryFields();
   populateToneTemplate();
@@ -797,3 +903,4 @@ populateSnippetOptions();
 updateCategoryFields();
 populateToneTemplate();
 updateOutput();
+initializeDescriptionEditor();
