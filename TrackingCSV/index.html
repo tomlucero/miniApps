@@ -1,0 +1,616 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tracking CSV Builder</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f7f7f4;
+      --panel: #ffffff;
+      --ink: #202124;
+      --muted: #60646c;
+      --line: #d9ddd6;
+      --accent: #176d5f;
+      --accent-strong: #0e5549;
+      --danger: #9f2d20;
+      --danger-bg: #fff0ed;
+      --ok: #1b6b43;
+      --shadow: 0 18px 45px rgba(32, 33, 36, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    .app {
+      width: min(1120px, calc(100vw - 32px));
+      margin: 0 auto;
+      padding: 32px 0 48px;
+    }
+
+    header {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: clamp(28px, 4vw, 44px);
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      max-width: 660px;
+      line-height: 1.45;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 320px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .workspace,
+    .side-panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .workspace {
+      overflow: hidden;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+      background: #fbfbf9;
+    }
+
+    .toolbar-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .count {
+      color: var(--muted);
+      font-size: 14px;
+      min-width: fit-content;
+    }
+
+    .rows {
+      display: grid;
+      gap: 10px;
+      padding: 16px;
+    }
+
+    .row,
+    .row-head {
+      display: grid;
+      grid-template-columns: minmax(135px, 0.55fr) minmax(220px, 1fr) 44px;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .row-head {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      padding: 0 16px;
+      margin-top: 14px;
+    }
+
+    .field {
+      display: grid;
+      gap: 5px;
+    }
+
+    label {
+      display: none;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #fff;
+      color: var(--ink);
+      outline: none;
+      transition: border-color 160ms ease, box-shadow 160ms ease;
+    }
+
+    input {
+      min-height: 42px;
+      padding: 9px 11px;
+    }
+
+    textarea {
+      min-height: 140px;
+      resize: vertical;
+      padding: 11px;
+      line-height: 1.45;
+    }
+
+    input:focus,
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(23, 109, 95, 0.13);
+    }
+
+    input.invalid {
+      border-color: var(--danger);
+      background: var(--danger-bg);
+    }
+
+    .message {
+      min-height: 18px;
+      color: var(--danger);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .icon-button,
+    .primary-button,
+    .secondary-button {
+      border: 1px solid transparent;
+      border-radius: 7px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 40px;
+      transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+    }
+
+    .primary-button {
+      background: var(--accent);
+      color: #fff;
+      padding: 0 15px;
+      font-weight: 800;
+    }
+
+    .primary-button:hover {
+      background: var(--accent-strong);
+    }
+
+    .primary-button:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+    }
+
+    .secondary-button {
+      background: #fff;
+      border-color: var(--line);
+      color: var(--ink);
+      padding: 0 13px;
+      font-weight: 700;
+    }
+
+    .secondary-button:hover,
+    .icon-button:hover {
+      border-color: #aab2aa;
+      background: #f4f6f3;
+    }
+
+    .icon-button {
+      width: 42px;
+      background: #fff;
+      border-color: var(--line);
+      color: var(--danger);
+      padding: 0;
+      margin-top: 0;
+    }
+
+    .icon {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex: 0 0 auto;
+    }
+
+    .side-panel {
+      padding: 16px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .side-panel h2 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    .paste-tools {
+      display: grid;
+      gap: 10px;
+    }
+
+    .hint,
+    .status,
+    .preview {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .status {
+      border-top: 1px solid var(--line);
+      padding-top: 14px;
+    }
+
+    .status strong {
+      color: var(--ok);
+    }
+
+    .preview {
+      margin: 0;
+      max-height: 170px;
+      overflow: auto;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #fbfbf9;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    @media (max-width: 860px) {
+      header,
+      .toolbar {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .app {
+        width: min(100vw - 20px, 1120px);
+        padding-top: 18px;
+      }
+
+      .row,
+      .row-head {
+        grid-template-columns: 1fr 44px;
+      }
+
+      .row-head {
+        display: none;
+      }
+
+      .field {
+        grid-column: 1 / 2;
+      }
+
+      label {
+        display: block;
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .icon-button {
+        grid-column: 2 / 3;
+        grid-row: 1 / 3;
+        margin-top: 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header>
+      <div>
+        <h1>Tracking CSV Builder</h1>
+        <p class="subtitle">Enter a packing list ID and each shipment tracking number. The download matches the sample format: two quoted values per row, no header.</p>
+      </div>
+      <button class="primary-button" id="downloadButton" type="button">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+        Download CSV
+      </button>
+    </header>
+
+    <section class="layout" aria-label="CSV builder">
+      <div class="workspace">
+        <div class="toolbar">
+          <div class="count" id="rowCount">1 row ready</div>
+          <div class="toolbar-actions">
+            <button class="secondary-button" id="addRowButton" type="button">
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+              Add row
+            </button>
+            <button class="secondary-button" id="clearButton" type="button">
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v5"/><path d="M14 11v5"/></svg>
+              Clear
+            </button>
+          </div>
+        </div>
+
+        <div class="row-head" aria-hidden="true">
+          <div>Packing List ID</div>
+          <div>Tracking Number</div>
+          <div></div>
+        </div>
+        <div class="rows" id="rows"></div>
+      </div>
+
+      <aside class="side-panel">
+        <h2>Paste rows</h2>
+        <div class="paste-tools">
+          <p class="hint">Paste one row per line. Use a comma, tab, or space between the packing list ID and tracking number.</p>
+          <textarea id="bulkInput" placeholder="6171706, 9114902307224980232042"></textarea>
+          <button class="secondary-button" id="importButton" type="button">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"/><path d="M7 8l5-5 5 5"/><path d="M5 21h14"/></svg>
+            Add pasted rows
+          </button>
+        </div>
+
+        <div class="status" id="status">CSV preview will appear here.</div>
+        <pre class="preview" id="preview" aria-label="CSV preview"></pre>
+      </aside>
+    </section>
+  </main>
+
+  <template id="rowTemplate">
+    <div class="row">
+      <div class="field">
+        <label>Packing List ID</label>
+        <input class="packing-input" aria-label="Packing List ID" inputmode="numeric" autocomplete="off" placeholder="6171706">
+        <div class="message"></div>
+      </div>
+      <div class="field">
+        <label>Tracking Number</label>
+        <input class="tracking-input" aria-label="Tracking Number" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="1Z..., 9400..., 7712...">
+        <div class="message"></div>
+      </div>
+      <button class="icon-button remove-button" type="button" aria-label="Remove row" title="Remove row">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+      </button>
+    </div>
+  </template>
+
+  <script>
+    const rowsElement = document.querySelector("#rows");
+    const template = document.querySelector("#rowTemplate");
+    const addRowButton = document.querySelector("#addRowButton");
+    const clearButton = document.querySelector("#clearButton");
+    const downloadButton = document.querySelector("#downloadButton");
+    const importButton = document.querySelector("#importButton");
+    const bulkInput = document.querySelector("#bulkInput");
+    const rowCount = document.querySelector("#rowCount");
+    const statusElement = document.querySelector("#status");
+    const previewElement = document.querySelector("#preview");
+
+    function normalizePackingId(value) {
+      return value.replace(/\D/g, "");
+    }
+
+    function normalizeTrackingNumber(value) {
+      return value.toUpperCase().replace(/[\s-]+/g, "");
+    }
+
+    function isLikelyTrackingNumber(value) {
+      return /^[A-Z0-9]{8,40}$/.test(value);
+    }
+
+    function csvEscape(value) {
+      return `"${String(value).replace(/"/g, '""')}"`;
+    }
+
+    function getRows() {
+      return [...rowsElement.querySelectorAll(".row")].map(row => ({
+        element: row,
+        packingInput: row.querySelector(".packing-input"),
+        trackingInput: row.querySelector(".tracking-input")
+      }));
+    }
+
+    function createRow(packingId = "", trackingNumber = "") {
+      const fragment = template.content.cloneNode(true);
+      const row = fragment.querySelector(".row");
+      const packingInput = row.querySelector(".packing-input");
+      const trackingInput = row.querySelector(".tracking-input");
+      const removeButton = row.querySelector(".remove-button");
+
+      packingInput.value = normalizePackingId(packingId);
+      trackingInput.value = normalizeTrackingNumber(trackingNumber);
+
+      packingInput.addEventListener("input", () => {
+        packingInput.value = normalizePackingId(packingInput.value);
+        update();
+      });
+      trackingInput.addEventListener("input", () => {
+        const selection = trackingInput.selectionStart;
+        trackingInput.value = normalizeTrackingNumber(trackingInput.value);
+        trackingInput.setSelectionRange(selection, selection);
+        update();
+      });
+      removeButton.addEventListener("click", () => {
+        row.remove();
+        if (getRows().length === 0) {
+          rowsElement.append(createRow());
+        }
+        update();
+      });
+
+      return row;
+    }
+
+    function validateRow(row) {
+      const packingId = normalizePackingId(row.packingInput.value);
+      const trackingNumber = normalizeTrackingNumber(row.trackingInput.value);
+      const packingMessage = row.element.querySelector(".field:first-child .message");
+      const trackingMessage = row.element.querySelector(".field:nth-child(2) .message");
+      let valid = true;
+
+      row.packingInput.classList.remove("invalid");
+      row.trackingInput.classList.remove("invalid");
+      packingMessage.textContent = "";
+      trackingMessage.textContent = "";
+
+      if (!packingId) {
+        packingMessage.textContent = "Required.";
+        row.packingInput.classList.add("invalid");
+        valid = false;
+      } else if (!packingId.startsWith("6")) {
+        packingMessage.textContent = "Packing list IDs should start with 6.";
+        row.packingInput.classList.add("invalid");
+        valid = false;
+      }
+
+      if (!trackingNumber) {
+        trackingMessage.textContent = "Required.";
+        row.trackingInput.classList.add("invalid");
+        valid = false;
+      } else if (!isLikelyTrackingNumber(trackingNumber)) {
+        trackingMessage.textContent = "Use 8-40 letters or numbers.";
+        row.trackingInput.classList.add("invalid");
+        valid = false;
+      }
+
+      return { valid, packingId, trackingNumber };
+    }
+
+    function validData() {
+      return getRows()
+        .map(validateRow)
+        .filter(row => row.valid)
+        .map(({ packingId, trackingNumber }) => [packingId, trackingNumber]);
+    }
+
+    function buildCsv(data) {
+      return data.map(row => row.map(csvEscape).join(",")).join("\r\n");
+    }
+
+    function update() {
+      const rows = getRows();
+      const data = validData();
+      const invalidCount = rows.length - data.length;
+      const plural = rows.length === 1 ? "row" : "rows";
+      rowCount.textContent = `${rows.length} ${plural} ready`;
+
+      if (data.length === 0) {
+        statusElement.textContent = invalidCount ? "Fix the highlighted fields before downloading." : "CSV preview will appear here.";
+        previewElement.textContent = "";
+      } else {
+        statusElement.innerHTML = `<strong>${data.length}</strong> valid ${data.length === 1 ? "shipment" : "shipments"}${invalidCount ? `, ${invalidCount} needing attention` : ""}.`;
+        previewElement.textContent = buildCsv(data);
+      }
+
+      downloadButton.disabled = data.length === 0 || invalidCount > 0;
+    }
+
+    function parsePastedRows(text) {
+      return text
+        .split(/\r?\n/)
+        .map(line => line.trim())
+        .filter(Boolean)
+        .map(line => {
+          const cleaned = line.replace(/^"|"$/g, "");
+          const csvMatch = cleaned.match(/^"?([^,"\t]+)"?[\t, ]+"?([^"]+)"?$/);
+          if (csvMatch) {
+            return [csvMatch[1], csvMatch[2]];
+          }
+
+          const parts = cleaned.split(/\s+/);
+          return [parts[0] || "", parts.slice(1).join("") || ""];
+        });
+    }
+
+    function importRows() {
+      const parsedRows = parsePastedRows(bulkInput.value);
+      if (!parsedRows.length) {
+        return;
+      }
+
+      const currentRows = getRows();
+      if (currentRows.length === 1 && !currentRows[0].packingInput.value && !currentRows[0].trackingInput.value) {
+        rowsElement.innerHTML = "";
+      }
+
+      parsedRows.forEach(([packingId, trackingNumber]) => {
+        rowsElement.append(createRow(packingId, trackingNumber));
+      });
+      bulkInput.value = "";
+      update();
+    }
+
+    function downloadCsv() {
+      const rows = getRows().map(validateRow);
+      const invalid = rows.some(row => !row.valid);
+      if (invalid) {
+        update();
+        return;
+      }
+
+      const csv = buildCsv(rows.map(({ packingId, trackingNumber }) => [packingId, trackingNumber]));
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      const date = new Date().toISOString().slice(0, 10);
+      link.href = url;
+      link.download = `tracking-upload-${date}.csv`;
+      document.body.append(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    addRowButton.addEventListener("click", () => {
+      rowsElement.append(createRow());
+      update();
+      rowsElement.lastElementChild.querySelector(".packing-input").focus();
+    });
+
+    clearButton.addEventListener("click", () => {
+      rowsElement.innerHTML = "";
+      rowsElement.append(createRow());
+      update();
+    });
+
+    importButton.addEventListener("click", importRows);
+    downloadButton.addEventListener("click", downloadCsv);
+
+    rowsElement.append(createRow("6171706", "9114902307224980232042"));
+    update();
+  </script>
+</body>
+</html>

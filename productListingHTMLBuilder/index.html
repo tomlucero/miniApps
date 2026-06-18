@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="app-version" content="0.7">
+    <title>Product Description HTML Builder</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    >
+    <link rel="stylesheet" href="style.css">
+    
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="intro-band">
+        <div class="hero-image" role="img" aria-label="Colorado State University Lory Student Center"></div>
+        <div class="container">
+          <div class="row align-items-end g-4">
+            <div class="col-lg-8">
+              <p class="eyebrow mb-2">MBS/Insite helper</p>
+              <h1>Product Description HTML Builder</h1>
+              <p class="lead mb-0">
+                Turn product listing notes into clean, approved HTML that is ready to copy and paste into a product description.
+              </p>
+            </div>
+            <div class="col-lg-4">
+              <div class="brand-mark">
+                <img src="images/bookstoreLogo.png" alt="Bookstore logo">
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="workspace-band">
+        <div class="container">
+          <div class="row g-4">
+            <div class="col-xl-7">
+              <form id="builderForm" class="builder-panel" autocomplete="off">
+                <div class="panel-header">
+                  <div>
+                    <h2>Listing Notes</h2>
+                    <p>Use short, plain notes. Empty fields are skipped.</p>
+                  </div>
+                  <button type="button" class="btn btn-outline-secondary btn-sm" id="resetButton">Reset</button>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label" for="employeeName">Employee Name</label>
+                  <input class="form-control" id="employeeName" name="employeeName" type="text" placeholder="Example: Taylor">
+                  <div class="form-text">Added as an HTML comment at the start of the generated description.</div>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label" for="tone">Tone Preset</label>
+                  <select class="form-select" id="tone" name="tone">
+                    <option value="standard">Standard Product Description</option>
+                    <option value="outdoor">Outdoor / Adventure</option>
+                    <option value="premium">Premium / Gift</option>
+                    <option value="student">Student Casual</option>
+                  </select>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label" for="category">Product Category</label>
+                  <select class="form-select" id="category" name="category">
+                    <option value="clothing">Clothing</option>
+                    <option value="drinkware">Drinkware</option>
+                    <option value="gift">Gift / General Merchandise</option>
+                    <option value="decal">Decal / Sticker</option>
+                    <option value="schoolSupply">School Supply</option>
+                    <option value="tech">Tech / Accessory</option>
+                  </select>
+                  <div class="form-text">This changes the helpful fields and variables available for the description.</div>
+                </div>
+
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <div class="label-row">
+                      <label class="form-label" for="productName">Product Name</label>
+                      <span class="label-tools">
+                        <span class="token-hint">{productName}</span>
+                        <span id="productNameCounter" class="character-counter">0 / 60</span>
+                      </span>
+                    </div>
+                    <input class="form-control" id="productName" name="productName" type="text" placeholder="Example: Alpine Trail Hoodie">
+                    <div id="productNameWarning" class="field-warning" role="alert"></div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="label-row">
+                      <label class="form-label" for="brand">Brand</label>
+                      <span class="token-hint">{brand}</span>
+                    </div>
+                    <input class="form-control" id="brand" name="brand" type="text" placeholder="Example: Summit Supply Co.">
+                  </div>
+                  <div class="col-md-6">
+                    <div class="label-row">
+                      <label class="form-label" for="productType">Product Type</label>
+                      <span class="token-hint">{productType}</span>
+                    </div>
+                    <input class="form-control" id="productType" name="productType" type="text" placeholder="Example: pullover hoodie">
+                  </div>
+                  <div class="col-md-6">
+                    <div class="label-row">
+                      <label class="form-label" for="color">Color</label>
+                      <span class="token-hint">{color}</span>
+                    </div>
+                    <input class="form-control" id="color" name="color" type="text" placeholder="Example: forest green">
+                  </div>
+                  <div class="col-md-6">
+                    <div class="label-row">
+                      <label class="form-label" for="material">Material</label>
+                      <span class="token-hint">{material}</span>
+                    </div>
+                    <input class="form-control" id="material" name="material" type="text" placeholder="Example: cotton-poly fleece">
+                  </div>
+                  <div class="col-md-6">
+                    <div class="label-row">
+                      <label class="form-label" for="fit">Fit / Sizing Notes</label>
+                      <span class="token-hint">{fit}</span>
+                    </div>
+                    <input class="form-control" id="fit" name="fit" type="text" placeholder="Example: relaxed unisex fit">
+                  </div>
+                </div>
+
+                <section class="category-details mt-3" aria-labelledby="categoryDetailsHeading">
+                  <div class="section-title-row">
+                    <h3 id="categoryDetailsHeading">Category Details</h3>
+                    <span id="categoryVariableSummary" class="variable-summary"></span>
+                  </div>
+                  <div class="row g-3">
+                    <div class="col-md-6 category-field" data-categories="drinkware">
+                      <div class="label-row">
+                        <label class="form-label" for="capacity">Capacity</label>
+                        <span class="token-hint">{capacity}</span>
+                      </div>
+                      <input class="form-control" id="capacity" name="capacity" type="text" placeholder="Example: 24 oz">
+                    </div>
+                    <div class="col-md-6 category-field" data-categories="drinkware">
+                      <div class="label-row">
+                        <label class="form-label" for="insulation">Insulation</label>
+                        <span class="token-hint">{insulation}</span>
+                      </div>
+                      <input class="form-control" id="insulation" name="insulation" type="text" placeholder="Example: double-wall insulated">
+                    </div>
+                    <div class="col-md-6 category-field" data-categories="drinkware">
+                      <div class="label-row">
+                        <label class="form-label" for="lidStraw">Lid / Straw</label>
+                        <span class="token-hint">{lidStraw}</span>
+                      </div>
+                      <input class="form-control" id="lidStraw" name="lidStraw" type="text" placeholder="Example: includes lid and straw">
+                    </div>
+                    <div class="col-md-6 category-field" data-categories="gift decal schoolSupply tech">
+                      <div class="label-row">
+                        <label class="form-label" for="dimensions">Dimensions / Size</label>
+                        <span class="token-hint">{dimensions}</span>
+                      </div>
+                      <input class="form-control" id="dimensions" name="dimensions" type="text" placeholder="Example: 3 in. x 5 in.">
+                    </div>
+                    <div class="col-md-6 category-field" data-categories="schoolSupply">
+                      <div class="label-row">
+                        <label class="form-label" for="packCount">Pack Count</label>
+                        <span class="token-hint">{packCount}</span>
+                      </div>
+                      <input class="form-control" id="packCount" name="packCount" type="text" placeholder="Example: 3 pack">
+                    </div>
+                    <div class="col-md-6 category-field" data-categories="gift decal schoolSupply tech drinkware">
+                      <div class="label-row">
+                        <label class="form-label" for="designFinish">Design / Finish</label>
+                        <span class="token-hint">{designFinish}</span>
+                      </div>
+                      <input class="form-control" id="designFinish" name="designFinish" type="text" placeholder="Example: matte finish with campus logo">
+                    </div>
+                    <div class="col-md-6 category-field" data-categories="schoolSupply gift tech">
+                      <div class="label-row">
+                        <label class="form-label" for="useCase">Use / Purpose</label>
+                        <span class="token-hint">{useCase}</span>
+                      </div>
+                      <input class="form-control" id="useCase" name="useCase" type="text" placeholder="Example: note taking, planning, or desk organization">
+                    </div>
+                    <div class="col-md-6 category-field" data-categories="tech">
+                      <div class="label-row">
+                        <label class="form-label" for="compatibility">Compatibility</label>
+                        <span class="token-hint">{compatibility}</span>
+                      </div>
+                      <input class="form-control" id="compatibility" name="compatibility" type="text" placeholder="Example: USB-C devices">
+                    </div>
+                    <div class="col-md-6 category-field" data-categories="tech">
+                      <div class="label-row">
+                        <label class="form-label" for="batteries">Batteries / Power</label>
+                        <span class="token-hint">{batteries}</span>
+                      </div>
+                      <input class="form-control" id="batteries" name="batteries" type="text" placeholder="Example: batteries included">
+                    </div>
+                  </div>
+                </section>
+
+                <div class="mt-3">
+                  <label class="form-label" for="features">Features</label>
+                  <textarea class="form-control" id="features" name="features" rows="4" placeholder="Example: Kangaroo pocket&#10;Ribbed cuffs&#10;Embroidered campus logo"></textarea>
+                  <div class="form-text">Add one feature per line. Commas and semicolons work too.</div>
+                </div>
+
+                <div class="mt-3">
+                  <div class="label-row">
+                    <label class="form-label" for="care">Care Instructions</label>
+                    <span class="token-hint">{care}</span>
+                  </div>
+                  <textarea class="form-control" id="care" name="care" rows="3" placeholder="Example: Machine wash cold. Tumble dry low."></textarea>
+                </div>
+
+                <div class="mt-3">
+                  <label class="form-label" for="limited">Limited Edition Notes</label>
+                  <textarea class="form-control" id="limited" name="limited" rows="2" placeholder="Example: Limited run for Homecoming Weekend."></textarea>
+                </div>
+
+                <div class="mt-3">
+                  <div class="label-row">
+                    <label class="form-label" for="additional">Additional Description Notes</label>
+                    <span class="token-hint">{additional}</span>
+                  </div>
+                  <textarea class="form-control" id="additional" name="additional" rows="3" placeholder="Example: Great for cool mornings, class, and game day."></textarea>
+                </div>
+
+                <div class="mt-3">
+                  <label class="form-label" for="descriptionTemplate">Editable Description Text</label>
+                  <textarea class="form-control" id="descriptionTemplate" name="descriptionTemplate" rows="4"></textarea>
+                  <div class="form-text">
+                    Insert variables like {productName}, {fit}, or {additional}. Enter starts a new paragraph; Shift+Enter inserts a line break.
+                  </div>
+                </div>
+
+                <div class="mt-3">
+                  <div class="form-check">
+                    <input class="form-check-input" id="studentAccountEligible" name="studentAccountEligible" type="checkbox">
+                    <label class="form-check-label" for="studentAccountEligible">
+                      Student Account Eligible
+                    </label>
+                  </div>
+                  <div class="form-text">Adds &lt;div id="sa"&gt;&lt;/div&gt; to the end of the listing.</div>
+                </div>
+
+                <div class="mt-3">
+                  <label class="form-label" for="snippet">Insert Code Snippet</label>
+                  <select class="form-select" id="snippet" name="snippet" multiple size="7">
+                  </select>
+                  <div class="form-text">Select one or more snippets. On Mac, use Command-click to select multiple.</div>
+                </div>
+              </form>
+            </div>
+
+            <div class="col-xl-5">
+              <div class="output-stack">
+                <section class="output-panel">
+                  <div class="panel-header">
+                    <div>
+                      <h2>Live Preview</h2>
+                      <p>How the description will read after pasting.</p>
+                    </div>
+                  </div>
+                  <div id="preview" class="preview-pane" aria-live="polite"></div>
+                </section>
+
+                <section class="output-panel">
+                  <div class="panel-header">
+                    <div>
+                      <h2>HTML Output</h2>
+                      <p>Copy this into MBS/Insite.</p>
+                    </div>
+                    <button type="button" class="btn btn-primary btn-sm" id="copyButton">Copy HTML</button>
+                  </div>
+                  <textarea id="htmlOutput" class="form-control code-output" rows="12" spellcheck="false" readonly></textarea>
+                  <div id="copyStatus" class="copy-status" role="status" aria-live="polite"></div>
+                </section>
+
+                <section class="output-panel">
+                  <div class="panel-header">
+                    <div>
+                      <h2>Suggested Metadata</h2>
+                      <p>Editable suggestions for product listing setup. Review before using.</p>
+                    </div>
+                  </div>
+
+                  <div class="metadata-field">
+                    <div class="label-row">
+                      <label class="form-label" for="seoTitle">SEO Title</label>
+                      <span id="seoTitleCounter" class="character-counter">0 / 60</span>
+                    </div>
+                    <div class="copy-row">
+                      <input class="form-control" id="seoTitle" type="text">
+                      <button type="button" class="btn btn-outline-secondary btn-sm metadata-copy" data-copy-target="seoTitle">Copy</button>
+                    </div>
+                  </div>
+
+                  <div class="metadata-field">
+                    <div class="label-row">
+                      <label class="form-label" for="metaDescription">Meta Description</label>
+                      <span id="metaDescriptionCounter" class="character-counter">0 / 155</span>
+                    </div>
+                    <div class="copy-row">
+                      <textarea class="form-control" id="metaDescription" rows="3"></textarea>
+                      <button type="button" class="btn btn-outline-secondary btn-sm metadata-copy" data-copy-target="metaDescription">Copy</button>
+                    </div>
+                  </div>
+
+                  <div class="metadata-field">
+                    <label class="form-label" for="searchKeywords">Search Keywords</label>
+                    <div class="copy-row">
+                      <textarea class="form-control" id="searchKeywords" rows="4"></textarea>
+                      <button type="button" class="btn btn-outline-secondary btn-sm metadata-copy" data-copy-target="searchKeywords">Copy</button>
+                    </div>
+                  </div>
+
+                  <div id="metadataCopyStatus" class="copy-status" role="status" aria-live="polite"></div>
+                </section>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>

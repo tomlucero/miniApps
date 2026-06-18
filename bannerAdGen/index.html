@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Banner Ad Builder</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <header class="app-header">
+      <div>
+        <p class="eyebrow">CSU Bookstore</p>
+        <h1>Banner Ad Builder</h1>
+      </div>
+      <div class="version">v1.0 local</div>
+    </header>
+
+    <main class="layout">
+      <section class="panel left-panel" aria-label="Banner editor">
+        <div class="source-tools">
+          <div>
+            <h2>Current JavaScript</h2>
+            <p>Load the existing banner file, then edit structured banner entries.</p>
+          </div>
+          <label class="file-button">
+            Load .js
+            <input id="fileInput" type="file" accept=".js,.txt">
+          </label>
+        </div>
+
+        <textarea id="sourceInput" spellcheck="false" placeholder="Paste codeSnippetsV9.js here, or use Load .js."></textarea>
+        <div class="button-row">
+          <button id="parseButton" type="button">Parse Banners</button>
+          <button id="loadSampleButton" type="button" class="secondary">Use Starter Template</button>
+        </div>
+        <div id="parseStatus" class="status" role="status"></div>
+
+        <div class="section-heading">
+          <h2>Banner Entries</h2>
+          <button id="newButton" type="button" class="secondary">Add Banner</button>
+        </div>
+        <div id="bannerList" class="banner-list" aria-label="Existing banners"></div>
+
+        <form id="bannerForm" novalidate autocomplete="off">
+          <h2 id="formTitle">Add Banner</h2>
+          <input id="editingIndex" type="hidden" value="">
+
+          <label>
+            Banner name / internal label
+            <input id="promoName" type="text" required maxlength="90">
+          </label>
+
+          <div class="url-builder">
+            <label>
+              Destination URL
+              <input id="destinationUrl" type="text" required placeholder="/shop/gifts/stuffed-animals">
+            </label>
+
+            <label>
+              Campaign name
+              <input id="campaignName" type="text" required placeholder="Stuffed_Animals">
+            </label>
+
+            <label>
+              Generated CTA URL
+              <input id="url" type="text" readonly aria-readonly="true">
+            </label>
+            <p class="field-help">Automatically adds <strong>utm_source=onsite</strong>, <strong>utm_medium=banner</strong>, and <strong>utm_campaign</strong>.</p>
+          </div>
+
+          <label>
+            Desktop image URL
+            <input id="desktop" type="text" required placeholder="/SiteImages/...1300x100.jpg">
+          </label>
+
+          <label>
+            Mobile image URL
+            <input id="mobile" type="text" required placeholder="/SiteImages/...768x150.jpg">
+          </label>
+
+          <label>
+            Alt text
+            <textarea id="alt" required maxlength="600" placeholder="Describe the visual banner and important text in the image."></textarea>
+          </label>
+
+          <div class="field-grid">
+            <label>
+              Banner type
+              <select id="use">
+                <option value="promotional">Promotional</option>
+                <option value="seasonal">Seasonal</option>
+                <option value="evergreen">Evergreen</option>
+                <option value="disabled">Disabled</option>
+              </select>
+            </label>
+
+            <label>
+              End date
+              <input id="endDate" type="date" required>
+            </label>
+          </div>
+
+          <label>
+            Internal note / comment
+            <input id="note" type="text" maxlength="140" placeholder="Optional. Saved as a JS comment above this entry.">
+          </label>
+
+          <div id="validationErrors" class="errors" aria-live="polite"></div>
+
+          <div class="button-row sticky-actions">
+            <button id="saveButton" type="submit">Add Banner</button>
+            <button id="resetFormButton" type="button" class="secondary">Reset Form</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel right-panel" aria-label="Preview and export">
+        <div class="preview-header">
+          <div>
+            <h2>Preview</h2>
+            <p id="previewMeta">Select or create a banner.</p>
+          </div>
+          <div class="segmented" aria-label="Preview size">
+            <button id="desktopPreviewButton" type="button" class="active">Desktop</button>
+            <button id="mobilePreviewButton" type="button">Mobile</button>
+          </div>
+        </div>
+
+        <div id="previewFrame" class="preview-frame desktop-preview">
+          <div class="empty-preview">No banner selected</div>
+        </div>
+
+        <div class="info-grid">
+          <div>
+            <span>Live fields</span>
+            <strong>promoName, url, alt, desktop, mobile, use, endDate</strong>
+          </div>
+          <div>
+            <span>Protected logic</span>
+            <strong>Filtering, random selection, rendering, GA tracking</strong>
+          </div>
+        </div>
+
+        <div class="export-header">
+          <div>
+            <h2>Updated JavaScript</h2>
+            <p>Exports the full file when a valid source script is loaded.</p>
+          </div>
+          <div class="button-row compact">
+            <button id="copyButton" type="button">Copy JS</button>
+            <button id="downloadButton" type="button" class="secondary">Download JS</button>
+            <button id="resetAllButton" type="button" class="danger">Reset</button>
+          </div>
+        </div>
+
+        <textarea id="output" spellcheck="false" readonly></textarea>
+      </section>
+    </main>
+
+    <template id="bannerItemTemplate">
+      <article class="banner-item">
+        <button type="button" class="select-banner"></button>
+        <div class="list-actions">
+          <button type="button" class="move-up" title="Move up">↑</button>
+          <button type="button" class="move-down" title="Move down">↓</button>
+          <button type="button" class="toggle-banner" title="Disable or enable">Disable</button>
+          <button type="button" class="delete-banner" title="Delete">Delete</button>
+        </div>
+      </article>
+    </template>
+
+    <script src="script.js"></script>
+  </body>
+</html>
