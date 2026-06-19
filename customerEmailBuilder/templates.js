@@ -76,6 +76,18 @@ window.CUSTOMER_EMAIL_BUILDER_CONFIG = {
         "finalPickup": true
       }
     },
+    "authorizedPickupPerson": {
+      "label": "Authorized Pickup Person",
+      "subject": "[CSU Bookstore] Authorized Pickup Person Added - Order #{orderNumber}",
+      "body": "We have added a note to your order authorizing {authorizedPerson} to pick up order #{orderNumber} on your behalf.\n\nPlease ensure the authorized person has the order number at pickup, as this helps our team locate the order quickly.\n\nPick-Up Hours / Location\n\nMonday–Friday, 8:00 a.m. – 4:00 p.m.\n\nThe pickup counter is located on the lower level of the CSU Bookstore.\n\nPlease note that orders must be picked up within 21 days of the initial notification that the order is ready for pickup. Orders not collected within that timeframe may be returned to inventory and refunded to the original payment method. Restocking fees may apply.\n\nIf you need to update or remove this authorization, please reply to this email.",
+      "note": "Customer authorized {authorizedPerson} to pick up order on their behalf. Customer notified via email on {generatedDate}",
+      "fields": {
+        "authorizedPickup": true,
+        "skipReplyHelp": true,
+        "noteIncludesGeneratedDate": true,
+        "signatureInNote": true
+      }
+    },
     "addressProblem": {
       "label": "Address problem",
       "subject": "Address confirmation needed for your CSU Bookstore order #{orderNumber}",

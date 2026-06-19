@@ -156,6 +156,7 @@
     $('pickupFields').classList.toggle('d-none', !fields.pickup);
     $('firstReminderField').classList.toggle('d-none', !fields.finalPickup);
     $('dayOneFields').classList.toggle('d-none', !fields.dayOne);
+    $('authorizedPickupFields').classList.toggle('d-none', !fields.authorizedPickup);
     $('deadlineFields').classList.toggle('d-none', !$('addDeadline').checked);
   }
 
@@ -193,6 +194,8 @@
     const customer = clean($('customerName').value, '[customer full name]');
     const order = clean($('orderNumber').value, '[order number]');
     const validOrder = /^\d{6}$/.test($('orderNumber').value.trim());
+    const authorizedPersonValue = $('authorizedPerson').value.trim();
+    const validAuthorizedPerson = !fields.authorizedPickup || authorizedPersonValue.length > 0;
     const originalPrice = formatCurrency($('originalPrice').value, '[original item price]');
     const custom = $('customNote').value.trim();
     const hasDeadline = $('addDeadline').checked;
@@ -212,8 +215,13 @@
       expectedRestockDate: formatDate($('expectedRestockDate').value),
       restockResponseDeadline: formatDate($('restockResponseDeadline').value),
       dayOneTitle: clean($('dayOneTitle').value, '[Day One Access title]'),
-      courseName: clean($('courseName').value, '[class/course]')
+      courseName: clean($('courseName').value, '[class/course]'),
+      authorizedPerson: clean(authorizedPersonValue, '[authorized pickup person]'),
+      generatedDate: today()
     };
+
+    $('authorizedPerson').classList.toggle('is-invalid', fields.authorizedPickup && !validAuthorizedPerson);
+    $('authorizedPersonRequirement').classList.toggle('text-danger', fields.authorizedPickup && !validAuthorizedPerson);
 
     const validProductUrls = validateProductUrls(fields.substitutions);
     if (!validProductUrls) {
@@ -258,7 +266,7 @@
 
     if (custom) body += `\n\n${custom}`;
     if (hasDeadline) body += `\n\n${deadline.email}`;
-    body += `\n\n${config.sharedText.replyHelp}`;
+    if (!fields.skipReplyHelp) body += `\n\n${config.sharedText.replyHelp}`;
     body += `\n\n${replaceTokens(signature.email, values)}`;
     body += `\n\n${config.sharedText.footer}`;
 
@@ -288,9 +296,11 @@
       : `${template.subject} #${order}`;
     $('subjectOutput').textContent = subject;
     $('emailOutput').textContent = body;
-    $('insiteOutput').textContent = `${today()} - ${action} - ${employee}`;
+    const notePrefix = fields.noteIncludesGeneratedDate ? '' : `${today()} - `;
+    const noteSigner = fields.signatureInNote ? signatureName : employee;
+    $('insiteOutput').textContent = `${notePrefix}${action} - ${noteSigner}`;
 
-    document.querySelectorAll('[data-copy]').forEach(button => button.disabled = !validOrder);
+    document.querySelectorAll('[data-copy]').forEach(button => button.disabled = !validOrder || !validAuthorizedPerson);
     $('orderNumber').classList.toggle('is-invalid', $('orderNumber').value.length > 0 && !validOrder);
     $('orderRequirement').classList.toggle('text-danger', !validOrder);
   }
@@ -329,7 +339,10 @@
 
   document.querySelectorAll('[data-copy]').forEach(button => {
     button.addEventListener('click', async () => {
-      if (!/^\d{6}$/.test($('orderNumber').value.trim()) || !validateProductUrls(selectedFields().substitutions)) return;
+      const fields = selectedFields();
+      if (!/^\d{6}$/.test($('orderNumber').value.trim()) ||
+          (fields.authorizedPickup && !$('authorizedPerson').value.trim()) ||
+          !validateProductUrls(fields.substitutions)) return;
       const text = $(button.dataset.copy).textContent;
       try {
         await navigator.clipboard.writeText(text);
