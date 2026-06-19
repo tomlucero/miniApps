@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Template Editor | Customer Email Builder</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    :root { --csu-green:#1e4d2b; --csu-green-dark:#153a20; --csu-gold:#c8c372; --paper:#f6f5f1; }
+    body { background:var(--paper); color:#17211a; }
+    .app-header { background:linear-gradient(125deg,var(--csu-green-dark),var(--csu-green)); border-bottom:4px solid var(--csu-gold); }
+    .breadcrumb-link { color:rgba(255,255,255,.75); }
+    .breadcrumb-link:hover { color:#fff; }
+    .panel { border:0; border-radius:1rem; box-shadow:0 .4rem 1.5rem rgba(23,62,35,.07); }
+    .section-kicker { color:var(--csu-green); font-size:.75rem; letter-spacing:.08em; text-transform:uppercase; font-weight:800; }
+    .form-label { font-weight:650; font-size:.9rem; }
+    .form-control:focus,.form-select:focus { border-color:#5a8b67; box-shadow:0 0 0 .25rem rgba(30,77,43,.12); }
+    .preview-box { white-space:pre-wrap; line-height:1.55; min-height:4rem; background:#fff; border:1px solid #dfe5e0; border-radius:.75rem; }
+    .code-output { min-height:30rem; font: .82rem/1.5 ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace; }
+    .placeholder-badge { background:#e8f0ea; color:var(--csu-green-dark); border:1px solid #c9d8cd; }
+    @media (min-width:1200px) { .sticky-tools { position:sticky; top:1.25rem; } }
+  </style>
+</head>
+<body>
+  <header class="app-header text-white py-4">
+    <div class="container-xl">
+      <a class="breadcrumb-link small text-decoration-none" href="index.html">&larr; Customer Email Builder</a>
+      <h1 class="h2 mt-2 mb-1">Email Template Editor</h1>
+      <p class="mb-0 text-white-50">Edit template wording and generate a complete replacement templates.js file.</p>
+    </div>
+  </header>
+
+  <main class="container-xl py-4 py-lg-5">
+    <div class="alert alert-warning border-warning mb-4" role="note">
+      <strong>This editor does not update the live app automatically.</strong>
+      It only creates copy/paste-ready JavaScript. After copying, replace <code>templates.js</code> in GitHub or VS Code, then commit and publish through GitHub Pages.
+    </div>
+
+    <div class="row g-4 align-items-start">
+      <div class="col-xl-6">
+        <section class="card panel">
+          <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-start gap-3 mb-4">
+              <div>
+                <div class="section-kicker">Draft editor</div>
+                <h2 class="h5 mb-1">Template content</h2>
+                <p class="small text-secondary mb-0">Changes are saved in this browser as you type.</p>
+              </div>
+              <button class="btn btn-sm btn-outline-danger" id="resetEditor" type="button">Reset Editor</button>
+            </div>
+
+            <div class="vstack gap-3">
+              <div>
+                <label class="form-label" for="templateSelect">Existing template</label>
+                <select class="form-select" id="templateSelect"></select>
+                <div class="form-text">Template key: <code id="templateKey"></code></div>
+              </div>
+
+              <div>
+                <label class="form-label" for="templateLabel">Template label</label>
+                <input class="form-control" id="templateLabel" type="text">
+              </div>
+
+              <div>
+                <label class="form-label" for="subjectTemplate">Subject line template</label>
+                <input class="form-control" id="subjectTemplate" type="text">
+              </div>
+
+              <div>
+                <label class="form-label" for="bodyTemplate">Customer email body template</label>
+                <textarea class="form-control" id="bodyTemplate" rows="7"></textarea>
+              </div>
+
+              <div>
+                <label class="form-label" for="noteTemplate">Insite note template</label>
+                <textarea class="form-control" id="noteTemplate" rows="4"></textarea>
+              </div>
+
+              <div>
+                <div class="form-label mb-2">Available placeholders</div>
+                <div class="d-flex flex-wrap gap-2" id="placeholderList"></div>
+                <div class="form-text">Keep the braces around placeholders. Conditional language added by the live app is preserved separately in the generated file.</div>
+              </div>
+
+              <div class="small text-success" id="saveStatus" aria-live="polite"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card panel mt-4">
+          <div class="card-body p-4">
+            <div class="section-kicker">Sample preview</div>
+            <h2 class="h5 mb-1" id="previewLabel"></h2>
+            <p class="small text-secondary">Placeholders are filled with sample values. This previews the editable template core; the live builder adds signatures and conditional sections.</p>
+
+            <h3 class="h6 mt-4">Subject</h3>
+            <div class="preview-box p-3" id="previewSubject"></div>
+
+            <h3 class="h6 mt-4">Customer email body</h3>
+            <div class="preview-box p-3" id="previewBody"></div>
+
+            <h3 class="h6 mt-4">Insite note</h3>
+            <div class="preview-box p-3" id="previewNote"></div>
+          </div>
+        </section>
+      </div>
+
+      <div class="col-xl-6 sticky-tools">
+        <section class="card panel">
+          <div class="card-body p-4">
+            <div class="section-kicker">Replacement file</div>
+            <h2 class="h5 mb-1">Generated templates.js</h2>
+            <p class="small text-secondary">This output includes every template and all existing configuration and logic text.</p>
+
+            <div class="d-flex flex-wrap gap-2 mb-3">
+              <button class="btn btn-success" id="generateFile" type="button">Generate templates.js</button>
+              <button class="btn btn-outline-success" id="copyFile" type="button" disabled>Copy Generated templates.js</button>
+            </div>
+
+            <textarea class="form-control code-output" id="generatedOutput" readonly spellcheck="false" aria-label="Generated templates.js code"></textarea>
+            <div class="small mt-2" id="outputStatus" aria-live="polite"></div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="templates.js"></script>
+  <script>
+    (() => {
+      'use strict';
+
+      const sourceConfig = window.CUSTOMER_EMAIL_BUILDER_CONFIG;
+      const storageKey = 'customerEmailBuilder.standaloneTemplateEditorDraft';
+      const $ = id => document.getElementById(id);
+      const editableFields = ['label', 'subject', 'body', 'note'];
+      const clone = value => JSON.parse(JSON.stringify(value));
+      let draftConfig = clone(sourceConfig);
+
+      const commonPlaceholders = ['{orderNumber}', '{customer}', '{employee}'];
+      const fieldPlaceholders = {
+        item: ['{item}'],
+        substitutions: ['{originalPrice}'],
+        restockExpected: ['{expectedRestockDate}', '{restockResponseDeadline}'],
+        pickup: ['{packedDate}', '{restockDate}'],
+        finalPickup: ['{firstReminderDate}'],
+        dayOne: ['{dayOneTitle}', '{courseName}']
+      };
+      const sampleValues = {
+        orderNumber: '209000', customer: 'Morgan Lee', employee: 'Taylor',
+        item: 'Sample Item', originalPrice: '$24.99',
+        expectedRestockDate: '06/28/2026', restockResponseDeadline: '06/24/2026',
+        packedDate: '06/08/2026', firstReminderDate: '06/10/2026', restockDate: '06/24/2026',
+        dayOneTitle: 'Sample Digital Textbook', courseName: 'CHEM 111'
+      };
+
+      function restoreSavedDraft() {
+        try {
+          const saved = JSON.parse(localStorage.getItem(storageKey) || 'null');
+          if (!saved?.templates) return;
+          Object.keys(draftConfig.templates).forEach(key => {
+            const savedTemplate = saved.templates[key];
+            if (!savedTemplate) return;
+            editableFields.forEach(field => {
+              if (typeof savedTemplate[field] === 'string') draftConfig.templates[key][field] = savedTemplate[field];
+            });
+          });
+        } catch {
+          $('saveStatus').textContent = 'Saved draft could not be loaded; using templates.js.';
+        }
+      }
+
+      function saveDraft() {
+        const templates = {};
+        Object.entries(draftConfig.templates).forEach(([key, template]) => {
+          templates[key] = Object.fromEntries(editableFields.map(field => [field, template[field]]));
+        });
+        try {
+          localStorage.setItem(storageKey, JSON.stringify({ templates }));
+          $('saveStatus').textContent = 'Draft saved in this browser.';
+        } catch {
+          $('saveStatus').textContent = 'Draft preview updated, but browser storage is unavailable.';
+        }
+      }
+
+      function replaceSampleTokens(text, note = false) {
+        const values = { ...sampleValues, item: note ? ` (${sampleValues.item})` : `, ${sampleValues.item},` };
+        return Object.entries(values).reduce(
+          (result, [key, value]) => result.replaceAll(`{${key}}`, value), text
+        );
+      }
+
+      function availablePlaceholders(template) {
+        const placeholders = [...commonPlaceholders];
+        Object.entries(template.fields || {}).forEach(([field, enabled]) => {
+          if (enabled && fieldPlaceholders[field]) placeholders.push(...fieldPlaceholders[field]);
+        });
+        const used = [template.subject, template.body, template.note].join(' ').match(/\{[A-Za-z][A-Za-z0-9]*\}/g) || [];
+        return [...new Set([...placeholders, ...used])];
+      }
+
+      function updatePreview() {
+        const template = draftConfig.templates[$('templateSelect').value];
+        $('previewLabel').textContent = template.label || '(Untitled template)';
+        $('previewSubject').textContent = replaceSampleTokens(template.subject);
+        $('previewBody').textContent = replaceSampleTokens(template.body);
+        $('previewNote').textContent = replaceSampleTokens(template.note, true);
+      }
+
+      function renderPlaceholderList() {
+        const template = draftConfig.templates[$('templateSelect').value];
+        $('placeholderList').replaceChildren(...availablePlaceholders(template).map(placeholder => {
+          const badge = document.createElement('code');
+          badge.className = 'badge placeholder-badge fw-normal';
+          badge.textContent = placeholder;
+          return badge;
+        }));
+      }
+
+      function loadSelectedTemplate() {
+        const key = $('templateSelect').value;
+        const template = draftConfig.templates[key];
+        $('templateKey').textContent = key;
+        $('templateLabel').value = template.label;
+        $('subjectTemplate').value = template.subject;
+        $('bodyTemplate').value = template.body;
+        $('noteTemplate').value = template.note;
+        renderPlaceholderList();
+        updatePreview();
+      }
+
+      function updateSelectedTemplate() {
+        const template = draftConfig.templates[$('templateSelect').value];
+        template.label = $('templateLabel').value;
+        template.subject = $('subjectTemplate').value;
+        template.body = $('bodyTemplate').value;
+        template.note = $('noteTemplate').value;
+        $('templateSelect').selectedOptions[0].textContent = template.label || '(Untitled template)';
+        saveDraft();
+        updatePreview();
+        $('copyFile').disabled = true;
+        $('outputStatus').className = 'small mt-2 text-warning-emphasis';
+        $('outputStatus').textContent = 'Draft changed. Generate templates.js again before copying.';
+      }
+
+      function generateFile() {
+        const header = `/**\n * Customer Email Builder template configuration.\n * Generated by template-editor.html.\n */\n`;
+        $('generatedOutput').value = `${header}window.CUSTOMER_EMAIL_BUILDER_CONFIG = ${JSON.stringify(draftConfig, null, 2)};\n`;
+        $('copyFile').disabled = false;
+        $('outputStatus').className = 'small mt-2 text-success';
+        $('outputStatus').textContent = 'Complete templates.js generated and ready to copy.';
+      }
+
+      async function copyGeneratedFile() {
+        const output = $('generatedOutput');
+        try {
+          await navigator.clipboard.writeText(output.value);
+          $('outputStatus').className = 'small mt-2 text-success';
+          $('outputStatus').textContent = 'Generated templates.js copied.';
+        } catch {
+          output.select();
+          $('outputStatus').className = 'small mt-2 text-warning-emphasis';
+          $('outputStatus').textContent = 'Code selected. Press Control or Command+C to copy.';
+        }
+      }
+
+      function resetEditor() {
+        try { localStorage.removeItem(storageKey); } catch {}
+        draftConfig = clone(sourceConfig);
+        $('templateSelect').replaceChildren();
+        populateTemplateSelect();
+        loadSelectedTemplate();
+        $('generatedOutput').value = '';
+        $('copyFile').disabled = true;
+        $('saveStatus').textContent = 'Editor reset to the current templates.js content.';
+        $('outputStatus').textContent = '';
+      }
+
+      function populateTemplateSelect() {
+        Object.entries(draftConfig.templates).forEach(([key, template]) => {
+          const option = document.createElement('option');
+          option.value = key;
+          option.textContent = template.label;
+          $('templateSelect').appendChild(option);
+        });
+      }
+
+      restoreSavedDraft();
+      populateTemplateSelect();
+      loadSelectedTemplate();
+      ['templateLabel', 'subjectTemplate', 'bodyTemplate', 'noteTemplate']
+        .forEach(id => $(id).addEventListener('input', updateSelectedTemplate));
+      $('templateSelect').addEventListener('change', loadSelectedTemplate);
+      $('generateFile').addEventListener('click', generateFile);
+      $('copyFile').addEventListener('click', copyGeneratedFile);
+      $('resetEditor').addEventListener('click', resetEditor);
+      generateFile();
+    })();
+  </script>
+</body>
+</html>
