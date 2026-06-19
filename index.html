@@ -3,18 +3,33 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Bookstore Online Retail Tools</title>
+  <title>Bookstore Online Retail Toolkit</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
   <link rel="stylesheet" href="shared-theme.css">
   <style>
-    .tools-band { padding: 32px 0 52px; }
-    .tool-card { display:block; height:100%; color:inherit; text-decoration:none; background:#fff; transition:transform .16s ease, box-shadow .16s ease, border-color .16s ease; }
-    .tool-card:hover, .tool-card:focus-visible { transform:translateY(-3px); border-color:var(--suite-accent) !important; box-shadow:0 18px 38px rgba(31,41,51,.12) !important; }
-    .tool-card .card-body { padding:1.4rem; }
-    .tool-number { display:inline-grid; place-items:center; width:2rem; height:2rem; margin-bottom:1rem; border-radius:50%; color:var(--suite-accent-dark); background:#e7f2f1; font-weight:800; }
-    .tool-card h2 { font-size:1.15rem; font-weight:760; }
-    .tool-card p { color:var(--suite-muted); }
-    .tool-link { color:var(--suite-accent-dark); font-size:.9rem; font-weight:750; }
+    .dashboard-band { padding: 36px 0 60px; }
+    .dashboard-section + .dashboard-section { margin-top: 48px; }
+    .section-heading { margin-bottom: 20px; }
+    .section-heading h2 { margin: 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -.015em; }
+    .section-heading p { max-width: 700px; margin: 6px 0 0; color: var(--suite-muted); }
+    .tool-card { display: block; height: 100%; color: inherit; text-decoration: none; background: #fff; transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease; }
+    .tool-card:hover, .tool-card:focus-visible { transform: translateY(-3px); border-color: var(--suite-accent) !important; box-shadow: 0 18px 38px rgba(31,41,51,.12) !important; }
+    .tool-card .card-body { display: flex; flex-direction: column; align-items: flex-start; padding: 1.4rem; }
+    .tool-icon, .resource-icon, .guide-icon { display: inline-grid; place-items: center; flex: 0 0 auto; color: var(--suite-accent-dark); background: var(--suite-accent-soft); }
+    .tool-icon { width: 2.4rem; height: 2.4rem; margin-bottom: 1rem; border-radius: 50%; }
+    .tool-card h3 { margin: 0; font-size: 1.1rem; font-weight: 760; }
+    .tool-card p { margin: .55rem 0 1.1rem; color: var(--suite-muted); }
+    .tool-link { margin-top: auto; color: var(--suite-accent-dark); font-size: .9rem; font-weight: 750; }
+    .resource-card { display: flex; align-items: flex-start; gap: 14px; height: 100%; padding: 18px; color: inherit; text-decoration: none; background: #fff; transition: border-color .16s ease, transform .16s ease; }
+    .resource-card:hover, .resource-card:focus-visible { color: inherit; border-color: var(--suite-accent) !important; transform: translateY(-2px); }
+    .resource-icon { width: 2.5rem; height: 2.5rem; border-radius: 8px; font-size: 1.05rem; }
+    .resource-card h3, .guide-card h3 { margin: 0; font-size: 1rem; font-weight: 760; }
+    .resource-card p, .guide-card p { margin: 5px 0 0; color: var(--suite-muted); font-size: .9rem; line-height: 1.5; }
+    .guide-library { padding: 24px; background: #eef2f5; border: 1px solid var(--suite-line); border-radius: 10px; }
+    .guide-card { display: flex; align-items: flex-start; gap: 12px; height: 100%; padding: 16px; color: inherit; text-decoration: none; background: rgba(255,255,255,.64); border: 1px solid #d4dce5; border-radius: 8px; transition: background .16s ease, border-color .16s ease; }
+    .guide-card:hover, .guide-card:focus-visible { color: inherit; background: #fff; border-color: #a7b6c5; }
+    .guide-icon { width: 2rem; height: 2rem; border-radius: 6px; font-size: .84rem; }
   </style>
 </head>
 <body>
@@ -23,22 +38,60 @@
     <div class="suite-hero-inner">
       <div>
         <p class="suite-eyebrow">CSU Bookstore</p>
-        <h1>Online Retail Tools</h1>
-        <p class="suite-lead">Quick, focused helpers for product listings, campaign tracking, site banners, carousels, and customer messages.</p>
+        <h1>Online Retail Toolkit</h1>
+        <p class="suite-lead">One dashboard for the tools, systems, and training resources used by Online Retail staff.</p>
       </div>
       <img class="suite-logo" src="productListingHTMLBuilder/images/bookstoreLogo.png" alt="CSU Bookstore logo">
     </div>
   </header>
 
-  <main class="tools-band">
+  <main class="dashboard-band">
     <div class="container">
-      <div class="row g-4">
-        <div class="col-md-6 col-xl-4"><a href="productListingHTMLBuilder/index.html" class="card tool-card"><div class="card-body"><span class="tool-number">1</span><h2>Product Listing Builder</h2><p>Turn product notes into clean, approved description HTML.</p><span class="tool-link">Open tool →</span></div></a></div>
-        <div class="col-md-6 col-xl-4"><a href="TrackingCSV/index.html" class="card tool-card"><div class="card-body"><span class="tool-number">2</span><h2>Tracking CSV Builder</h2><p>Create consistent tracking rows for campaigns and links.</p><span class="tool-link">Open tool →</span></div></a></div>
-        <div class="col-md-6 col-xl-4"><a href="bannerAdGen/index.html" class="card tool-card"><div class="card-body"><span class="tool-number">3</span><h2>Banner Ad Builder</h2><p>Edit, preview, and export structured site banner entries.</p><span class="tool-link">Open tool →</span></div></a></div>
-        <div class="col-md-6 col-xl-4"><a href="carouselBuilder/index.html" class="card tool-card"><div class="card-body"><span class="tool-number">4</span><h2>Carousel Builder</h2><p>Build and preview carousel content for site updates.</p><span class="tool-link">Open tool →</span></div></a></div>
-        <div class="col-md-6 col-xl-4"><a href="customerEmailBuilder/index.html" class="card tool-card"><div class="card-body"><span class="tool-number">5</span><h2>Customer Email Builder</h2><p>Draft customer-ready email copy and a matching Insite note.</p><span class="tool-link">Open tool →</span></div></a></div>
-      </div>
+      <section class="dashboard-section" aria-labelledby="toolsHeading">
+        <div class="section-heading">
+          <p class="suite-eyebrow">Daily workflow</p>
+          <h2 id="toolsHeading">Mini Apps</h2>
+          <p>Focused helpers for product content, fulfillment, promotions, and customer communication.</p>
+        </div>
+        <div class="row g-4">
+          <div class="col-md-6 col-xl-4"><a href="productListingHTMLBuilder/index.html" class="card tool-card"><div class="card-body"><span class="tool-icon"><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i></span><h3>Product Listing Builder</h3><p>Turn product notes into clean, approved description HTML.</p><span class="tool-link">Open tool &rarr;</span></div></a></div>
+          <div class="col-md-6 col-xl-4"><a href="TrackingCSV/index.html" class="card tool-card"><div class="card-body"><span class="tool-icon"><i class="fa-solid fa-file-csv" aria-hidden="true"></i></span><h3>Tracking CSV Builder</h3><p>Create consistent tracking rows for shipments and orders.</p><span class="tool-link">Open tool &rarr;</span></div></a></div>
+          <div class="col-md-6 col-xl-4"><a href="bannerAdGen/index.html" class="card tool-card"><div class="card-body"><span class="tool-icon"><i class="fa-solid fa-image" aria-hidden="true"></i></span><h3>Banner Ad Builder</h3><p>Edit, preview, and export structured site banner entries.</p><span class="tool-link">Open tool &rarr;</span></div></a></div>
+          <div class="col-md-6 col-xl-4"><a href="carouselBuilder/index.html" class="card tool-card"><div class="card-body"><span class="tool-icon"><i class="fa-solid fa-images" aria-hidden="true"></i></span><h3>Carousel Builder</h3><p>Build and preview responsive carousel content for site updates.</p><span class="tool-link">Open tool &rarr;</span></div></a></div>
+          <div class="col-md-6 col-xl-4"><a href="customerEmailBuilder/index.html" class="card tool-card"><div class="card-body"><span class="tool-icon"><i class="fa-solid fa-envelope" aria-hidden="true"></i></span><h3>Customer Email Builder</h3><p>Draft customer-ready email copy and a matching Insite note.</p><span class="tool-link">Open tool &rarr;</span></div></a></div>
+        </div>
+      </section>
+
+      <section class="dashboard-section" aria-labelledby="quickLinksHeading">
+        <div class="section-heading">
+          <p class="suite-eyebrow">Connected systems</p>
+          <h2 id="quickLinksHeading">Quick Links</h2>
+          <p>Jump to the systems used across daily bookstore operations.</p>
+        </div>
+        <div class="row g-3">
+          <div class="col-md-6"><a class="card resource-card" href="https://example.com/mbs-insite"><span class="resource-icon"><i class="fa-solid fa-boxes-stacked" aria-hidden="true"></i></span><span><h3>MBS Insite</h3><p>Order management, inventory, and eCommerce administration.</p></span></a></div>
+          <div class="col-md-6"><a class="card resource-card" href="https://example.com/csu-bookstore"><span class="resource-icon"><i class="fa-solid fa-globe" aria-hidden="true"></i></span><span><h3>CSU Bookstore Website</h3><p>Review the public storefront, products, and customer experience.</p></span></a></div>
+          <div class="col-md-6"><a class="card resource-card" href="https://example.com/workday"><span class="resource-icon"><i class="fa-solid fa-briefcase" aria-hidden="true"></i></span><span><h3>Workday</h3><p>HR, payroll, and employee management.</p></span></a></div>
+          <div class="col-md-6"><a class="card resource-card" href="https://example.com/whentowork"><span class="resource-icon"><i class="fa-solid fa-clock" aria-hidden="true"></i></span><span><h3>WhenToWork</h3><p>View schedules, availability, and shift assignments.</p></span></a></div>
+        </div>
+      </section>
+
+      <section class="dashboard-section" aria-labelledby="trainingHeading">
+        <div class="section-heading">
+          <p class="suite-eyebrow">Resource library</p>
+          <h2 id="trainingHeading">Training Guides</h2>
+          <p>Quick references for common Online Retail processes and tools.</p>
+        </div>
+        <div class="guide-library">
+          <div class="row g-3">
+            <div class="col-lg-6"><a class="guide-card" href="https://example.com/tax-exempt-order"><span class="guide-icon"><i class="fa-solid fa-receipt" aria-hidden="true"></i></span><span><h3>Process Tax Exempt Order</h3><p>See how to process an order with a sales tax exemption.</p></span></a></div>
+            <div class="col-lg-6"><a class="guide-card" href="https://example.com/department-charge"><span class="guide-icon"><i class="fa-solid fa-building" aria-hidden="true"></i></span><span><h3>Process Department Charge Order</h3><p>Learn how to complete department-funded purchases.</p></span></a></div>
+            <div class="col-lg-6"><a class="guide-card" href="https://example.com/order-fulfillment"><span class="guide-icon"><i class="fa-solid fa-truck-fast" aria-hidden="true"></i></span><span><h3>Online Order Fulfillment</h3><p>Step-by-step instructions for picking, packing, and shipping orders.</p></span></a></div>
+            <div class="col-lg-6"><a class="guide-card" href="https://example.com/email-builder-guide"><span class="guide-icon"><i class="fa-solid fa-envelope-open-text" aria-hidden="true"></i></span><span><h3>Customer Email Builder Guide</h3><p>Learn how to use the email templates and generated Insite notes.</p></span></a></div>
+            <div class="col-lg-6"><a class="guide-card" href="https://example.com/product-listing-guide"><span class="guide-icon"><i class="fa-solid fa-align-left" aria-hidden="true"></i></span><span><h3>Product Listing Builder Guide</h3><p>Learn how to create consistent SEO-friendly product descriptions.</p></span></a></div>
+          </div>
+        </div>
+      </section>
     </div>
   </main>
 </body>
