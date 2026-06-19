@@ -334,19 +334,28 @@
       }
     }
   </style>
+  <link rel="stylesheet" href="../shared-theme.css">
 </head>
 <body>
-  <main class="app">
-    <header>
+  <header class="suite-hero">
+    <div class="suite-hero-image" role="img" aria-label="Colorado State University Lory Student Center"></div>
+    <div class="suite-hero-inner">
       <div>
+        <a class="suite-back" href="../index.html">&larr; Online Retail Tools</a>
+        <p class="suite-eyebrow">Campaign helper</p>
         <h1>Tracking CSV Builder</h1>
-        <p class="subtitle">Enter a packing list ID and each shipment tracking number. The download matches the sample format: two quoted values per row, no header.</p>
+        <p class="suite-lead">Enter a packing list ID and each shipment tracking number, then export a clean CSV.</p>
       </div>
+      <img class="suite-logo" src="../productListingHTMLBuilder/images/bookstoreLogo.png" alt="CSU Bookstore logo">
+    </div>
+  </header>
+  <main class="app">
+    <div class="suite-workspace-actions">
       <button class="primary-button" id="downloadButton" type="button">
         <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
         Download CSV
       </button>
-    </header>
+    </div>
 
     <section class="layout" aria-label="CSV builder">
       <div class="workspace">
