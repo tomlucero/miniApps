@@ -465,23 +465,28 @@
       }
     }
   </style>
+  <link rel="stylesheet" href="../shared-theme.css">
 </head>
 <body>
   <div class="app-shell">
-    <header>
-      <div class="header-inner">
+    <header class="suite-hero">
+      <div class="suite-hero-image" role="img" aria-label="Colorado State University Lory Student Center"></div>
+      <div class="suite-hero-inner">
         <div>
-          <h1>CSU Bookstore Carousel Builder</h1>
-          <p class="header-copy">Paste an existing banner carousel, edit the slides in plain fields, preview the result, and copy fresh Bootstrap carousel code.</p>
+          <a class="suite-back" href="../index.html">&larr; Online Retail Tools</a>
+          <p class="suite-eyebrow">Site content helper</p>
+          <h1>Carousel Builder</h1>
+          <p class="suite-lead">Paste an existing banner carousel, edit the slides in plain fields, preview the result, and copy fresh Bootstrap carousel code.</p>
         </div>
-        <div class="top-actions">
-          <button class="btn primary" id="copyTop" type="button" title="Copy generated carousel code">Copy Code</button>
-          <button class="btn" id="addTop" type="button" title="Add a new carousel slide">Add Slide</button>
-        </div>
+        <img class="suite-logo" src="../productListingHTMLBuilder/images/bookstoreLogo.png" alt="CSU Bookstore logo">
       </div>
     </header>
 
     <main class="layout">
+      <div class="top-actions suite-workspace-actions">
+        <button class="btn primary" id="copyTop" type="button" title="Copy generated carousel code">Copy Code</button>
+        <button class="btn" id="addTop" type="button" title="Add a new carousel slide">Add Slide</button>
+      </div>
       <section class="panel">
         <div class="panel-heading">
           <h2>Slides</h2>

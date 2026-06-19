@@ -1,0 +1,124 @@
+:root {
+  --suite-ink: #1f2933;
+  --suite-muted: #64748b;
+  --suite-line: #d9e2ec;
+  --suite-paper: #ffffff;
+  --suite-wash: #f5f7fb;
+  --suite-accent: #126a64;
+  --suite-accent-dark: #0c514d;
+  --suite-focus: rgba(18, 106, 100, 0.22);
+  --suite-shadow: 0 14px 34px rgba(31, 41, 51, 0.06);
+}
+
+body {
+  color: var(--suite-ink);
+  background: var(--suite-wash);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.suite-hero {
+  background: var(--suite-paper);
+  border-bottom: 1px solid var(--suite-line);
+}
+
+.suite-hero-image {
+  min-height: clamp(130px, 20vw, 230px);
+  background: url("https://www.bookstore.colostate.edu/SiteImages/109-SchoolImages/109-upstairs-store-1920x500.jpg") top center / cover;
+}
+
+.suite-hero-inner {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 28px 0 32px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 32px;
+}
+
+.suite-back {
+  display: inline-block;
+  margin-bottom: 12px;
+  color: var(--suite-accent-dark);
+  font-size: .84rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.suite-back:hover { text-decoration: underline; }
+
+.suite-eyebrow {
+  margin: 0 0 8px;
+  color: var(--suite-accent);
+  font-size: .78rem;
+  font-weight: 750;
+  text-transform: uppercase;
+}
+
+.suite-hero h1 {
+  margin: 0;
+  max-width: 820px;
+  color: var(--suite-ink);
+  font-size: clamp(2rem, 4vw, 3.3rem);
+  font-weight: 800;
+  line-height: 1.08;
+}
+
+.suite-lead {
+  max-width: 760px;
+  margin: 12px 0 0;
+  color: var(--suite-muted);
+  font-size: 1.08rem;
+  line-height: 1.55;
+}
+
+.suite-logo {
+  display: block;
+  width: min(220px, 26vw);
+  height: auto;
+}
+
+.panel, .card, .workspace, .side-panel, .builder-panel, .output-panel {
+  border-color: var(--suite-line) !important;
+  border-radius: 8px !important;
+  box-shadow: var(--suite-shadow) !important;
+}
+
+button, .btn {
+  border-radius: 6px !important;
+}
+
+button:not(.secondary):not(.btn-outline-secondary):not(.btn-outline-danger),
+.btn-primary {
+  background-color: var(--suite-accent);
+  border-color: var(--suite-accent);
+}
+
+button:not(.secondary):not(.btn-outline-secondary):not(.btn-outline-danger):hover,
+.btn-primary:hover {
+  background-color: var(--suite-accent-dark);
+  border-color: var(--suite-accent-dark);
+}
+
+input:focus, textarea:focus, select:focus, .form-control:focus, .form-select:focus {
+  border-color: var(--suite-accent) !important;
+  box-shadow: 0 0 0 .2rem var(--suite-focus) !important;
+  outline: 0;
+}
+
+.section-kicker, .eyebrow { color: var(--suite-accent) !important; }
+
+.suite-workspace-actions {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.layout > .suite-workspace-actions { grid-column: 1 / -1; }
+
+@media (max-width: 700px) {
+  .suite-hero-inner { grid-template-columns: 1fr; }
+  .suite-logo { width: 180px; }
+}
