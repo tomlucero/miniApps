@@ -18,6 +18,12 @@
     .daily-card-kicker { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; color: var(--suite-accent); font-size: .76rem; font-weight: 750; letter-spacing: .04em; text-transform: uppercase; }
     .daily-greeting { margin: 0; font-size: clamp(1.5rem, 3vw, 2.15rem); font-weight: 800; letter-spacing: -.025em; }
     .daily-date { margin: 8px 0 0; color: var(--suite-muted); }
+    .trivia-block { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--suite-line); }
+    .trivia-category { display: inline-flex; margin-bottom: 8px; padding: 4px 8px; color: var(--suite-accent-dark); background: var(--suite-accent-soft); border-radius: 999px; font-size: .7rem; font-weight: 750; letter-spacing: .04em; text-transform: uppercase; }
+    .trivia-question { margin: 0 0 12px; color: var(--suite-ink); font-size: .9rem; font-weight: 650; line-height: 1.5; }
+    .trivia-reveal { width: 100%; padding: 10px 12px; color: var(--suite-accent-dark); background: var(--suite-soft); border: 1px dashed #9fb8b5; border-radius: 7px; font-size: .8rem; font-weight: 700; text-align: left; }
+    .trivia-reveal:hover, .trivia-reveal:focus-visible { background: var(--suite-accent-soft); border-color: var(--suite-accent); }
+    .trivia-answer { display: block; margin-top: 7px; color: var(--suite-ink); font-size: .9rem; font-weight: 700; line-height: 1.45; }
     .date-helper-table { width: 100%; margin: 0; border-collapse: separate; border-spacing: 0; overflow: hidden; border: 1px solid var(--suite-line); border-radius: 7px; }
     .date-helper-table th, .date-helper-table td { width: 50%; padding: 10px 12px; text-align: left; }
     .date-helper-table th { color: var(--suite-muted); background: var(--suite-soft); border-bottom: 1px solid var(--suite-line); font-size: .78rem; font-weight: 750; text-transform: uppercase; }
@@ -71,6 +77,14 @@
               <div class="daily-card-kicker"><i class="fa-solid fa-sun" aria-hidden="true"></i> Today</div>
               <h2 class="daily-greeting" id="dailyGreeting">Good Morning</h2>
               <p class="daily-date" id="todayDate">Today is Wednesday, June 17, 2026</p>
+              <div class="trivia-block d-none" id="triviaBlock">
+                <span class="trivia-category" id="triviaCategory"></span>
+                <p class="trivia-question" id="triviaQuestion"></p>
+                <button class="trivia-reveal" id="triviaReveal" type="button" aria-expanded="false" aria-controls="triviaAnswer">
+                  <span id="triviaPrompt">Click/tap to reveal answer</span>
+                  <span class="trivia-answer" id="triviaAnswer" hidden></span>
+                </button>
+              </div>
             </article>
           </div>
           <div class="col-lg-4">
@@ -158,6 +172,7 @@
   </main>
   <script>
     (() => {
+      let triviaItems = [];
       const fullDateFormatter = new Intl.DateTimeFormat(undefined, {
         weekday: "long",
         month: "long",
@@ -191,9 +206,42 @@
         document.getElementById("remind28").textContent = helperDateFormatter.format(offsetDate(now, -28));
         document.getElementById("payment3").textContent = helperDateFormatter.format(offsetDate(now, 3));
         document.getElementById("payment5").textContent = helperDateFormatter.format(offsetDate(now, 5));
+        updateTrivia(now);
       }
 
+      function updateTrivia(date) {
+        if (!triviaItems.length) return;
+        const startOfYear = new Date(date.getFullYear(), 0, 0);
+        const dayOfYear = Math.floor((date - startOfYear) / 86400000);
+        const item = triviaItems[dayOfYear % triviaItems.length];
+        document.getElementById("triviaCategory").textContent = item.category;
+        document.getElementById("triviaQuestion").textContent = item.question;
+        document.getElementById("triviaAnswer").textContent = item.answer;
+        document.getElementById("triviaBlock").classList.remove("d-none");
+      }
+
+      async function loadTrivia() {
+        try {
+          const response = await fetch("trivia.json", { cache: "no-store" });
+          if (!response.ok) throw new Error(`Trivia request failed: ${response.status}`);
+          const data = await response.json();
+          triviaItems = data.filter((item) => item.category && item.question && item.answer);
+          updateTrivia(new Date());
+        } catch (error) {
+          console.warn("Trivia could not be loaded.", error);
+        }
+      }
+
+      document.getElementById("triviaReveal").addEventListener("click", () => {
+        const answer = document.getElementById("triviaAnswer");
+        const isRevealed = !answer.hidden;
+        answer.hidden = isRevealed;
+        document.getElementById("triviaReveal").setAttribute("aria-expanded", String(!isRevealed));
+        document.getElementById("triviaPrompt").textContent = isRevealed ? "Click/tap to reveal answer" : "Answer";
+      });
+
       updateDailyDashboard();
+      loadTrivia();
       window.setInterval(updateDailyDashboard, 60000);
     })();
   </script>
