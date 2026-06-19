@@ -206,14 +206,18 @@
         document.getElementById("remind28").textContent = helperDateFormatter.format(offsetDate(now, -28));
         document.getElementById("payment3").textContent = helperDateFormatter.format(offsetDate(now, 3));
         document.getElementById("payment5").textContent = helperDateFormatter.format(offsetDate(now, 5));
-        updateTrivia(now);
       }
 
-      function updateTrivia(date) {
+      function showRandomTrivia() {
         if (!triviaItems.length) return;
-        const startOfYear = new Date(date.getFullYear(), 0, 0);
-        const dayOfYear = Math.floor((date - startOfYear) / 86400000);
-        const item = triviaItems[dayOfYear % triviaItems.length];
+        const previousValue = sessionStorage.getItem("lastTriviaIndex");
+        const previousIndex = previousValue === null ? -1 : Number(previousValue);
+        let index = Math.floor(Math.random() * triviaItems.length);
+        if (triviaItems.length > 1 && index === previousIndex) {
+          index = (index + 1 + Math.floor(Math.random() * (triviaItems.length - 1))) % triviaItems.length;
+        }
+        sessionStorage.setItem("lastTriviaIndex", String(index));
+        const item = triviaItems[index];
         document.getElementById("triviaCategory").textContent = item.category;
         document.getElementById("triviaQuestion").textContent = item.question;
         document.getElementById("triviaAnswer").textContent = item.answer;
@@ -226,7 +230,7 @@
           if (!response.ok) throw new Error(`Trivia request failed: ${response.status}`);
           const data = await response.json();
           triviaItems = data.filter((item) => item.category && item.question && item.answer);
-          updateTrivia(new Date());
+          showRandomTrivia();
         } catch (error) {
           console.warn("Trivia could not be loaded.", error);
         }
