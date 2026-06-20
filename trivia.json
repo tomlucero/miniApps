@@ -91,6 +91,21 @@
   },
   {
     "category": "CSU",
+    "question": "Who is Morgan Library named for?",
+    "answer": "William Morgan, the CSU president during the growth years post World War II."
+  },
+  {
+    "category": "Lory Student Center",
+    "question": "Who was the architect who designed the original Lory Student Center in the 1960s?",
+    "answer": "James M. Hunter. Did you know that his ashes are interred in the Danforth Chapel on the CSU Oval?"
+  },
+  {
+    "category": "Bookstore",
+    "question": "Who is the store director?",
+    "answer": "John Parry (JP)"
+  },
+  {
+    "category": "CSU",
     "question": "Which CSU faculty member was mayor of Fort Collins?",
     "answer": "Wade Troxell"
   }
