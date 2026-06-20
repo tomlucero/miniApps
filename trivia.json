@@ -30,6 +30,41 @@
     "answer": "Anne Gill, a former Dean of the College of Liberal Arts."
   },
   {
+    "category": "CSU",
+    "question": "What is the origin of the name Moby Arena?",
+    "answer": "Originally Auditorium Arena, a writer for the Collegian said it resembled a whale rising from the athletic fields. The name eventually stuck."
+  },
+  {
+    "category": "Bookstore",
+    "question": "What is NACS",
+    "answer": "National Association of College Stores. NACS is the trade association for college bookstores, and the CSU Bookstore is a member of this organization."
+  },
+  {
+    "category": "Bookstore",
+    "question": "What is ICBA",
+    "answer": "International College Bookstore Association. ICBA is the trade association for college bookstores, and the CSU Bookstore is a member of this organization."
+  },
+  {
+    "category": "Bookstore",
+    "question": "Who is the Online Retail Manager?",
+    "answer": "Tom Lucero"
+  },
+  {
+    "category": "Bookstore",
+    "question": "Who is the RAMTech Manager?",
+    "answer": "JD McConkey"
+  },
+  {
+    "category": "Bookstore",
+    "question": "Who is Amy Lawton?",
+    "answer": "Amy Lawton is the Apparel and Gifts Manager for the CSU Bookstore."
+  },
+  {
+    "category": "Bookstore",
+    "question": "What is RMSBA",
+    "answer": "Rocky Mountain Skyline Booksellers Association. RMSBA is the regional trade association for college bookstores, and the CSU Bookstore is a member of this organization."
+  },
+  {
     "category": "Bookstore",
     "question": "What does ISBN stand for?",
     "answer": "International Standard Book Number"
@@ -82,7 +117,7 @@
   {
     "category": "Fort Collins",
     "question": "What is the name of the local newspaper?",
-    "answer": "The Coloradoan"
+    "answer": "The Fort CollinsColoradoan"
   },
   {
     "category": "Fort Collins",
@@ -103,6 +138,61 @@
     "category": "Bookstore",
     "question": "Who is the store director?",
     "answer": "John Parry (JP)"
+  },
+  {
+    "category": "Fort Collins",
+    "question": "What is official elevation of Fort Collins?",
+    "answer": "5,003 feet over sea level (1,525 meters)"
+  },
+  {
+    "category": "Fort Collins",
+    "question": "What is WWVB?",
+    "answer": "A radio station that broadcasts time signals. Radio Controlled Clocks use this signal to set the time accurately."
+  },
+  {
+    "category": "Fort Collins",
+    "question": "This CSU president sold a lease to the railroad to allow the railroad to run through the campus.",
+    "answer": "Chipotle Mexican Grill"
+  },
+  {
+    "category": "Colorado",
+    "question": "This burrito chain started with a store in Denver, Colorado.",
+    "answer": "Chipotle Mexican Grill"
+  },
+  {
+    "category": "Fort Collins",
+    "question": "Now home to Lucky's Market, what used to be in the space at Mulberry and South College?",
+    "answer": "It was a Safeway grocery store until the 1980s, when it became Gart Bros. Sporting Goods, then Sports Authority."
+  },
+  {
+    "category": "Fort Collins",
+    "question": "A 2009 Colorado media sensation involved a homemade balloon supposedly carrying a six-year-old boy. What was the name of this infamous hoax?",
+    "answer": "The Balloon Boy hoax"
+  },
+  {
+    "category": "Lory Student Center",
+    "question": "What is the little building next to the Transit Center?",
+    "answer": "A Weather Station. It is one of the oldest weather stations in the area."
+  },
+  {
+    "category": "Lory Student Center",
+    "question": "What radio station broadcasts from the Lory Student Center?",
+    "answer": "90.5 KCSU, the student-run radio station."
+  },
+  {
+    "category": "Fort Collins",
+    "question": "What was Drake Road named for?",
+    "answer": "It was named for William A. Drake, who along with his wife Emma had a farm house in the area."
+  },
+  {
+    "category": "Fort Collins",
+    "question": "Who was Fort Collins named after?",
+    "answer": "William O. Collins, a Civil War officer who established a military fort in the area in 1864."
+  },
+  {
+    "category": "Lory Student Center",
+    "question": "Before the Flood of 1997, what used to be located in the lower level of the Lory Student Center?",
+    "answer": "There was a bowling alley."
   },
   {
     "category": "CSU",
