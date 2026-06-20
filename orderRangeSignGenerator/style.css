@@ -44,14 +44,17 @@
 .screen-page.rack { grid-template-columns: 1fr; aspect-ratio: 11 / 8.5; }
 
 .range-sign { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 0; padding: 8%; color: #111; background: #fff; border: 3px solid #111; text-align: center; }
+.range-sign-content { display: flex; flex: 1; min-height: 0; width: 100%; flex-direction: column; align-items: center; justify-content: center; }
 .range-sign-header { margin: 0 0 12%; font-size: clamp(.68rem, 1.6vw, 1.18rem); font-weight: 900; line-height: 1.15; letter-spacing: .04em; overflow-wrap: anywhere; }
 .range-sign-number { font-size: clamp(1.45rem, 4.2vw, 3rem); font-weight: 900; line-height: 1; }
 .range-sign-through { margin: 6% 0; font-size: clamp(.58rem, 1.35vw, .95rem); font-weight: 600; text-transform: uppercase; }
 .range-sign-footer { min-height: 1.4em; margin: 12% 0 0; font-size: clamp(.48rem, 1vw, .78rem); font-weight: 500; line-height: 1.35; overflow-wrap: anywhere; }
+.range-sign-logo { display: block; width: auto; height: auto; max-width: 42%; max-height: 14%; margin-top: 4%; object-fit: contain; }
 .screen-page.rack .range-sign-header { margin-bottom: 5%; font-size: clamp(1.25rem, 3vw, 2.1rem); }
 .screen-page.rack .range-sign-number { font-size: clamp(3.5rem, 8vw, 6rem); }
 .screen-page.rack .range-sign-through { margin: 3% 0; font-size: clamp(1rem, 2vw, 1.5rem); }
 .screen-page.rack .range-sign-footer { margin-top: 5%; font-size: clamp(.85rem, 1.5vw, 1.15rem); }
+.screen-page.rack .range-sign-logo { max-width: 28%; max-height: 16%; margin-top: 3%; }
 
 .print-area { display: none; }
 
@@ -77,8 +80,10 @@
   .print-page.shelf .range-sign-number { font-size: 48pt; }
   .print-page.shelf .range-sign-through { margin: .2in 0; font-size: 16pt; }
   .print-page.shelf .range-sign-footer { margin-top: .38in; font-size: 11pt; }
+  .print-page.shelf .range-sign-logo { max-width: 1.35in; max-height: .45in; margin-top: .12in; }
   .print-page.rack .range-sign-header { margin-bottom: .45in; font-size: 38pt; }
   .print-page.rack .range-sign-number { font-size: 92pt; }
   .print-page.rack .range-sign-through { margin: .25in 0; font-size: 24pt; }
   .print-page.rack .range-sign-footer { margin-top: .45in; font-size: 16pt; }
+  .print-page.rack .range-sign-logo { max-width: 2.4in; max-height: .75in; margin-top: .2in; }
 }
