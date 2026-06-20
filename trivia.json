@@ -1,0 +1,97 @@
+[
+  {
+    "category": "CSU",
+    "question": "What year was Colorado State University founded?",
+    "answer": "1870"
+  },
+  {
+    "category": "CSU",
+    "question": "What is the name of CSU's mascot?",
+    "answer": "CAM the Ram"
+  },
+  {
+    "category": "CSU",
+    "question": "What is the name of CSU's football stadium?",
+    "answer": "Canvas Stadium"
+  },
+  {
+    "category": "CSU",
+    "question": "What does CAM in CAM the Ram stand for?",
+    "answer": "Colorado Agricultural and Mechanical; our first name was Colorado Agricultural College."
+  },
+  {
+    "category": "CSU",
+    "question": "What does the term RAMSkellar come from?",
+    "answer": "The German word rathskellar which is an underground pub."
+  },
+  {
+    "category": "CSU",
+    "question": "Who is Anne Gill Hall named for?",
+    "answer": "Anne Gill, a former Dean of the College of Liberal Arts."
+  },
+  {
+    "category": "Bookstore",
+    "question": "What does ISBN stand for?",
+    "answer": "International Standard Book Number"
+  },
+  {
+    "category": "Bookstore",
+    "question": "What is the CSU Bookstore phone number?",
+    "answer": "970-491-0546"
+  },
+  {
+    "category": "Bookstore",
+    "question": "Who is the assistant director overseeing course materials at the CSU Bookstore?",
+    "answer": "Kurt Kaiser"
+  },
+  {
+    "category": "Bookstore",
+    "question": "Who is the assistant director overseeing merchandise and customer service at the CSU Bookstore?",
+    "answer": "Michelle Staley"
+  },
+  {
+    "category": "Bookstore",
+    "question": "Who is the oversees the Supplies and Art Department at the CSU Bookstore?",
+    "answer": "Val Ciurej"
+  },
+  {
+    "category": "Fort Collins",
+    "question": "What river runs through Fort Collins?",
+    "answer": "The Cache la Poudre River."
+  },
+  {
+    "category": "Fort Collins",
+    "question": "What was the first microbrewery in Fort Collins?",
+    "answer": "Coopersmith's Pub and Brewing"
+  },
+  {
+    "category": "General Knowledge",
+    "question": "What is the largest planet in our solar system?",
+    "answer": "Jupiter"
+  },
+  {
+    "category": "General Knowledge",
+    "question": "How many continents are there on Earth?",
+    "answer": "Seven"
+  },
+  {
+    "category": "General Knowledge",
+    "question": "What state does not share a letter with the world 'Mackeral'?",
+    "answer": "Ohio"
+  },
+  {
+    "category": "Fort Collins",
+    "question": "What is the name of the local newspaper?",
+    "answer": "The Coloradoan"
+  },
+  {
+    "category": "Fort Collins",
+    "question": "Who is the mayor of Fort Collins?",
+    "answer": "Emily Francis"
+  },
+  {
+    "category": "CSU",
+    "question": "Which CSU faculty member was mayor of Fort Collins?",
+    "answer": "Wade Troxell"
+  }
+]
