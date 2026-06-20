@@ -4,6 +4,7 @@
 .panel-title { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 22px; }
 .panel-title h2, .preview-panel-head h2 { margin: 0; font-size: 1.2rem; font-weight: 800; }
 .form-control { resize: vertical; }
+.optional-label { margin-left: 4px; color: var(--suite-muted); font-size: .76rem; font-weight: 500; }
 .form-status { min-height: 0; }
 .form-status.error, .form-status.success { padding: 10px 12px; border-radius: 6px; }
 .form-status.error { color: var(--suite-danger); background: var(--suite-danger-soft); border: 1px solid #f1aaa4; }
@@ -21,22 +22,25 @@
 .tag-title { margin: 0 0 2%; font-size: clamp(.8rem, 2.4vw, 1.55rem); font-weight: 900; line-height: 1.1; letter-spacing: .025em; text-align: center; }
 .tag-copy { margin: 0 0 2%; font-size: clamp(.48rem, 1.2vw, .8rem); line-height: 1.4; text-align: center; }
 .tag-details { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 2% 5%; margin: 3% 0 0; }
+.pick-reminder .tag-details { gap: 1.5% 5%; margin-top: 2%; }
 .tag-field { min-width: 0; }
 .tag-field.full { grid-column: 1 / -1; }
 .tag-label { display: block; margin-bottom: .15em; color: #4b5563; font-size: clamp(.4rem, .9vw, .65rem); font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
 .tag-value { display: block; font-size: clamp(.58rem, 1.45vw, .95rem); font-weight: 700; line-height: 1.25; overflow-wrap: anywhere; white-space: pre-wrap; }
 .tag-value.order-number { font-size: clamp(1.25rem, 4vw, 2.65rem); font-weight: 900; line-height: 1; }
 .item-tag .tag-title { font-size: clamp(1.05rem, 3vw, 2rem); }
-.item-tag .tag-details { gap: 8% 5%; margin-top: 7%; }
+.item-tag .section-instruction { margin-bottom: 1%; }
+.item-tag .tag-details { gap: 2% 5%; margin-top: 2%; }
 .item-tag .tag-value.customer-name { font-size: clamp(1.1rem, 3.4vw, 2.25rem); font-weight: 900; line-height: 1; text-transform: uppercase; }
 .item-tag .tag-value.item-emphasis { font-size: clamp(.9rem, 2.5vw, 1.7rem); font-weight: 900; line-height: 1.15; }
 .item-tag .tag-value.notes-emphasis { font-size: clamp(.65rem, 1.65vw, 1.05rem); }
+.item-tag .tag-value.sku-emphasis { font-size: clamp(.65rem, 1.65vw, 1.05rem); }
 .section-footer { width: 70%; margin-top: auto; padding-top: 2%; }
 .acknowledgment p { margin: 0 0 4%; font-size: clamp(.48rem, 1.1vw, .75rem); font-weight: 700; }
 .signature-lines { display: grid; grid-template-columns: minmax(0, 1fr) 28%; gap: 8%; }
 .signature-lines span { padding-top: 3%; color: #4b5563; border-top: 1px solid #111; font-size: clamp(.38rem, .8vw, .58rem); font-weight: 700; text-transform: uppercase; }
-.tag-logo { position: absolute; right: 4.5%; bottom: 4.5%; display: block; width: 23%; height: auto; object-fit: contain; }
-.item-tag-footer { min-height: 12%; }
+.tag-logo { position: absolute; right: 4.5%; bottom: 4.5%; display: block; width: 22%; height: auto; object-fit: contain; }
+.item-tag-footer { min-height: 10%; }
 .print-area { display: none; }
 
 @media (max-width: 575px) {
@@ -63,14 +67,17 @@
   .print-area .tag-value { font-size: 13pt; }
   .print-area .tag-value.order-number { font-size: 34pt; }
   .print-area .item-tag .tag-title { font-size: 30pt; }
-  .print-area .item-tag .tag-details { gap: .24in .3in; margin-top: .3in; }
+  .print-area .pick-reminder .tag-details { gap: .08in .3in; margin-top: .1in; }
+  .print-area .item-tag .section-instruction { margin-bottom: .08in; }
+  .print-area .item-tag .tag-details { gap: .07in .3in; margin-top: .1in; }
   .print-area .item-tag .tag-value.customer-name { font-size: 27pt; }
   .print-area .item-tag .tag-value.item-emphasis { font-size: 21pt; }
   .print-area .item-tag .tag-value.notes-emphasis { font-size: 14pt; }
+  .print-area .item-tag .tag-value.sku-emphasis { font-size: 14pt; }
   .print-area .section-footer { width: 70%; padding-top: .12in; }
   .print-area .acknowledgment p { margin-bottom: .2in; font-size: 10pt; }
   .print-area .signature-lines { gap: .3in; }
   .print-area .signature-lines span { padding-top: .07in; font-size: 7.5pt; }
   .print-area .tag-logo { right: .5in; bottom: .4in; width: 1.5in; max-height: .62in; }
-  .print-area .item-tag-footer { min-height: .65in; }
+  .print-area .item-tag-footer { min-height: .55in; }
 }

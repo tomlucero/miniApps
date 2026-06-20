@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Oversized Item Tag Generator | CSU Bookstore</title>
+  <title>Oversized/Secure Item Tag Generator | CSU Bookstore</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -20,8 +20,8 @@
         <div>
           <a class="suite-back" href="../index.html">&larr; Return to Toolbox</a>
           <p class="suite-eyebrow">Fulfillment helper</p>
-          <h1>Oversized Item Tag Generator</h1>
-          <p class="suite-lead">Create a pick-list reminder and matching tag for items stored away from the main pickup area.</p>
+          <h1>Oversized/Secure Item Tag Generator</h1>
+          <p class="suite-lead">Create a pick-list reminder and matching tag for oversized or securely stored items.</p>
         </div>
         <img class="suite-logo" src="../productListingHTMLBuilder/images/bookstoreLogo.png" alt="CSU Bookstore logo">
       </div>
@@ -41,6 +41,13 @@
               </div>
               <form id="tagForm" novalidate>
                 <div class="mb-3">
+                  <label class="form-label" for="itemType">Item Type</label>
+                  <select class="form-select" id="itemType" required>
+                    <option value="Oversized Item" selected>Oversized Item</option>
+                    <option value="Secure Item">Secure Item</option>
+                  </select>
+                </div>
+                <div class="mb-3">
                   <label class="form-label" for="orderNumber">Order Number</label>
                   <input class="form-control" id="orderNumber" type="text" inputmode="numeric" autocomplete="off" required>
                 </div>
@@ -49,12 +56,25 @@
                   <input class="form-control" id="customerLastName" type="text" autocomplete="family-name" required>
                 </div>
                 <div class="mb-3">
-                  <label class="form-label" for="itemDescription">Oversized Item Description</label>
+                  <label class="form-label" for="itemDescription">Item Description</label>
                   <textarea class="form-control" id="itemDescription" rows="3" required></textarea>
                 </div>
                 <div class="mb-3">
-                  <label class="form-label" for="itemLocation">Oversized Item Rack / Location</label>
-                  <input class="form-control" id="itemLocation" type="text" required>
+                  <label class="form-label" for="locationPreset">Item Location</label>
+                  <select class="form-select" id="locationPreset" required>
+                    <option value="Oversized Item Rack" selected>Oversized Item Rack</option>
+                    <option value="RAMtech Lock-up">RAMtech Lock-up</option>
+                    <option value="Gift Card Lock Box">Gift Card Lock Box</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                <div class="mb-3 d-none" id="customLocationField">
+                  <label class="form-label" for="customLocation">Custom Location</label>
+                  <input class="form-control" id="customLocation" type="text" placeholder="Enter the item location">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label" for="skuUpc">SKU / UPC <span class="optional-label">Optional</span></label>
+                  <input class="form-control" id="skuUpc" type="text" autocomplete="off">
                 </div>
                 <div>
                   <label class="form-label" for="optionalNotes">Optional Notes</label>
