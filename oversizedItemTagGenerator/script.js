@@ -26,6 +26,14 @@
     return field;
   }
 
+  function logoMarkup() {
+    const logo = document.createElement("img");
+    logo.className = "tag-logo";
+    logo.src = "../Bookstore-VPSA-CSU-HBlk.png";
+    logo.alt = "CSU Bookstore";
+    return logo;
+  }
+
   function buildSheet() {
     const order = displayValue(orderNumber.value);
     const customer = displayValue(customerLastName.value);
@@ -44,6 +52,15 @@
       <h2 class="tag-title">ORDER HAS OVERSIZED ITEM</h2>
       <p class="tag-copy">Please retrieve the following item from the oversized item rack/location:</p>
       <div class="tag-details"></div>
+      <div class="section-footer">
+        <div class="acknowledgment">
+          <p>I received the oversized items in my order.</p>
+          <div class="signature-lines">
+            <span>Customer Signature</span>
+            <span>Date</span>
+          </div>
+        </div>
+      </div>
     `;
     const reminderDetails = reminder.querySelector(".tag-details");
     reminderDetails.append(
@@ -53,6 +70,7 @@
       fieldMarkup("Customer Last Name", customer)
     );
     if (notes) reminderDetails.append(fieldMarkup("Optional Notes", notes, "", true));
+    reminder.querySelector(".section-footer").append(logoMarkup());
 
     const itemTag = document.createElement("section");
     itemTag.className = "tag-section item-tag";
@@ -62,12 +80,17 @@
       <h2 class="tag-title">OVERSIZED ITEM</h2>
       <div class="tag-details"></div>
     `;
-    itemTag.querySelector(".tag-details").append(
+    const itemTagDetails = itemTag.querySelector(".tag-details");
+    itemTagDetails.append(
       fieldMarkup("Order", `#${order}`, "order-number"),
-      fieldMarkup("Customer Last Name", customer),
-      fieldMarkup("Item", item, "", true),
-      fieldMarkup("Location", location, "", true)
+      fieldMarkup("Customer Last Name", customer, "customer-name"),
+      fieldMarkup("Item", item, "item-emphasis", true)
     );
+    if (notes) itemTagDetails.append(fieldMarkup("Optional Notes", notes, "notes-emphasis", true));
+    const itemTagFooter = document.createElement("div");
+    itemTagFooter.className = "section-footer item-tag-footer";
+    itemTagFooter.append(logoMarkup());
+    itemTag.append(itemTagFooter);
 
     sheet.append(reminder, itemTag);
     return sheet;
