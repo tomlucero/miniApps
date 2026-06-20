@@ -122,11 +122,14 @@
     const sign = document.createElement("article");
     sign.className = "range-sign";
     sign.innerHTML = `
-      <h3 class="range-sign-header"></h3>
-      <div class="range-sign-number range-start"></div>
-      <div class="range-sign-through">through</div>
-      <div class="range-sign-number range-end"></div>
-      <p class="range-sign-footer"></p>
+      <div class="range-sign-content">
+        <h3 class="range-sign-header"></h3>
+        <div class="range-sign-number range-start"></div>
+        <div class="range-sign-through">through</div>
+        <div class="range-sign-number range-end"></div>
+        <p class="range-sign-footer"></p>
+      </div>
+      <img class="range-sign-logo" src="../Bookstore-VPSA-CSU-HBlk.png" alt="CSU Bookstore">
     `;
     sign.querySelector(".range-sign-header").textContent = header;
     sign.querySelector(".range-start").textContent = range.start;
