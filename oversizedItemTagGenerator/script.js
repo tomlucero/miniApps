@@ -1,9 +1,13 @@
 (() => {
   const form = document.getElementById("tagForm");
+  const itemType = document.getElementById("itemType");
   const orderNumber = document.getElementById("orderNumber");
   const customerLastName = document.getElementById("customerLastName");
   const itemDescription = document.getElementById("itemDescription");
-  const itemLocation = document.getElementById("itemLocation");
+  const locationPreset = document.getElementById("locationPreset");
+  const customLocationField = document.getElementById("customLocationField");
+  const customLocation = document.getElementById("customLocation");
+  const skuUpc = document.getElementById("skuUpc");
   const optionalNotes = document.getElementById("optionalNotes");
   const screenPreview = document.getElementById("screenPreview");
   const printArea = document.getElementById("printArea");
@@ -34,27 +38,39 @@
     return logo;
   }
 
+  function selectedLocation() {
+    return locationPreset.value === "other" ? customLocation.value.trim() : locationPreset.value;
+  }
+
+  function updateLocationField() {
+    const isCustom = locationPreset.value === "other";
+    customLocationField.classList.toggle("d-none", !isCustom);
+    customLocation.required = isCustom;
+  }
+
   function buildSheet() {
+    const type = itemType.value;
+    const typeLower = type.toLowerCase();
     const order = displayValue(orderNumber.value);
     const customer = displayValue(customerLastName.value);
     const item = displayValue(itemDescription.value);
-    const location = displayValue(itemLocation.value);
+    const location = displayValue(selectedLocation());
+    const sku = skuUpc.value.trim();
     const notes = optionalNotes.value.trim();
 
     const sheet = document.createElement("article");
     sheet.className = "tag-sheet";
-    sheet.setAttribute("aria-label", "Oversized item reminder and tag sheet");
+    sheet.setAttribute("aria-label", `${type} reminder and tag sheet`);
 
     const reminder = document.createElement("section");
     reminder.className = "tag-section pick-reminder";
     reminder.innerHTML = `
       <p class="section-instruction">Staple this section to pick list.</p>
-      <h2 class="tag-title">ORDER HAS OVERSIZED ITEM</h2>
-      <p class="tag-copy">Please retrieve the following item from the oversized item rack/location:</p>
+      <h2 class="tag-title">ORDER HAS ${type.toUpperCase()}</h2>
       <div class="tag-details"></div>
       <div class="section-footer">
         <div class="acknowledgment">
-          <p>I received the oversized items in my order.</p>
+          <p>I received the ${typeLower}s in my order.</p>
           <div class="signature-lines">
             <span>Customer Signature</span>
             <span>Date</span>
@@ -64,29 +80,34 @@
     `;
     const reminderDetails = reminder.querySelector(".tag-details");
     reminderDetails.append(
+      fieldMarkup("Item Type", type),
+      fieldMarkup("Location", location),
       fieldMarkup("Item", item, "", true),
-      fieldMarkup("Location", location, "", true),
       fieldMarkup("Order", `#${order}`, "order-number"),
       fieldMarkup("Customer Last Name", customer)
     );
-    if (notes) reminderDetails.append(fieldMarkup("Optional Notes", notes, "", true));
+    if (sku) reminderDetails.append(fieldMarkup("SKU / UPC", sku));
+    if (notes) reminderDetails.append(fieldMarkup("Optional Notes", notes, "", !sku));
     reminder.querySelector(".section-footer").append(logoMarkup());
 
     const itemTag = document.createElement("section");
     itemTag.className = "tag-section item-tag";
     itemTag.innerHTML = `
       <span class="cut-label">Cut along dashed line</span>
-      <p class="section-instruction">Attach this section to oversized item.</p>
-      <h2 class="tag-title">OVERSIZED ITEM</h2>
+      <p class="section-instruction">Attach this section to ${typeLower}.</p>
+      <h2 class="tag-title">${type.toUpperCase()}</h2>
       <div class="tag-details"></div>
     `;
     const itemTagDetails = itemTag.querySelector(".tag-details");
     itemTagDetails.append(
       fieldMarkup("Order", `#${order}`, "order-number"),
       fieldMarkup("Customer Last Name", customer, "customer-name"),
+      fieldMarkup("Item Type", type),
+      fieldMarkup("Location", location),
       fieldMarkup("Item", item, "item-emphasis", true)
     );
-    if (notes) itemTagDetails.append(fieldMarkup("Optional Notes", notes, "notes-emphasis", true));
+    if (sku) itemTagDetails.append(fieldMarkup("SKU / UPC", sku, "sku-emphasis"));
+    if (notes) itemTagDetails.append(fieldMarkup("Optional Notes", notes, "notes-emphasis", !sku));
     const itemTagFooter = document.createElement("div");
     itemTagFooter.className = "section-footer item-tag-footer";
     itemTagFooter.append(logoMarkup());
@@ -104,10 +125,11 @@
   }
 
   function validate() {
-    const requiredFields = [orderNumber, customerLastName, itemDescription, itemLocation];
+    const requiredFields = [itemType, orderNumber, customerLastName, itemDescription, locationPreset];
+    if (locationPreset.value === "other") requiredFields.push(customLocation);
     const firstEmpty = requiredFields.find((field) => !field.value.trim());
     if (!firstEmpty) return true;
-    formStatus.textContent = "Complete the order number, customer last name, item description, and location before printing.";
+    formStatus.textContent = "Complete the item type, order number, customer last name, item description, and location before printing.";
     formStatus.className = "form-status mt-4 error";
     firstEmpty.focus();
     return false;
@@ -115,6 +137,7 @@
 
   function resetApp() {
     form.reset();
+    updateLocationField();
     renderPreview();
     orderNumber.focus();
   }
@@ -124,12 +147,17 @@
     event.preventDefault();
     renderPreview();
     if (!validate()) return;
-    formStatus.textContent = "Your oversized item tag sheet is ready to print.";
+    formStatus.textContent = `Your ${itemType.value.toLowerCase()} tag sheet is ready to print.`;
     formStatus.className = "form-status mt-4 success";
     window.print();
   });
   document.getElementById("resetButton").addEventListener("click", resetApp);
   document.getElementById("clearButton").addEventListener("click", resetApp);
+  locationPreset.addEventListener("change", () => {
+    updateLocationField();
+    renderPreview();
+  });
 
+  updateLocationField();
   renderPreview();
 })();
