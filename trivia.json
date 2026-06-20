@@ -127,7 +127,32 @@
   {
     "category": "CSU",
     "question": "Who is Morgan Library named for?",
-    "answer": "William Morgan, the CSU president during the growth years post World War II."
+    "answer": "William Morgan, the CSU 8th president. He led efforts to secure funding for the construction of the library, and saw the name change of Colorado A&M to Colorado State University."
+  },
+  {
+    "category": "CSU",
+    "question": "What year did Colorado A&M change its name to Colorado State University?",
+    "answer": "1957"
+  },
+  {
+    "category": "CSU",
+    "question": "What were the origninal school colors of Colorado A&M?",
+    "answer": "Pumpkin Orange and Alfalfa Green"
+  },
+  {
+    "category": "MBS Insite",
+    "question": "What menu function do you use to reprint a receipt for a customer?",
+    "answer": "Go to Pack Orders, enter the order number, check the box that says 'Reprint Receipt', and click 'Pack Order'."
+  },
+  {
+    "category": "MBS Insite",
+    "question": "What do you use to mark an order as picked up?",
+    "answer": "Use the 'Order Pick Up Utility'."
+  },
+  {
+    "category": "SEO",
+    "question": "Why might a CSU Bookstore product description mention Fort Collins or Colorado State University?",
+    "answer": "To provide local relevance for search engines and help customers find products related to CSU and the Fort Collins community."
   },
   {
     "category": "Lory Student Center",
@@ -140,6 +165,36 @@
     "answer": "John Parry (JP)"
   },
   {
+    "category": "SEO",
+    "question": "What does SEO stand for?",
+    "answer": "Search Engine Optimization."
+  },
+  {
+    "category": "SEO",
+    "question": "Why should product descriptions be unique instead of copied from a manufacturer website?",
+    "answer": "Unique content helps search engines distinguish our pages from competitors and can improve rankings."
+  },
+  {
+    "category": "SEO",
+    "question": "Why do product images need descriptive alt text?",
+    "answer": "Alt text helps accessibility and gives search engines additional context about the image."
+  },
+  {
+    "category": "SEO",
+    "question": "Why do we keep sold-out product pages online for a period of time instead of deleting them immediately?",
+    "answer": "The page may still have search engine value and can direct customers to similar products."
+  },
+  {
+    "category": "SEO",
+    "question": "What is the purpose of a meta description?",
+    "answer": "It summarizes a page for search engines and can encourage customers to click on search results."
+  },
+  {
+    "category": "SEO",
+    "question": "Why do we include product features and specifications in descriptions?",
+    "answer": "They help customers make informed decisions and provide search engines with relevant content."
+  },
+  {
     "category": "Fort Collins",
     "question": "What is official elevation of Fort Collins?",
     "answer": "5,003 feet over sea level (1,525 meters)"
@@ -147,7 +202,7 @@
   {
     "category": "Fort Collins",
     "question": "What is WWVB?",
-    "answer": "A radio station that broadcasts time signals. Radio Controlled Clocks use this signal to set the time accurately."
+    "answer": "A radio station that broadcasts time signals outside of Fort Collins. Radio Controlled Clocks use this signal to set the time accurately."
   },
   {
     "category": "Fort Collins",
