@@ -8,7 +8,7 @@ window.CUSTOMER_EMAIL_BUILDER_CONFIG = {
     "outOfStock": {
       "label": "Out of stock item",
       "subject": "Update on your CSU Bookstore order #{orderNumber}",
-      "body": "One of the items in your order{item} is currently unavailable. We apologize for the inconvenience. Please let us know how you would like to proceed.",
+      "body": "Thank you for your order from the CSU Bookstore. Regrettably, we sold out of {item}, and it is currently unavailable.",
       "note": "Emailed customer regarding unavailable item{item}",
       "fields": {
         "item": true,
@@ -19,7 +19,7 @@ window.CUSTOMER_EMAIL_BUILDER_CONFIG = {
     "substitutions": {
       "label": "Out of stock item with substitutions",
       "subject": "Substitution options for your CSU Bookstore order #{orderNumber}",
-      "body": "One of the items in your order{item} is currently unavailable. We found the following possible substitutions for you:",
+      "body": "Thank you for your order from the CSU Bookstore. Regrettably, one of the items in your order{item} is currently unavailable. We understand this is disappointing, but we have found the following possible substitutions that may fit your needs.",
       "note": "Emailed customer regarding unavailable item. Provided substitution options",
       "fields": {
         "item": true,
@@ -60,7 +60,7 @@ window.CUSTOMER_EMAIL_BUILDER_CONFIG = {
     "pickupReminder": {
       "label": "Pickup reminder",
       "subject": "REMINDER: CSU Bookstore Order #{orderNumber} Is Awaiting Pick Up",
-      "body": "Your CSU Bookstore order #{orderNumber} is ready for pickup and is still awaiting collection.\n\nYou may pick up your order at the CSU Bookstore Pickup Counter, located on the lower level of the CSU Bookstore. Please bring your order number and a photo ID when picking up your order.\n\nIf you are unable to pick up the order yourself, you may authorize someone else to do so. Simply reply to this email with their name, and we will note that they are authorized to pick up the order on your behalf.\n\nSummer pickup hours are Monday through Friday from 9:00 a.m. to 4:00 p.m. If you need assistance arranging pickup outside of these hours, please contact bookstoreorders@colostate.edu.\n\nPlease pick up your order by {restockDate}. Orders not picked up by this date may be returned to inventory and refunded in accordance with bookstore policies.\n\nIf you have any questions, please reply to this email and we will be happy to assist you.",
+      "body": "This is the CSU Bookstore Online Order Department reminding you that order #{orderNumber} is awaiting pickup.\n\nYou may pick up your order at the CSU Bookstore Pickup Counter, located on the lower level of the CSU Bookstore. Please bring your order number when picking up your order.\n\nIf you are unable to pick up the order yourself, you may authorize someone else to do so. Simply reply to this email with their name, and we will note that they are authorized to pick up the order on your behalf.\n\nSummer pickup hours are Monday through Friday from 9:00 a.m. to 4:00 p.m. If you need assistance arranging pickup outside of these hours, please contact bookstoreorders@colostate.edu.\n\nPlease pick up your order by {restockDate}. Orders not picked up by this date may be returned to inventory and refunded in accordance with bookstore policies.\n\nIf you have any questions, please reply to this email and we will be happy to assist you.",
       "note": "Sent customer pickup reminder for order packed on {packedDate}; advised restock/cancellation date of {restockDate}",
       "fields": {
         "pickup": true
