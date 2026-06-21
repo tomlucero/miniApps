@@ -104,20 +104,32 @@
                 <section class="d-none" id="rackAllocationFields" aria-labelledby="rackAllocationHeading">
                   <div class="section-title-row">
                     <h3 id="rackAllocationHeading">Rack allocation</h3>
-                    <span>Any remainder goes to the final sign.</span>
+                    <span id="rackAllocationDescription">Rack boundaries end in 99.</span>
                   </div>
                   <div class="row g-3">
                     <div class="col-md-6">
                       <label class="form-label" for="rackStartOrder">Starting Order Number</label>
-                      <input class="form-control" id="rackStartOrder" type="number" min="0" step="1" inputmode="numeric">
+                      <input class="form-control" id="rackStartOrder" type="number" min="1" step="1" inputmode="numeric">
                     </div>
                     <div class="col-md-6">
-                      <label class="form-label" for="rackEndOrder">Ending Order Number</label>
-                      <input class="form-control" id="rackEndOrder" type="number" min="0" step="1" inputmode="numeric">
+                      <label class="form-label" for="rackCount">Number of Racks</label>
+                      <input class="form-control" id="rackCount" type="number" min="1" step="1" inputmode="numeric" value="1">
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label" for="shelvesPerRack">Shelves per Rack</label>
+                      <input class="form-control" id="shelvesPerRack" type="number" min="1" step="1" inputmode="numeric" value="3">
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label" for="ordersPerRack">Orders per Rack</label>
+                      <input class="form-control" id="ordersPerRack" type="number" min="1" step="1" inputmode="numeric" value="100">
                     </div>
                     <div class="col-12">
-                      <label class="form-label" for="rackSignCount">Number of Signs</label>
-                      <input class="form-control" id="rackSignCount" type="number" min="1" step="1" inputmode="numeric" value="3">
+                      <label class="form-label" for="rackEndingRule">Rack Ending Rule</label>
+                      <select class="form-select" id="rackEndingRule">
+                        <option value="require-99" selected>Require ending in 99</option>
+                        <option value="freeform">Freeform</option>
+                      </select>
+                      <div class="form-text">Freeform counts forward from the starting order using the configured orders per rack.</div>
                     </div>
                   </div>
                 </section>
