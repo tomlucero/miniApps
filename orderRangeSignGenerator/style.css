@@ -11,7 +11,7 @@
 
 .panel-title h2, .preview-panel-head h2 { margin: 0; font-size: 1.2rem; font-weight: 760; }
 
-.mode-toggle { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.mode-toggle { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
 .mode-toggle .btn { display: inline-flex; align-items: center; justify-content: center; }
 .mode-toggle .btn-check:checked + .btn { color: #fff; background: var(--suite-accent) !important; border-color: var(--suite-accent) !important; }
 
