@@ -104,7 +104,7 @@
                 <section class="d-none" id="rackAllocationFields" aria-labelledby="rackAllocationHeading">
                   <div class="section-title-row">
                     <h3 id="rackAllocationHeading">Rack allocation</h3>
-                    <span>Rack boundaries honor the preferred ending digits.</span>
+                    <span id="rackAllocationDescription">Rack boundaries end in 99.</span>
                   </div>
                   <div class="row g-3">
                     <div class="col-md-6">
@@ -124,9 +124,12 @@
                       <input class="form-control" id="ordersPerRack" type="number" min="1" step="1" inputmode="numeric" value="100">
                     </div>
                     <div class="col-12">
-                      <label class="form-label" for="preferredRackEnding">Preferred Rack Ending <span class="rack-ending-hint">last two digits</span></label>
-                      <input class="form-control" id="preferredRackEnding" type="number" min="0" max="99" step="1" inputmode="numeric" value="99">
-                      <div class="form-text">Example: 99 keeps rack ranges ending at 199, 299, 399, and so on.</div>
+                      <label class="form-label" for="rackEndingRule">Rack Ending Rule</label>
+                      <select class="form-select" id="rackEndingRule">
+                        <option value="require-99" selected>Require ending in 99</option>
+                        <option value="freeform">Freeform</option>
+                      </select>
+                      <div class="form-text">Freeform counts forward from the starting order using the configured orders per rack.</div>
                     </div>
                   </div>
                 </section>

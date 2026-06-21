@@ -2,6 +2,8 @@
   const form = document.getElementById("signForm");
   const defaultRangeFields = document.getElementById("defaultRangeFields");
   const rackAllocationFields = document.getElementById("rackAllocationFields");
+  const rackEndingRule = document.getElementById("rackEndingRule");
+  const rackAllocationDescription = document.getElementById("rackAllocationDescription");
   const customRangeFields = document.getElementById("customRangeFields");
   const customRangeList = document.getElementById("customRangeList");
   const signType = document.getElementById("signType");
@@ -79,6 +81,12 @@
     showStatus();
   }
 
+  function updateRackEndingRule() {
+    rackAllocationDescription.textContent = rackEndingRule.value === "require-99"
+      ? "Rack boundaries end in 99."
+      : "Rack boundaries count forward from the starting order.";
+  }
+
   function updateSignType() {
     const isCustom = signType.value === "custom";
     customHeaderField.classList.toggle("d-none", !isCustom);
@@ -107,18 +115,23 @@
     const rackCount = positiveInteger(document.getElementById("rackCount"));
     const shelvesPerRack = positiveInteger(document.getElementById("shelvesPerRack"));
     const ordersPerRack = positiveInteger(document.getElementById("ordersPerRack"));
-    const preferredEnding = positiveInteger(document.getElementById("preferredRackEnding"));
+    const endingRule = rackEndingRule.value;
 
-    if (start === null || start < 1 || rackCount === null || rackCount < 1 || shelvesPerRack === null || shelvesPerRack < 1 || ordersPerRack === null || ordersPerRack < 1 || preferredEnding === null || preferredEnding > 99) {
-      throw new Error("Enter valid whole numbers for the starting order, racks, shelves, orders per rack, and preferred ending.");
+    if (start === null || start < 1 || rackCount === null || rackCount < 1 || shelvesPerRack === null || shelvesPerRack < 1 || ordersPerRack === null || ordersPerRack < 1) {
+      throw new Error("Enter valid whole numbers for the starting order, racks, shelves, and orders per rack.");
     }
-    if (ordersPerRack % 100 !== 0) {
+    if (endingRule === "require-99" && ordersPerRack % 100 !== 0) {
       throw new Error("Orders per rack must be a multiple of 100 to keep every rack on the same preferred ending digits.");
     }
 
-    const firstEndingBase = Math.floor(start / 100) * 100;
-    let firstRackEnd = firstEndingBase + preferredEnding;
-    if (firstRackEnd < start) firstRackEnd += 100;
+    let firstRackEnd;
+    if (endingRule === "require-99") {
+      const firstEndingBase = Math.floor(start / 100) * 100;
+      firstRackEnd = firstEndingBase + 99;
+      if (firstRackEnd < start) firstRackEnd += 100;
+    } else {
+      firstRackEnd = start + ordersPerRack - 1;
+    }
     const firstRackSize = firstRackEnd - start + 1;
     if (firstRackSize > ordersPerRack) {
       throw new Error("The starting order is too far from the next preferred rack ending for the configured rack capacity.");
@@ -278,6 +291,7 @@
     previewCount.textContent = "0 signs";
     printButton.disabled = true;
     updateMode();
+    updateRackEndingRule();
     updateSignType();
     showStatus();
   }
@@ -288,6 +302,7 @@
   });
   form.addEventListener("input", clearGeneratedPreview);
   [...form.elements.rangeMode].forEach((radio) => radio.addEventListener("change", updateMode));
+  rackEndingRule.addEventListener("change", updateRackEndingRule);
   signType.addEventListener("change", updateSignType);
   document.getElementById("addRangeButton").addEventListener("click", () => addCustomRange());
   document.getElementById("resetButton").addEventListener("click", resetApp);
@@ -298,5 +313,6 @@
 
   addCustomRange();
   updateMode();
+  updateRackEndingRule();
   updateSignType();
 })();
