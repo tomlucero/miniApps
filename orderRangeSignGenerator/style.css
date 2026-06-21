@@ -18,6 +18,7 @@
 .section-title-row { align-items: flex-end; margin-bottom: 14px; }
 .section-title-row h3 { margin: 0; font-size: 1rem; font-weight: 760; }
 .section-title-row span { display: block; color: var(--suite-muted); font-size: .82rem; }
+.rack-ending-hint { display: inline !important; margin-left: 4px; font-size: .74rem !important; font-weight: 500; text-transform: none; }
 
 .custom-range-list { display: grid; gap: 10px; }
 .custom-range-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 42px; gap: 10px; align-items: end; padding: 12px; background: var(--suite-soft); border: 1px solid var(--suite-line); border-radius: 8px; }

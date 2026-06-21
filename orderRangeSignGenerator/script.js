@@ -104,30 +104,76 @@
 
   function buildRackAllocationRanges() {
     const start = positiveInteger(document.getElementById("rackStartOrder"));
-    const end = positiveInteger(document.getElementById("rackEndOrder"));
-    const signCount = positiveInteger(document.getElementById("rackSignCount"));
+    const rackCount = positiveInteger(document.getElementById("rackCount"));
+    const shelvesPerRack = positiveInteger(document.getElementById("shelvesPerRack"));
+    const ordersPerRack = positiveInteger(document.getElementById("ordersPerRack"));
+    const preferredEnding = positiveInteger(document.getElementById("preferredRackEnding"));
 
-    if (start === null || end === null || signCount === null || signCount < 1) {
-      throw new Error("Enter valid whole numbers for the starting order, ending order, and number of signs.");
+    if (start === null || start < 1 || rackCount === null || rackCount < 1 || shelvesPerRack === null || shelvesPerRack < 1 || ordersPerRack === null || ordersPerRack < 1 || preferredEnding === null || preferredEnding > 99) {
+      throw new Error("Enter valid whole numbers for the starting order, racks, shelves, orders per rack, and preferred ending.");
     }
-    if (end < start) throw new Error("The ending order number must be equal to or greater than the starting order number.");
+    if (ordersPerRack % 100 !== 0) {
+      throw new Error("Orders per rack must be a multiple of 100 to keep every rack on the same preferred ending digits.");
+    }
 
-    const totalOrders = end - start + 1;
-    if (signCount > totalOrders) throw new Error("The number of signs cannot be greater than the number of orders in the range.");
+    const firstEndingBase = Math.floor(start / 100) * 100;
+    let firstRackEnd = firstEndingBase + preferredEnding;
+    if (firstRackEnd < start) firstRackEnd += 100;
+    const firstRackSize = firstRackEnd - start + 1;
+    if (firstRackSize > ordersPerRack) {
+      throw new Error("The starting order is too far from the next preferred rack ending for the configured rack capacity.");
+    }
 
-    const baseSize = Math.floor(totalOrders / signCount);
-    const remainder = totalOrders % signCount;
     const ranges = [];
-    let rangeStart = start;
+    let rackStart = start;
+    let rackEnd = firstRackEnd;
 
-    for (let index = 0; index < signCount; index += 1) {
-      const rangeSize = baseSize + (index === signCount - 1 ? remainder : 0);
-      const rangeEnd = rangeStart + rangeSize - 1;
-      ranges.push({ start: rangeStart, end: rangeEnd });
-      rangeStart = rangeEnd + 1;
+    for (let rackIndex = 0; rackIndex < rackCount; rackIndex += 1) {
+      const rackSize = rackEnd - rackStart + 1;
+      if (shelvesPerRack > rackSize) {
+        throw new Error(`Rack ${rackIndex + 1} has fewer orders than shelves. Reduce the shelves per rack.`);
+      }
+
+      const shelfSizes = symmetricShelfSizes(rackSize, shelvesPerRack);
+      let shelfStart = rackStart;
+      shelfSizes.forEach((shelfSize) => {
+        const shelfEnd = shelfStart + shelfSize - 1;
+        ranges.push({ start: shelfStart, end: shelfEnd });
+        shelfStart = shelfEnd + 1;
+      });
+
+      rackStart = rackEnd + 1;
+      rackEnd += ordersPerRack;
     }
 
     return ranges;
+  }
+
+  function symmetricShelfSizes(totalOrders, shelfCount) {
+    if (shelfCount === 1) return [totalOrders];
+    if (shelfCount === 2) return [Math.ceil(totalOrders / 2), Math.floor(totalOrders / 2)];
+
+    const minimumInteriorOrders = shelfCount - 2;
+    const preferredOuterSize = Math.ceil(totalOrders / shelfCount);
+    const outerSize = Math.min(preferredOuterSize, Math.floor((totalOrders - minimumInteriorOrders) / 2));
+    const interiorCount = shelfCount - 2;
+    const interiorTotal = totalOrders - (outerSize * 2);
+    const interiorBase = Math.floor(interiorTotal / interiorCount);
+    let interiorRemainder = interiorTotal % interiorCount;
+    const interiorSizes = Array(interiorCount).fill(interiorBase);
+
+    for (let offset = 0; interiorRemainder > 0; offset += 1) {
+      const leftIndex = offset;
+      const rightIndex = interiorCount - 1 - offset;
+      interiorSizes[leftIndex] += 1;
+      interiorRemainder -= 1;
+      if (interiorRemainder > 0 && rightIndex !== leftIndex) {
+        interiorSizes[rightIndex] += 1;
+        interiorRemainder -= 1;
+      }
+    }
+
+    return [outerSize, ...interiorSizes, outerSize];
   }
 
   function buildCustomRanges() {
@@ -207,7 +253,11 @@
       const header = selectedHeader();
       generatedRanges = ranges;
       renderPages(ranges, header, footerNote.value.trim());
-      showStatus(`${ranges.length} ${ranges.length === 1 ? "sign is" : "signs are"} ready to print.`, "success");
+      const rackTotal = Number(document.getElementById("rackCount").value);
+      const readyMessage = mode === "rack-allocation"
+        ? `${ranges.length} ${ranges.length === 1 ? "sign" : "signs"} across ${rackTotal} ${rackTotal === 1 ? "rack" : "racks"} ${ranges.length === 1 ? "is" : "are"} ready to print.`
+        : `${ranges.length} ${ranges.length === 1 ? "sign is" : "signs are"} ready to print.`;
+      showStatus(readyMessage, "success");
       return true;
     } catch (error) {
       generatedRanges = [];
