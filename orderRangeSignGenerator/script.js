@@ -27,6 +27,7 @@
   }
 
   function positiveInteger(input) {
+    if (!input) return null;
     const value = Number(input.value);
     return Number.isInteger(value) && value >= 0 ? value : null;
   }
