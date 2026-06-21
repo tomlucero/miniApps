@@ -1,6 +1,7 @@
 (() => {
   const form = document.getElementById("signForm");
   const defaultRangeFields = document.getElementById("defaultRangeFields");
+  const rackAllocationFields = document.getElementById("rackAllocationFields");
   const customRangeFields = document.getElementById("customRangeFields");
   const customRangeList = document.getElementById("customRangeList");
   const signType = document.getElementById("signType");
@@ -69,9 +70,12 @@
   }
 
   function updateMode() {
-    const isDefault = currentMode() === "default";
+    const mode = currentMode();
+    const isDefault = mode === "default";
+    const isRackAllocation = mode === "rack-allocation";
     defaultRangeFields.classList.toggle("d-none", !isDefault);
-    customRangeFields.classList.toggle("d-none", isDefault);
+    rackAllocationFields.classList.toggle("d-none", !isRackAllocation);
+    customRangeFields.classList.toggle("d-none", mode !== "custom");
     showStatus();
   }
 
@@ -95,6 +99,34 @@
     for (let rangeStart = start; rangeStart <= end; rangeStart += perSign) {
       ranges.push({ start: rangeStart, end: Math.min(rangeStart + perSign - 1, end) });
     }
+    return ranges;
+  }
+
+  function buildRackAllocationRanges() {
+    const start = positiveInteger(document.getElementById("rackStartOrder"));
+    const end = positiveInteger(document.getElementById("rackEndOrder"));
+    const signCount = positiveInteger(document.getElementById("rackSignCount"));
+
+    if (start === null || end === null || signCount === null || signCount < 1) {
+      throw new Error("Enter valid whole numbers for the starting order, ending order, and number of signs.");
+    }
+    if (end < start) throw new Error("The ending order number must be equal to or greater than the starting order number.");
+
+    const totalOrders = end - start + 1;
+    if (signCount > totalOrders) throw new Error("The number of signs cannot be greater than the number of orders in the range.");
+
+    const baseSize = Math.floor(totalOrders / signCount);
+    const remainder = totalOrders % signCount;
+    const ranges = [];
+    let rangeStart = start;
+
+    for (let index = 0; index < signCount; index += 1) {
+      const rangeSize = baseSize + (index === signCount - 1 ? remainder : 0);
+      const rangeEnd = rangeStart + rangeSize - 1;
+      ranges.push({ start: rangeStart, end: rangeEnd });
+      rangeStart = rangeEnd + 1;
+    }
+
     return ranges;
   }
 
@@ -166,7 +198,12 @@
 
   function generateSigns() {
     try {
-      const ranges = currentMode() === "default" ? buildDefaultRanges() : buildCustomRanges();
+      const mode = currentMode();
+      const ranges = mode === "default"
+        ? buildDefaultRanges()
+        : mode === "rack-allocation"
+          ? buildRackAllocationRanges()
+          : buildCustomRanges();
       const header = selectedHeader();
       generatedRanges = ranges;
       renderPages(ranges, header, footerNote.value.trim());
