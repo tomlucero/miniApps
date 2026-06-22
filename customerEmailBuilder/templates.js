@@ -104,7 +104,7 @@ window.CUSTOMER_EMAIL_BUILDER_CONFIG = {
     },
     "onCampusDelivery": {
       "label": "On Campus Delivery - Changing to PUAS",
-      "subject": "Payment update needed for your CSU Bookstore order #{orderNumber}",
+      "subject": "CSU Bookstore order #{orderNumber} - Changed to Pick Up at Store",
       "body": "To help support a more sustainable CSU, the CSU Bookstore is updating orders shipping to residence halls to Pick Up at Store. \n\nShipping to on-campus residence halls can result in unnecessary delays — sometimes adding an extra business day for delivery. By switching to in-store pickup, we can reduce packaging waste, lower delivery emissions, and get your order to you faster. \n\nYour order will be available for pickup at the CSU Bookstore inside the Lory Student Center during regular business hours. You may also have a friend or roommate pick up your order on your behalf — just provide them with your name and order number, and reply to this email to let us know they are authorized to do so. \n\n If you have a circumstance that makes in-store pickup difficult (such as illness, a mobility limitation, or a work-schedule conflict), simply reply to this email and we'll be happy to ship your order instead for our standard $9.99 shipping fee. Please note that shipping times may take 1-2 business days, as packages must first go through our carrier’s processing systems. \n\n Thank you for supporting a more sustainable and efficient campus community.",
       "note": "Emailed customer to notify of change to pick up at store (On campus delivery)",
       "fields": {}
