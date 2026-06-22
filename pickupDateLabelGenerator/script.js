@@ -1,53 +1,66 @@
 (() => {
-const LABEL_TEMPLATES = {
-  avery5160: {
-    id: "avery5160",
-    name: "Avery 5160",
-    pageWidth: 8.5,
-    pageHeight: 11,
-    columns: 3,
-    rows: 10,
-    labelWidth: 2.625,
-    labelHeight: 1,
-    marginTop: 0.5,
-    marginLeft: 0.1875,
-    columnGap: 0.125,
-    rowGap: 0,
-    labelsPerSheet: 30
-  },
+  const LABEL_TEMPLATES = {
+    avery5160: {
+      id: "avery5160",
+      name: "Avery 5160",
+      pageWidth: 8.5,
+      pageHeight: 11,
+      columns: 3,
+      rows: 10,
+      labelWidth: 2.625,
+      labelHeight: 1,
+      marginTop: 0.5,
+      marginLeft: 0.1875,
+      columnGap: 0.125,
+      rowGap: 0,
+      labelsPerSheet: 30
+    },
+    ulineS5047: {
+      id: "ulineS5047",
+      name: "ULINE S-5047",
+      pageWidth: 8.5,
+      pageHeight: 11,
+      columns: 3,
+      rows: 10,
+      labelWidth: 2.625,
+      labelHeight: 1,
+      marginTop: 0.5,
+      marginLeft: 0.1875,
+      columnGap: 0.125,
+      rowGap: 0,
+      labelsPerSheet: 30
+    },
+    avery5163: {
+      id: "avery5163",
+      name: "Avery 5163",
+      pageWidth: 8.5,
+      pageHeight: 11,
+      columns: 2,
+      rows: 5,
+      labelWidth: 4,
+      labelHeight: 2,
+      marginTop: 0.5,
+      marginLeft: 0.15625,
+      columnGap: 0.125,
+      rowGap: 0,
+      labelsPerSheet: 10
+    }
+  };
 
-  ulineS5047: {
-    id: "ulineS5047",
-    name: "ULINE S-5047",
-    pageWidth: 8.5,
-    pageHeight: 11,
-    columns: 3,
-    rows: 10,
-    labelWidth: 2.625,
-    labelHeight: 1,
-    marginTop: 0.5,
-    marginLeft: 0.1875,
-    columnGap: 0.125,
-    rowGap: 0,
-    labelsPerSheet: 30
-  },
-
-  avery5163: {
-    id: "avery5163",
-    name: "Avery 5163",
-    pageWidth: 8.5,
-    pageHeight: 11,
-    columns: 2,
-    rows: 5,
-    labelWidth: 4,
-    labelHeight: 2,
-    marginTop: 0.5,
-    marginLeft: 0.15625,
-    columnGap: 0.125,
-    rowGap: 0, 
-    labelsPerSheet: 10
-  }
-};
+  const REQUIRED_TEMPLATE_FIELDS = [
+    "id",
+    "name",
+    "pageWidth",
+    "pageHeight",
+    "columns",
+    "rows",
+    "labelWidth",
+    "labelHeight",
+    "marginTop",
+    "marginLeft",
+    "columnGap",
+    "rowGap"
+  ];
 
   const form = document.getElementById("labelForm");
   const packedDate = document.getElementById("packedDate");
@@ -63,6 +76,7 @@ const LABEL_TEMPLATES = {
   const newSheetButton = document.getElementById("newSheetButton");
 
   let generatedLabelCount = 0;
+  let availableTemplates = [];
 
   function localDateInputValue(date = new Date()) {
     const year = date.getFullYear();
@@ -89,7 +103,11 @@ const LABEL_TEMPLATES = {
   }
 
   function currentTemplate() {
-    return LABEL_TEMPLATES[labelTemplate.value];
+    const template = availableTemplates.find(({ id }) => id === labelTemplate.value);
+    if (!template) {
+      throw new Error("The selected label template is unavailable. Choose a valid label template and try again.");
+    }
+    return template;
   }
 
   function selectedStyle() {
@@ -101,12 +119,70 @@ const LABEL_TEMPLATES = {
     formStatus.className = `form-status mt-3${type ? ` ${type}` : ""}`;
   }
 
+  function validateTemplate(template, configKey, usedIds) {
+    if (!template || typeof template !== "object" || Array.isArray(template)) {
+      throw new Error(`Template “${configKey}” must be a configuration object.`);
+    }
+
+    const missingFields = REQUIRED_TEMPLATE_FIELDS.filter((field) => !(field in template) || template[field] === "" || template[field] == null);
+    if (missingFields.length) {
+      throw new Error(`Template “${configKey}” is missing: ${missingFields.join(", ")}.`);
+    }
+    if (typeof template.id !== "string" || !template.id.trim()) {
+      throw new Error(`Template “${configKey}” must have a non-empty text id.`);
+    }
+    if (usedIds.has(template.id)) {
+      throw new Error(`Template id “${template.id}” is used more than once.`);
+    }
+    if (typeof template.name !== "string" || !template.name.trim()) {
+      throw new Error(`Template “${template.id}” must have a non-empty name.`);
+    }
+
+    const positiveFields = ["pageWidth", "pageHeight", "columns", "rows", "labelWidth", "labelHeight"];
+    const nonNegativeFields = ["marginTop", "marginLeft", "columnGap", "rowGap"];
+    const invalidPositive = positiveFields.filter((field) => !Number.isFinite(template[field]) || template[field] <= 0);
+    const invalidNonNegative = nonNegativeFields.filter((field) => !Number.isFinite(template[field]) || template[field] < 0);
+    if (invalidPositive.length || invalidNonNegative.length) {
+      throw new Error(`Template “${template.id}” has invalid measurements: ${[...invalidPositive, ...invalidNonNegative].join(", ")}.`);
+    }
+    if (!Number.isInteger(template.columns) || !Number.isInteger(template.rows)) {
+      throw new Error(`Template “${template.id}” must use whole numbers for columns and rows.`);
+    }
+
+    const calculatedCapacity = template.columns * template.rows;
+    const labelsPerSheet = template.labelsPerSheet ?? calculatedCapacity;
+    if (!Number.isInteger(labelsPerSheet) || labelsPerSheet !== calculatedCapacity) {
+      throw new Error(`Template “${template.id}” labelsPerSheet must equal columns × rows (${calculatedCapacity}).`);
+    }
+
+    usedIds.add(template.id);
+    return { ...template, labelsPerSheet };
+  }
+
+  function loadTemplates() {
+    const usedIds = new Set();
+    const errors = [];
+    availableTemplates = Object.entries(LABEL_TEMPLATES).flatMap(([configKey, template]) => {
+      try {
+        return [validateTemplate(template, configKey, usedIds)];
+      } catch (error) {
+        errors.push(error.message);
+        return [];
+      }
+    });
+
+    if (!availableTemplates.length) {
+      throw new Error(`No valid label templates are available.${errors.length ? ` ${errors.join(" ")}` : ""}`);
+    }
+    return errors;
+  }
+
   function populateTemplateOptions() {
     labelTemplate.replaceChildren();
-    Object.values(LABEL_TEMPLATES).forEach((template) => {
+    availableTemplates.forEach((template) => {
       const option = document.createElement("option");
       option.value = template.id;
-      option.textContent = `${template.name} — ${template.columns * template.rows} labels`;
+      option.textContent = `${template.name} — ${template.labelsPerSheet} labels`;
       labelTemplate.appendChild(option);
     });
   }
@@ -183,7 +259,7 @@ const LABEL_TEMPLATES = {
     const sheet = document.createElement("section");
     sheet.className = "label-sheet";
     applyTemplateVariables(sheet, template);
-    const capacity = template.columns * template.rows;
+    const capacity = template.labelsPerSheet;
     let placed = 0;
     for (let slotIndex = 0; slotIndex < capacity; slotIndex += 1) {
       const slot = document.createElement("div");
@@ -236,7 +312,7 @@ const LABEL_TEMPLATES = {
       let generated = 0;
       while (remaining > 0) {
         const pageStart = pageIndex === 0 ? startIndex : 0;
-        const available = template.columns * template.rows - pageStart;
+        const available = template.labelsPerSheet - pageStart;
         const pageCount = Math.min(remaining, available);
         const screenSheet = createSheet(template, pageStart, pageCount, style, dates);
         const printSheet = createSheet(template, pageStart, pageCount, style, dates);
@@ -269,8 +345,12 @@ const LABEL_TEMPLATES = {
     form.reset();
     packedDate.value = localDateInputValue();
     labelCount.value = "10";
-    labelTemplate.value = "avery5160";
-    populatePositionOptions();
+    labelTemplate.value = availableTemplates[0]?.id || "";
+    try {
+      populatePositionOptions();
+    } catch (error) {
+      showStatus(error.message, "error");
+    }
     startingRow.value = "1";
     startingColumn.value = "1";
     updateCalculatedDates();
@@ -297,7 +377,13 @@ const LABEL_TEMPLATES = {
     if (generatedLabelCount) clearPreview();
   });
   labelTemplate.addEventListener("change", () => {
-    populatePositionOptions();
+    try {
+      populatePositionOptions();
+    } catch (error) {
+      clearPreview();
+      showStatus(error.message, "error");
+      return;
+    }
     if (generatedLabelCount) clearPreview();
   });
   startingRow.addEventListener("change", updateSummaryPosition);
@@ -309,8 +395,21 @@ const LABEL_TEMPLATES = {
     window.print();
   });
 
-  populateTemplateOptions();
   packedDate.value = localDateInputValue();
-  populatePositionOptions();
   updateCalculatedDates();
+  try {
+    const templateErrors = loadTemplates();
+    populateTemplateOptions();
+    populatePositionOptions();
+    if (templateErrors.length) {
+      showStatus(`Some label templates could not be loaded: ${templateErrors.join(" ")}`, "error");
+    }
+  } catch (error) {
+    labelTemplate.replaceChildren(new Option("No valid templates available", ""));
+    labelTemplate.disabled = true;
+    startingRow.disabled = true;
+    startingColumn.disabled = true;
+    form.querySelector('button[type="submit"]').disabled = true;
+    showStatus(error.message, "error");
+  }
 })();
