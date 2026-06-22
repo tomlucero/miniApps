@@ -13,6 +13,34 @@
       marginLeft: 0.1875,
       columnGap: 0.125,
       rowGap: 0
+    },
+    ulineS5047: {
+      id: "ulineS5047",
+      name: "ULINE S-5047X",
+      pageWidth: 8.5,
+      pageHeight: 11,
+      columns: 3,
+      rows: 10,
+      labelWidth: 2.625,
+      labelHeight: 1,
+      marginTop: 0.5,
+      marginLeft: 0.1875,
+      columnGap: 0.125,
+      rowGap: 0
+    },
+    avery5163: {
+      id: "Avery 5163",
+      name: "Avery 5163",
+      pageWidth: 8.5,
+      pageHeight: 11,
+      columns: 2,
+      rows: 5,
+      labelWidth: 4,
+      labelHeight: 2,
+      marginTop: 0.5,
+      marginLeft: 0.1875,
+      columnGap: 0.14,
+      rowGap: 0
     }
   };
 
