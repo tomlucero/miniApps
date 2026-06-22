@@ -18,8 +18,8 @@ window.CUSTOMER_EMAIL_BUILDER_CONFIG = {
     },
     "substitutions": {
       "label": "Out of stock item with substitutions",
-      "subject": "Substitution options for your CSU Bookstore order #{orderNumber}",
-      "body": "Thank you for your order from the CSU Bookstore. Regrettably, one of the items in your order{item} is currently unavailable. We understand this is disappointing, but we have found the following possible substitutions that may fit your needs.",
+      "subject": "Substitution Options for CSU Bookstore Order #{orderNumber}",
+      "body": "Thank you for your order from the CSU Bookstore. Regrettably, one of the items in your order, {item}, is currently unavailable. We understand this is disappointing, but we have found the following possible substitutions that may fit your needs.",
       "note": "Emailed customer regarding unavailable item. Provided substitution options",
       "fields": {
         "item": true,
@@ -78,7 +78,7 @@ window.CUSTOMER_EMAIL_BUILDER_CONFIG = {
     },
     "authorizedPickupPerson": {
       "label": "Authorized Pickup Person",
-      "subject": "[CSU Bookstore] Authorized Pickup Person Added - Order #{orderNumber}",
+      "subject": "Authorized Pickup Person Added - CSU Bookstore Order #{orderNumber}",
       "body": "We have added a note to your order authorizing {authorizedPerson} to pick up order #{orderNumber} on your behalf.\n\nPlease provide the authorized person with the order number so our team can locate your order quickly.\n\nPick-Up Location/Hours\n\nThe pickup counter is located on the lower level of the CSU Bookstore inside the Lory Student Center on the CSU Campus. Our pickup counter is open Monday–Friday, 8:00 a.m. – 4:00 p.m. \n\nAs a reminder, orders must be picked up within 28 days of the initial pick-up notification. Orders not collected within that timeframe may be returned to inventory and refunded to the original payment method.\n\nIf you need to update or remove this authorization, please reply to this email.",
       "note": "Customer authorized {authorizedPerson} to pick up the order on their behalf. Customer notified via email on {generatedDate}",
       "fields": {
@@ -90,7 +90,7 @@ window.CUSTOMER_EMAIL_BUILDER_CONFIG = {
     },
     "addressProblem": {
       "label": "Address problem",
-      "subject": "Address confirmation needed for your CSU Bookstore order #{orderNumber}",
+      "subject": "[ACTION REQUIRED] CSU Bookstore #{orderNumber} - Update Address Info",
       "body": "We need to confirm your shipping address before we can continue processing your order. Please reply with your complete delivery address, including any apartment or unit number.",
       "note": "Emailed customer to request corrected shipping address",
       "fields": {}
@@ -100,6 +100,13 @@ window.CUSTOMER_EMAIL_BUILDER_CONFIG = {
       "subject": "Payment update needed for your CSU Bookstore order #{orderNumber}",
       "body": "We were unable to process the payment for your order. Please contact the CSU Bookstore so we can help update your payment information. For your security, do not send card information by email.",
       "note": "Emailed customer regarding payment issue and requested contact",
+      "fields": {}
+    },
+    "onCampusDelivery": {
+      "label": "On Campus Delivery - Changing to PUAS",
+      "subject": "Payment update needed for your CSU Bookstore order #{orderNumber}",
+      "body": "To help support a more sustainable CSU, the CSU Bookstore is updating orders shipping to residence halls to Pick Up at Store. \n\nShipping to on-campus residence halls can result in unnecessary delays — sometimes adding an extra business day for delivery. By switching to in-store pickup, we can reduce packaging waste, lower delivery emissions, and get your order to you faster. \n\nYour order will be available for pickup at the CSU Bookstore inside the Lory Student Center during regular business hours. You may also have a friend or roommate pick up your order on your behalf — just provide them with your name and order number, and reply to this email to let us know they are authorized to do so. \n\n If you have a circumstance that makes in-store pickup difficult (such as illness, a mobility limitation, or a work-schedule conflict), simply reply to this email and we'll be happy to ship your order instead for our standard $9.99 shipping fee. Please note that shipping times may take 1-2 business days, as packages must first go through our carrier’s processing systems. \n\n Thank you for supporting a more sustainable and efficient campus community.",
+      "note": "Emailed customer to notify of change to pick up at store (On campus delivery)",
       "fields": {}
     }
   },
@@ -124,7 +131,7 @@ window.CUSTOMER_EMAIL_BUILDER_CONFIG = {
     "dayOneNoteLead": "Emailed customer regarding Day One Access title “{dayOneTitle}” for {courseName}",
     "dayOneOnlyNote": "Entire order canceled; payment method was not charged",
     "dayOneMoreNote": "Title cannot be fulfilled through order; remaining items will be prepared for fulfillment",
-    "footer": "The CSU Bookstore is owned and operated by Colorado State University.\n\nThe CSU Bookstore returns all revenues to CSU to support student programs and services at the university."
+    "footer": "The CSU Bookstore is owned and operated by Colorado State University and returns all revenues to CSU for student programs and services."
   },
   "deadlineText": {
     "requestEmail": "Please reply by {deadlineDate} at {deadlineTime}.",
