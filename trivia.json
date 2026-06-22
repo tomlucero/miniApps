@@ -205,9 +205,94 @@
     "answer": "A radio station that broadcasts time signals outside of Fort Collins. Radio Controlled Clocks use this signal to set the time accurately."
   },
   {
+    "category": "Colorado",
+    "question": "What Colorado town is the visual inspiration for South Park?",
+    "answer": "Fairplay, Colorado."
+  },
+  {
+    "category": "Colorado",
+    "question": "Which step on the Colorado Capital building is 1 mile above sea level?",
+    "answer": "the 13th step."
+  },
+  {
+    "category": "Dad Joke",
+    "question": "Why don't skeletons fight each other?",
+    "answer": "They don't have the guts."
+  },
+  {
+    "category": "Dad Joke",
+    "question": "Why are books always cold?",
+    "answer": "Because they have too many drafts."
+  },
+  {
+    "category": "Dad Joke",
+    "question": "Why did the librarian get kicked off the plane?",
+    "answer": "Because it was overbooked."
+  },
+  {
+    "category": "Dad Joke",
+    "question": "Why was the bookmark so calm?",
+    "answer": "Because it knew its place."
+  },
+  {
+    "category": "Dad Joke",
+    "question": "Why did the employee get fired from the calendar factory?",
+    "answer": "He took a couple days off."
+  }
+  {
+    "category": "Dad Joke",
+    "question": "Why did the employee wear sunglasses to work?",
+    "answer": "Because their future was looking bright."
+  },
+  {
+    "category": "Dad Joke",
+    "question": "Why do some fish swim in salt water?",
+    "answer": "If they swam in pepper water, they would sneeze."
+  },
+  {
+    "category": "CSU",
+    "question": "Who is Amy Van Dyken?",
+    "answer": "Formerly a CSU athlete, she earned NCAA Female Swimmer of the Year in 1994. She made history at the 1996 Atlanta Summer Olympics by becoming the first American woman to win four gold medals in a single Olympic Games."
+  },
+  {
+    "category": "CSU Bookstore",
+    "question": "Why are closed-toe shoes required in many bookstore work areas?",
+    "answer": "To help protect employees from injuries caused by dropped boxes, carts, and other workplace hazards."
+  },
+  {
+    "category": "Colorado",
+    "question": "What is the real name of bus that picks up downtown and along I-25 and takes passengers to Denver Union Station?",
+    "answer": "Bustang."
+  },
+  {
+    "category": "MBS Insite",
+    "question": "What is the difference between a Picking List and Packing List?",
+    "answer": "A picking list tells an employee what items to pick to fulfill an order. A packing list shows which items were pack on that order."
+  },
+  {
+    "category": "MBS Insite",
+    "question": "In UPS WorldShip, why do you never want to delete the number in the 'Address 3' spot? ",
+    "answer": "The number in Address 3 corresponds to the picking list number, which Insite uses to assign tracking information to the order."
+  },
+  {
+    "category": "MBS Insite",
+    "question": "What does the Repick order status mean?",
+    "answer": "An item on the customer's order is on backorder."
+  },
+  {
+    "category": "MBS Insite",
+    "question": "Where do you find information about a customer order, including the current order status?",
+    "answer": "Retrieve Customer Orders from the Order Processing menu."
+  },
+  {
+    "category": "Colorado",
+    "question": "What is the real name of 'Blucifer', the blue horse outside of Denver International Airport?",
+    "answer": "Blue Mustang."
+  },
+  {
     "category": "Fort Collins",
     "question": "This CSU president sold a lease to the railroad to allow the railroad to run through the campus.",
-    "answer": "Chipotle Mexican Grill"
+    "answer": "Aylesworth"
   },
   {
     "category": "Colorado",
@@ -250,8 +335,18 @@
     "answer": "There was a bowling alley."
   },
   {
+    "category": "Lory Student Center",
+    "question": "What restaurant was in the space where Taco Bell operates today?",
+    "answer": "Taco John's"
+  },
+  {
     "category": "CSU",
     "question": "Which CSU faculty member was mayor of Fort Collins?",
     "answer": "Wade Troxell"
+  },
+  {
+    "category": "CSU",
+    "question": "Who is Hughes Street on the CSU Campus named for?",
+    "answer": "Harry W. Hughes, the head coach for Colorado A&M football from 1911-41."
   }
 ]
