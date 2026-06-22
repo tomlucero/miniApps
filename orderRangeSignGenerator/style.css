@@ -58,6 +58,9 @@
 
 .print-area { display: none; }
 
+@page shelfPage { size: letter portrait; margin: .25in; }
+@page rackPage { size: letter landscape; margin: .25in; }
+
 @media (max-width: 575px) {
   .panel-title, .section-title-row, .preview-panel-head { align-items: flex-start; flex-direction: column; }
   .mode-toggle { grid-template-columns: 1fr; }
@@ -73,8 +76,8 @@
   .print-area { display: block !important; }
   .print-page { box-sizing: border-box; display: grid; break-after: page; page-break-after: always; }
   .print-page:last-child { break-after: auto; page-break-after: auto; }
-  .print-page.shelf { width: 8in; height: 10.5in; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); gap: .18in; }
-  .print-page.rack { width: 10.5in; height: 8in; grid-template-columns: 1fr; grid-template-rows: 1fr; }
+  .print-page.shelf { page: shelfPage; width: 8in; height: 10.5in; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); gap: .18in; }
+  .print-page.rack { page: rackPage; width: 10.5in; height: 8in; grid-template-columns: 1fr; grid-template-rows: 1fr; }
   .print-page .range-sign { padding: .32in; border-width: 4px; }
   .print-page.shelf .range-sign-header { margin-bottom: .42in; font-size: 22pt; }
   .print-page.shelf .range-sign-number { font-size: 48pt; }

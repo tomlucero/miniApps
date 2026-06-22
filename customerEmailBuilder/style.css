@@ -1,0 +1,19 @@
+:root { --csu-green:#1e4d2b; --csu-green-dark:#153a20; --csu-gold:#c8c372; --paper:#f6f5f1; }
+body { background: var(--paper); color:#17211a; }
+.app-header { background:linear-gradient(125deg,var(--csu-green-dark),var(--csu-green)); border-bottom:4px solid var(--csu-gold); }
+.breadcrumb-link { color:rgba(255,255,255,.75); }
+.breadcrumb-link:hover { color:#fff; }
+.panel { border:0; border-radius:1rem; box-shadow:0 .4rem 1.5rem rgba(23,62,35,.07); }
+.section-kicker { color:var(--csu-green); font-size:.75rem; letter-spacing:.08em; text-transform:uppercase; font-weight:800; }
+.form-label { font-weight:650; font-size:.9rem; }
+.form-control:focus,.form-select:focus { border-color:#5a8b67; box-shadow:0 0 0 .25rem rgba(30,77,43,.12); }
+.form-check-input:checked { background-color:var(--csu-green); border-color:var(--csu-green); }
+.output-card { border:1px solid #dfe5e0; border-radius:.9rem; overflow:hidden; background:#fff; }
+.output-head { background:#f1f5f2; border-bottom:1px solid #dfe5e0; }
+.output-text { white-space:pre-wrap; min-height:3rem; line-height:1.55; }
+.output-text.email { min-height:17rem; }
+.copy-btn { color:var(--csu-green); border-color:#9fb2a4; }
+.copy-btn:hover,.copy-btn:focus { background:var(--csu-green); border-color:var(--csu-green); color:#fff; }
+.required::after { content:" *"; color:#b42318; }
+.deadline-box { background:#f8faf8; border:1px solid #dce5de; border-radius:.75rem; }
+@media (min-width: 992px) { .outputs-column { position:sticky; top:1.25rem; align-self:flex-start; } }
