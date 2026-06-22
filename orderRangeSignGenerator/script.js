@@ -17,7 +17,6 @@
   const previewEmpty = document.getElementById("previewEmpty");
   const previewCount = document.getElementById("previewCount");
   const printButton = document.getElementById("printButton");
-  const pageOrientation = document.getElementById("pageOrientation");
 
   let rangeRowId = 0;
   let generatedRanges = [];
@@ -235,8 +234,6 @@
     const perPage = layout === "shelf" ? 4 : 1;
     screenPreview.replaceChildren();
     printArea.replaceChildren();
-    pageOrientation.textContent = `@page { size: letter ${layout === "shelf" ? "portrait" : "landscape"}; margin: ${layout === "shelf" ? "0.25in" : "0.25in"}; }`;
-
     for (let index = 0; index < ranges.length; index += perPage) {
       const group = ranges.slice(index, index + perPage);
       const screenPage = document.createElement("div");
