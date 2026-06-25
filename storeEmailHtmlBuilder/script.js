@@ -177,17 +177,29 @@ function alertBlock() {
               ${spacer(18)}`;
 }
 
-function requestedPickupSection() {
-  if (!elements.includeRequestedPickup.checked) return "";
+function promoAndNotesValue() {
+  return `<<<PROMOCODE>>>${spacer(16)}<div style="font-size:12px; line-height:18px; letter-spacing:.6px; text-transform:uppercase; color:#617068; font-weight:bold;">Order Notes</div>${spacer(6)}<div style="font-size:16px; line-height:24px; color:${BRAND.ink};"><<<CUSTORDNOTES>>></div>`;
+}
+
+function orderNotesSection() {
+  const includeRequestedPickup = elements.includeRequestedPickup.checked;
+
   return `
               ${sectionRule()}
               <div style="padding-top:22px;">
-                ${twoColumn(
-                  "Requested Pickup Date",
-                  `<<<PICKUPDATE>>>${spacer(6)}<div style="font-size:12px; line-height:18px; color:${BRAND.muted};">When applicable. Pickup orders are completed by or before 3:00 p.m. on the requested date and may be ready sooner.</div>`,
-                  "Promo Code",
-                  `<<<PROMOCODE>>>${spacer(16)}<div style="font-size:12px; line-height:18px; letter-spacing:.6px; text-transform:uppercase; color:#617068; font-weight:bold;">Order Notes</div>${spacer(6)}<div style="font-size:16px; line-height:24px; color:${BRAND.ink};"><<<CUSTORDNOTES>>></div>`
-                )}
+                ${includeRequestedPickup
+                  ? twoColumn(
+                      "Requested Pickup Date",
+                      `<<<PICKUPDATE>>>${spacer(6)}<div style="font-size:12px; line-height:18px; color:${BRAND.muted};">When applicable. Pickup orders are completed by or before 3:00 p.m. on the requested date and may be ready sooner.</div>`,
+                      "Promo Code",
+                      promoAndNotesValue()
+                    )
+                  : twoColumn(
+                      "Promo Code",
+                      "<<<PROMOCODE>>>",
+                      "Order Notes",
+                      `<<<CUSTORDNOTES>>>`
+                    )}
               </div>`;
 }
 
@@ -283,7 +295,7 @@ function confirmationSpecificSections() {
               <div style="padding-top:22px;">
                 ${twoColumn("Shipping Address", "<<<SHIPADDRESS>>>", "Billing Address", "<<<BILLADDRESS>>>")}
               </div>
-              ${requestedPickupSection()}`;
+              ${orderNotesSection()}`;
 }
 
 function pickupSpecificSections() {

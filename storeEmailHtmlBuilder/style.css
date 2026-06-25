@@ -81,14 +81,7 @@
 
 .preview-frame-wrap {
   padding: 18px;
-  background:
-    linear-gradient(45deg, #eef2f6 25%, transparent 25%),
-    linear-gradient(-45deg, #eef2f6 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, #eef2f6 75%),
-    linear-gradient(-45deg, transparent 75%, #eef2f6 75%);
-  background-color: #f8fafc;
-  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
-  background-size: 16px 16px;
+  background: #e6ebe6;
 }
 
 #emailPreview {
@@ -105,10 +98,10 @@
   width: 100%;
   min-height: 420px;
   padding: 18px;
-  color: #24303a;
-  background: #0f172a;
-  color: #dbeafe;
+  color: var(--suite-ink);
+  background: #fff;
   border: 0;
+  border-top: 1px solid var(--suite-line);
   border-radius: 0 0 var(--suite-radius) var(--suite-radius);
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
   font-size: .82rem;
