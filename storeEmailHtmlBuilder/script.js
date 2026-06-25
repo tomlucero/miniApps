@@ -10,7 +10,9 @@ const EMAIL_TEMPLATES = [
     defaults: {
       emailHeadline: "Thank you for your order.",
       openingMessage: "We received your order and will begin processing it soon.",
-      standardShippingMessage: "Orders received before 2:00 p.m. Mountain Time are processed the same business day. Orders received after 2:00 p.m. Mountain Time are processed the next business day. Orders received after 2:00 p.m. on Fridays are processed the next business day, typically Monday.",
+      standardShippingMessage: `Orders received <strong>before 2:00 p.m. Mountain Time</strong> are processed the same business day and are typically available for pickup by <strong>3:00 p.m.</strong>
+Orders received <strong>after 2:00 p.m. Mountain Time</strong> are processed the next business day and are typically available for pickup by <strong>3:00 p.m.</strong>
+Orders received <strong>after 2:00 p.m. on Fridays</strong> are processed the next business day, typically Monday.`,
       pickupMessage: "If you selected in-store pickup, please wait for a pickup notification before coming to the bookstore.",
       footerContactMessage: "Have questions about your order? Email BookstoreOrders@colostate.edu or call 970-491-0904 between 8 a.m. and 4 p.m. Mountain Time."
     },
@@ -103,6 +105,32 @@ function richText(value = "") {
     .map((paragraph) => paragraph.replace(/\n/g, "<br>"))
     .filter(Boolean)
     .join('<div style="height:10px; line-height:10px;">&nbsp;</div>');
+}
+
+function trustedInlineHtml(value = "") {
+  return String(value)
+    .replaceAll(/<strong>/gi, "%%STRONG_OPEN%%")
+    .replaceAll(/<\/strong>/gi, "%%STRONG_CLOSE%%")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;")
+    .replaceAll("%%STRONG_OPEN%%", "<strong>")
+    .replaceAll("%%STRONG_CLOSE%%", "</strong>");
+}
+
+function processingList(value = "") {
+  const items = String(value)
+    .split(/\n+/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+
+  if (!items.length) return "";
+
+  return `<ul style="margin:0; padding-left:20px;">
+                    ${items.map((item, index) => `<li${index < items.length - 1 ? ' style="margin-bottom:10px;"' : ""}>${trustedInlineHtml(item)}</li>`).join("\n                    ")}
+                  </ul>`;
 }
 
 function prettyDateTime(value) {
@@ -286,7 +314,7 @@ function confirmationSpecificSections() {
               <div style="padding-top:28px;">
                 <h3 style="font-size:20px; line-height:26px; color:#163c21; font-weight:bold; margin:0;">How long will my order take?</h3>
                 ${spacer(12)}
-                <div style="font-size:16px; line-height:24px; color:#2f3a34;">${richText(elements.standardShippingMessage.value)}</div>
+                <div style="font-size:16px; line-height:24px; color:#2f3a34;">${processingList(elements.standardShippingMessage.value)}</div>
               </div>
               <div style="padding-top:28px;">
                 ${twoColumn("Payment Method", "<<<PAYMETHOD>>>", "Fulfillment Method", "<<<SHIPMETHOD>>>")}
