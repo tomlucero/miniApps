@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Store Email HTML Builder | CSU Bookstore</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/b65fbcdd34.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="../shared-theme.css?v=20260621-1">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="suite-hero">
+    <div class="suite-hero-image" role="img" aria-label="Colorado State University Lory Student Center"></div>
+    <div class="suite-hero-inner">
+      <div>
+        <a class="suite-back" href="../index.html">&larr; Return to Toolbox</a>
+        <p class="suite-eyebrow">Customer communication</p>
+        <h1>Store Email HTML Builder</h1>
+        <p class="suite-lead">Edit CSU Bookstore HTML email templates and generate copy/paste-ready email-safe HTML.</p>
+      </div>
+      <img class="suite-logo" src="../productListingHTMLBuilder/images/bookstoreLogo.png" alt="CSU Bookstore logo">
+    </div>
+  </header>
+
+  <main class="workspace-band">
+    <div class="container">
+      <div class="row g-4 align-items-start">
+        <div class="col-xl-5">
+          <form class="card builder-card" id="emailForm" novalidate>
+            <div class="card-body p-4">
+              <div class="panel-title mb-4">
+                <div>
+                  <p class="suite-eyebrow">Template setup</p>
+                  <h2>Email content</h2>
+                </div>
+                <button class="btn btn-outline-secondary btn-sm" id="resetButton" type="button">Reset</button>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label" for="templateType">Email Template Type</label>
+                <select class="form-select" id="templateType"></select>
+              </div>
+
+              <div class="row g-3">
+                <div class="col-12">
+                  <label class="form-label" for="emailHeadline">Email headline</label>
+                  <input class="form-control" id="emailHeadline" type="text">
+                </div>
+                <div class="col-12">
+                  <label class="form-label" for="openingMessage">Opening message</label>
+                  <textarea class="form-control" id="openingMessage" rows="4"></textarea>
+                </div>
+                <div class="col-12">
+                  <label class="form-label" for="standardShippingMessage">Standard shipping message</label>
+                  <textarea class="form-control" id="standardShippingMessage" rows="3"></textarea>
+                </div>
+                <div class="col-12">
+                  <label class="form-label" for="pickupMessage">Pickup message</label>
+                  <textarea class="form-control" id="pickupMessage" rows="3"></textarea>
+                </div>
+                <div class="col-12">
+                  <label class="form-label" for="footerContactMessage">Footer/contact message</label>
+                  <textarea class="form-control" id="footerContactMessage" rows="3"></textarea>
+                </div>
+              </div>
+
+              <hr class="my-4">
+
+              <div class="optional-block">
+                <div class="form-check form-switch">
+                  <input class="form-check-input" id="includeAlert" type="checkbox">
+                  <label class="form-check-label" for="includeAlert">Include Closing / Delay Alert</label>
+                </div>
+
+                <div class="optional-fields mt-3 d-none" id="alertFields">
+                  <div class="row g-3">
+                    <div class="col-12">
+                      <label class="form-label" for="alertHeadline">Alert headline</label>
+                      <input class="form-control" id="alertHeadline" type="text">
+                    </div>
+                    <div class="col-12">
+                      <label class="form-label" for="alertMessage">Alert message</label>
+                      <textarea class="form-control" id="alertMessage" rows="4"></textarea>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label" for="alertStart">Start date/time <span class="text-muted fw-normal">(optional)</span></label>
+                      <input class="form-control" id="alertStart" type="datetime-local">
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label" for="alertEnd">End date/time <span class="text-muted fw-normal">(optional)</span></label>
+                      <input class="form-control" id="alertEnd" type="datetime-local">
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="optional-block mt-3" id="requestedPickupBlockControl">
+                <div class="form-check form-switch">
+                  <input class="form-check-input" id="includeRequestedPickup" type="checkbox">
+                  <label class="form-check-label" for="includeRequestedPickup">Include Requested Pickup Date Block</label>
+                </div>
+              </div>
+
+              <div class="form-status mt-3" id="formStatus" role="status" aria-live="polite"></div>
+
+              <div class="action-row mt-4">
+                <button class="btn btn-primary" id="copyButton" type="button"><i class="fa-solid fa-copy" aria-hidden="true"></i> Copy HTML</button>
+                <button class="btn btn-outline-secondary" id="downloadButton" type="button"><i class="fa-solid fa-file-code" aria-hidden="true"></i> Download HTML</button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <div class="col-xl-7">
+          <section class="card preview-card" aria-labelledby="previewHeading">
+            <div class="preview-card-head">
+              <div>
+                <p class="suite-eyebrow">Live preview</p>
+                <h2 id="previewHeading">Generated email</h2>
+              </div>
+              <span class="template-badge" id="templateBadge">Order Confirmation Email</span>
+            </div>
+            <div class="preview-frame-wrap">
+              <iframe id="emailPreview" title="Generated email preview"></iframe>
+            </div>
+          </section>
+
+          <section class="card output-card mt-4" aria-labelledby="htmlOutputHeading">
+            <div class="preview-card-head">
+              <div>
+                <p class="suite-eyebrow">Copy/paste output</p>
+                <h2 id="htmlOutputHeading">Generated HTML</h2>
+              </div>
+              <button class="btn btn-outline-secondary btn-sm" id="selectHtmlButton" type="button">Select all</button>
+            </div>
+            <textarea class="html-output" id="htmlOutput" spellcheck="false" aria-label="Generated email HTML"></textarea>
+          </section>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

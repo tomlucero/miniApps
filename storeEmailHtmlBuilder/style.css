@@ -1,0 +1,134 @@
+.workspace-band {
+  padding: 32px 0 56px;
+}
+
+.panel-title,
+.preview-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.panel-title h2,
+.preview-card-head h2 {
+  margin: 0;
+  color: var(--suite-ink);
+  font-size: 1.15rem;
+  font-weight: 780;
+}
+
+.builder-card,
+.preview-card,
+.output-card {
+  overflow: hidden;
+}
+
+.optional-block {
+  padding: 14px;
+  background: var(--suite-soft);
+  border: 1px solid var(--suite-line);
+  border-radius: var(--suite-radius);
+}
+
+.form-check-label {
+  color: var(--suite-ink);
+  font-weight: 700;
+}
+
+.form-check-input:checked {
+  background-color: var(--suite-accent);
+  border-color: var(--suite-accent);
+}
+
+.action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.form-status {
+  min-height: 0;
+  font-size: .9rem;
+}
+
+.form-status:not(:empty) {
+  padding: 10px 12px;
+  color: var(--suite-success);
+  background: var(--suite-success-soft);
+  border: 1px solid #b9e4d2;
+  border-radius: 6px;
+}
+
+.preview-card-head {
+  padding: 20px 22px;
+  background: var(--suite-soft);
+  border-bottom: 1px solid var(--suite-line);
+}
+
+.template-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 4px 10px;
+  color: var(--suite-accent-dark);
+  background: var(--suite-accent-soft);
+  border-radius: 999px;
+  font-size: .78rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.preview-frame-wrap {
+  padding: 18px;
+  background:
+    linear-gradient(45deg, #eef2f6 25%, transparent 25%),
+    linear-gradient(-45deg, #eef2f6 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #eef2f6 75%),
+    linear-gradient(-45deg, transparent 75%, #eef2f6 75%);
+  background-color: #f8fafc;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+  background-size: 16px 16px;
+}
+
+#emailPreview {
+  display: block;
+  width: 100%;
+  min-height: 720px;
+  background: #e6ebe6;
+  border: 1px solid var(--suite-line);
+  border-radius: 6px;
+}
+
+.html-output {
+  display: block;
+  width: 100%;
+  min-height: 420px;
+  padding: 18px;
+  color: #24303a;
+  background: #0f172a;
+  color: #dbeafe;
+  border: 0;
+  border-radius: 0 0 var(--suite-radius) var(--suite-radius);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: .82rem;
+  line-height: 1.55;
+  resize: vertical;
+}
+
+@media (max-width: 720px) {
+  .panel-title,
+  .preview-card-head {
+    display: block;
+  }
+
+  .panel-title .btn,
+  .preview-card-head .btn,
+  .template-badge {
+    margin-top: 12px;
+  }
+
+  #emailPreview {
+    min-height: 560px;
+  }
+}
