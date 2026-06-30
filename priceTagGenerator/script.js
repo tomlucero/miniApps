@@ -1,6 +1,4 @@
 (() => {
-  const LOGO_PATH = "../Bookstore-VPSA-CSU-HBlk.png";
-
   const PRINT_FORMATS = {
     avery5160: {
       id: "avery5160",
@@ -123,7 +121,7 @@
   const startingColumn = document.getElementById("startingColumn");
   const priceSize = document.getElementById("priceSize");
   const barcodeDisplay = document.getElementById("barcodeDisplay");
-  const includeLogo = document.getElementById("includeLogo");
+  const showBarcodeText = document.getElementById("showBarcodeText");
   const excelPaste = document.getElementById("excelPaste");
   const pastePanel = document.getElementById("pastePanel");
   const manualPanel = document.getElementById("manualPanel");
@@ -282,8 +280,8 @@
     const barcodeValue = sanitizeInlineText(item.barcodeValue) || sku;
     const techSpecs = normalizeSpecs(item.techSpecs);
     if (!description) throw new Error(`${indexLabel}: Description is required.`);
-    if (!sku) throw new Error(`${indexLabel}: SKU / Part Number is required.`);
-    if (!manufacturerModel) throw new Error(`${indexLabel}: Manufacturer Model Number is required.`);
+    if (!sku) throw new Error(`${indexLabel}: SKU / UPC is required.`);
+    if (!manufacturerModel) throw new Error(`${indexLabel}: MFG MOD is required.`);
     return { description, price, sku, manufacturerModel, barcodeValue, techSpecs };
   }
 
@@ -294,7 +292,7 @@
     return rows.map((row, index) => {
       const columns = row.split("\t");
       if (columns.length < 4) {
-        throw new Error(`Row ${index + 1} must include Description, Price, SKU / Part Number, and Manufacturer Model Number in separate Excel columns.`);
+        throw new Error(`Row ${index + 1} must include Description, Price, SKU / UPC, and MFG MOD in separate Excel columns.`);
       }
       return normalizeItem({
         description: columns[0],
@@ -331,7 +329,7 @@
       title.textContent = item.description;
       const meta = document.createElement("div");
       meta.className = "manual-item-meta";
-      meta.textContent = `$${item.price} | SKU: ${item.sku} | MFG: ${item.manufacturerModel} | Barcode: ${item.barcodeValue}`;
+      meta.textContent = `$${item.price} | SKU / UPC: ${item.sku} | MFG MOD: ${item.manufacturerModel} | Barcode: ${item.barcodeValue}`;
       info.append(title, meta);
       if (item.techSpecs) {
         const specs = document.createElement("div");
@@ -418,38 +416,37 @@
     Object.entries(values).forEach(([property, value]) => sheet.style.setProperty(property, value));
   }
 
-  function makeLogoImage() {
-    const logo = document.createElement("img");
-    logo.className = "sign-logo";
-    logo.alt = "CSU Bookstore";
-    const preloader = new Image();
-    preloader.addEventListener("load", () => {
-      logo.src = LOGO_PATH;
-      logo.classList.add("is-ready");
-    }, { once: true });
-    preloader.addEventListener("error", () => {
-      logo.classList.add("is-hidden");
-    }, { once: true });
-    preloader.src = LOGO_PATH;
-    return logo;
-  }
-
-  function barcodeHeightFor(template, mode) {
-    if (template.id === "halfSheet") return mode === "textBarcode" ? 24 : 52;
+  function barcodeHeightFor(template, showText) {
+    if (template.id === "halfSheet") return showText ? 14 : 18;
     if (template.id === "fourUp" || template.id === "avery5163" || template.id === "avery8163") {
-      return mode === "textBarcode" ? 16 : 28;
+      return showText ? 11 : 14;
     }
-    return mode === "textBarcode" ? 10 : 14;
+    return showText ? 8 : 10;
   }
 
-  function barcodeWidthFor(template, value, mode) {
+  function barcodeWidthFor(template, value, showText) {
     const base = template.id === "halfSheet"
-      ? (mode === "textBarcode" ? 1.15 : 2.1)
+      ? (showText ? 0.62 : 0.72)
       : (template.id === "fourUp" || template.id === "avery5163" || template.id === "avery8163")
-        ? (mode === "textBarcode" ? 0.85 : 1.35)
-        : (mode === "textBarcode" ? 0.68 : 0.9);
-    const min = template.id === "halfSheet" ? (mode === "textBarcode" ? 0.7 : 1.1) : 0.5;
+        ? (showText ? 0.54 : 0.64)
+        : (showText ? 0.42 : 0.5);
+    const min = template.id === "halfSheet" ? 0.48 : 0.32;
     return Math.max(min, Math.min(base, 22 / Math.max(value.length, 8)));
+  }
+
+  function barcodeTextSizeFor(template, showText) {
+    if (!showText) return undefined;
+    if (template.id === "avery5160") return 9.5;
+    if (template.id === "halfSheet") return 12;
+    if (template.id === "fourUp" || template.id === "avery5163" || template.id === "avery8163") return 10.5;
+    return 10;
+  }
+
+  function barcodeTextMarginFor(template, showText) {
+    if (!showText) return 0;
+    if (template.id === "avery5160") return 4;
+    if (template.id === "halfSheet") return 3;
+    return 2;
   }
 
   function buildSpecsBlock(item, template) {
@@ -480,8 +477,9 @@
 
   function buildCard(item, template) {
     const card = document.createElement("article");
-    card.className = `price-card ${template.layoutClass} price-${priceSize.value}${includeLogo.checked ? " logo-on" : ""}`;
     const barcodeMode = barcodeDisplay.value;
+    const renderBarcodeText = barcodeMode !== "none" && showBarcodeText.checked;
+    card.className = `price-card ${template.layoutClass} price-${priceSize.value} barcode-${barcodeMode} ${renderBarcodeText ? "barcode-text-on" : "barcode-text-off"}`;
 
     const inner = document.createElement("div");
     inner.className = "price-card-inner";
@@ -501,10 +499,10 @@
     meta.className = "meta-block";
     const sku = document.createElement("div");
     sku.className = "meta-line";
-    sku.textContent = `SKU / Part Number: ${item.sku}`;
+    sku.textContent = `SKU / UPC: ${item.sku}`;
     const model = document.createElement("div");
     model.className = "meta-line";
-    model.textContent = `Manufacturer Model Number: ${item.manufacturerModel}`;
+    model.textContent = `MFG MOD: ${item.manufacturerModel}`;
     meta.append(sku, model);
 
     const specsBlock = buildSpecsBlock(item, template);
@@ -516,27 +514,24 @@
       barcodeSvg.classList.add("barcode-svg");
       JsBarcode(barcodeSvg, item.barcodeValue, {
         format: "CODE128",
-        displayValue: barcodeMode === "textBarcode",
+        displayValue: renderBarcodeText,
         font: "Poppins",
         fontOptions: "600",
-        textMargin: template.id === "halfSheet" ? 3 : 2,
+        fontSize: barcodeTextSizeFor(template, renderBarcodeText),
+        textMargin: barcodeTextMarginFor(template, renderBarcodeText),
         margin: 0,
-        width: barcodeWidthFor(template, item.barcodeValue, barcodeMode),
-        height: barcodeHeightFor(template, barcodeMode)
+        width: barcodeWidthFor(template, item.barcodeValue, renderBarcodeText),
+        height: barcodeHeightFor(template, renderBarcodeText)
       });
       barcodeWrap.appendChild(barcodeSvg);
     }
 
-    const logoWrap = document.createElement("div");
-    logoWrap.className = "sign-logo-wrap";
-    if (includeLogo.checked) logoWrap.appendChild(makeLogoImage());
-
     if (template.id === "halfSheet") {
-      inner.append(descriptionBlock, price, specsBlock || document.createElement("div"), meta, barcodeWrap, logoWrap);
+      inner.append(descriptionBlock, price, specsBlock || document.createElement("div"), meta, barcodeWrap);
     } else {
       inner.append(descriptionBlock, price, meta);
       if (specsBlock) inner.append(specsBlock);
-      inner.append(barcodeWrap, logoWrap);
+      inner.append(barcodeWrap);
     }
 
     card.appendChild(inner);
@@ -659,7 +654,7 @@
   });
   startingRow.addEventListener("change", updateSummaryPosition);
   startingColumn.addEventListener("change", updateSummaryPosition);
-  [priceSize, barcodeDisplay, includeLogo].forEach((element) => {
+  [priceSize, barcodeDisplay, showBarcodeText].forEach((element) => {
     element.addEventListener("change", () => {
       if (generatedCount) clearPreview();
     });

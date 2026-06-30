@@ -7,13 +7,12 @@
 .method-toggle { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 .method-toggle .btn { display: inline-flex; align-items: center; justify-content: center; }
 .method-toggle .btn-check:checked + .btn { color: #fff; background: var(--suite-accent) !important; border-color: var(--suite-accent) !important; }
-.layout-check { min-height: 46px; padding: 11px 14px 11px 38px; background: var(--suite-soft); border: 1px solid var(--suite-line); border-radius: 10px; }
-
 .entry-panel, .list-panel { padding: 16px; background: var(--suite-soft); border: 1px solid var(--suite-line); border-radius: 12px; }
 .excel-paste { min-height: 180px; resize: vertical; }
 .field-note { color: var(--suite-muted); font-size: .82rem; }
 .manual-grid { display: grid; gap: 12px; }
 .manual-specs-field { grid-column: 1 / -1; }
+.barcode-text-check { min-height: 46px; padding: 11px 14px 11px 38px; background: var(--suite-soft); border: 1px solid var(--suite-line); border-radius: 10px; }
 
 .queue-count, .sheet-count { padding: 5px 9px; color: var(--suite-accent-dark); background: var(--suite-accent-soft); border-radius: 999px; font-size: .8rem; font-weight: 750; }
 .manual-empty { color: var(--suite-muted); font-size: .9rem; }
@@ -75,19 +74,6 @@
   min-height: 0;
 }
 
-.price-card.logo-on .sign-logo-wrap { display: flex; }
-.sign-logo-wrap { display: none; align-items: center; justify-content: flex-end; min-height: 0; }
-.sign-logo {
-  display: block;
-  width: auto;
-  height: auto;
-  max-width: 42%;
-  max-height: 100%;
-  object-fit: contain;
-}
-.sign-logo:not(.is-ready) { display: none; }
-.sign-logo.is-hidden { display: none !important; }
-
 .description-block { min-width: 0; }
 .product-description {
   margin: 0;
@@ -118,7 +104,7 @@
   min-height: 0;
   overflow: hidden;
 }
-.barcode-svg { display: block; width: 100%; height: auto; max-height: 100%; }
+.barcode-svg { display: block; width: auto; height: auto; max-width: 100%; max-height: 100%; }
 
 .specs-block {
   min-height: 0;
@@ -132,22 +118,34 @@
 .format-ulineS5047 .price-card { padding: 6% 7%; }
 .format-avery5160 .price-card-inner,
 .format-ulineS5047 .price-card-inner { grid-template-rows: auto auto auto 1fr; gap: 2%; }
+.format-avery5160.barcode-none .price-card-inner,
+.format-ulineS5047.barcode-none .price-card-inner { grid-template-rows: auto auto auto; align-content: center; gap: 5%; }
 .format-avery5160 .product-description,
-.format-ulineS5047 .product-description { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: .27rem; line-height: 1.15; }
+.format-ulineS5047 .product-description { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: .38rem; line-height: 1.12; }
 .format-avery5160 .meta-line,
-.format-ulineS5047 .meta-line { font-size: .19rem; font-weight: 600; line-height: 1.15; letter-spacing: .04em; }
+.format-ulineS5047 .meta-line { font-size: .24rem; font-weight: 600; line-height: 1.12; letter-spacing: .04em; }
 .format-avery5160 .barcode-wrap,
 .format-ulineS5047 .barcode-wrap { min-height: 0; }
+.format-avery5160 .barcode-wrap.barcode-mode-none,
+.format-ulineS5047 .barcode-wrap.barcode-mode-none { display: none; }
 .format-avery5160 .specs-block,
 .format-ulineS5047 .specs-block { display: none; }
-.format-avery5160 .sign-logo-wrap,
-.format-ulineS5047 .sign-logo-wrap { max-height: 12%; margin-bottom: 1%; }
 .format-avery5160.price-standard .price-value,
-.format-ulineS5047.price-standard .price-value { font-size: .54rem; }
+.format-ulineS5047.price-standard .price-value { font-size: .88rem; }
 .format-avery5160.price-large .price-value,
-.format-ulineS5047.price-large .price-value { font-size: .66rem; }
+.format-ulineS5047.price-large .price-value { font-size: 1.02rem; }
 .format-avery5160.price-xlarge .price-value,
-.format-ulineS5047.price-xlarge .price-value { font-size: .76rem; }
+.format-ulineS5047.price-xlarge .price-value { font-size: 1.16rem; }
+.format-avery5160.barcode-none .product-description,
+.format-ulineS5047.barcode-none .product-description { font-size: .43rem; line-height: 1.1; }
+.format-avery5160.barcode-none .meta-line,
+.format-ulineS5047.barcode-none .meta-line { font-size: .27rem; line-height: 1.1; }
+.format-avery5160.barcode-none.price-standard .price-value,
+.format-ulineS5047.barcode-none.price-standard .price-value { font-size: 1rem; }
+.format-avery5160.barcode-none.price-large .price-value,
+.format-ulineS5047.barcode-none.price-large .price-value { font-size: 1.16rem; }
+.format-avery5160.barcode-none.price-xlarge .price-value,
+.format-ulineS5047.barcode-none.price-xlarge .price-value { font-size: 1.32rem; }
 
 .format-avery5163 .price-card,
 .format-avery8163 .price-card { padding: 6.5% 7%; }
@@ -159,8 +157,6 @@
 .format-avery8163 .meta-line { font-size: .3rem; font-weight: 600; line-height: 1.15; letter-spacing: .04em; }
 .format-avery5163 .specs-block,
 .format-avery8163 .specs-block { font-size: .33rem; line-height: 1.2; color: #334155; }
-.format-avery5163 .sign-logo-wrap,
-.format-avery8163 .sign-logo-wrap { max-height: 10%; }
 .format-avery5163.price-standard .price-value,
 .format-avery8163.price-standard .price-value { font-size: 1.15rem; }
 .format-avery5163.price-large .price-value,
@@ -168,35 +164,44 @@
 .format-avery5163.price-xlarge .price-value,
 .format-avery8163.price-xlarge .price-value { font-size: 1.75rem; }
 
-.format-fourUp .price-card { padding: .25in; }
-.format-fourUp .price-card-inner { grid-template-rows: auto auto auto 1fr auto; gap: 3%; }
+.format-fourUp .price-card { display: flex; align-items: stretch; padding: .25in; }
+.format-fourUp .price-card-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  min-height: 100%;
+  gap: .18in;
+}
+.format-fourUp .description-block { width: 100%; }
 .format-fourUp .product-description { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; font-size: .9rem; line-height: 1.15; }
+.format-fourUp .price-value { line-height: .92; }
+.format-fourUp .meta-block { gap: .05in; }
 .format-fourUp .meta-line { font-size: .48rem; font-weight: 600; line-height: 1.15; letter-spacing: .05em; }
-.format-fourUp .barcode-wrap.barcode-mode-textBarcode { min-height: 25%; max-height: 25%; }
-.format-fourUp .barcode-wrap.barcode-mode-barcodeOnly { min-height: 32%; max-height: 32%; }
+.format-fourUp .barcode-wrap { width: 100%; margin-top: auto; padding-top: .08in; }
+.format-fourUp .barcode-wrap.barcode-mode-barcodeOnly { min-height: 25%; max-height: 25%; }
 .format-fourUp .specs-block { font-size: .54rem; line-height: 1.2; color: #334155; }
-.format-fourUp .sign-logo-wrap { max-height: 10%; }
 .format-fourUp.price-standard .price-value { font-size: 2.2rem; }
 .format-fourUp.price-large .price-value { font-size: 2.8rem; }
 .format-fourUp.price-xlarge .price-value { font-size: 3.3rem; }
 
-.format-halfSheet .price-card { padding: .25in; }
-.format-halfSheet .price-card-inner { grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); grid-template-rows: auto auto 1fr auto; gap: 4% 5%; }
+.format-halfSheet .price-card { display: flex; align-items: stretch; padding: .25in; }
+.format-halfSheet .price-card-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  min-height: 100%;
+  gap: .24in;
+}
+.format-halfSheet .description-block { width: 100%; }
 .format-halfSheet .product-description { font-size: 1.35rem; line-height: 1.15; }
-.format-halfSheet .description-block,
-.format-halfSheet .specs-block { grid-column: 1 / 2; }
-.format-halfSheet .price-value,
-.format-halfSheet .meta-block,
-.format-halfSheet .barcode-wrap,
-.format-halfSheet .sign-logo-wrap { grid-column: 2 / 3; }
-.format-halfSheet .price-value { align-self: start; text-align: right; }
-.format-halfSheet .meta-block { align-self: start; justify-self: end; width: 100%; }
-.format-halfSheet .meta-line { font-size: .66rem; font-weight: 600; line-height: 1.15; letter-spacing: .05em; text-align: right; }
-.format-halfSheet .barcode-wrap.barcode-mode-textBarcode { min-height: 25%; max-height: 25%; align-self: end; }
-.format-halfSheet .barcode-wrap.barcode-mode-barcodeOnly { min-height: 38%; max-height: 38%; align-self: end; }
-.format-halfSheet .barcode-wrap.barcode-mode-none { min-height: 0; max-height: none; align-self: end; }
-.format-halfSheet .specs-block { font-size: .92rem; line-height: 1.35; color: #334155; padding-top: 2%; border-top: 1px solid #d7dee7; }
-.format-halfSheet .sign-logo-wrap { align-self: start; justify-self: end; max-height: 12%; }
+.format-halfSheet .price-value { line-height: .92; }
+.format-halfSheet .meta-block { gap: .08in; width: 100%; }
+.format-halfSheet .meta-line { font-size: .66rem; font-weight: 600; line-height: 1.15; letter-spacing: .05em; }
+.format-halfSheet .barcode-wrap { width: 100%; margin-top: auto; padding-top: .1in; }
+.format-halfSheet .barcode-wrap.barcode-mode-barcodeOnly { min-height: 25%; max-height: 25%; }
+.format-halfSheet .specs-block { font-size: .92rem; line-height: 1.35; color: #334155; padding-top: .12in; border-top: 1px solid #d7dee7; }
 .format-halfSheet.price-standard .price-value { font-size: 3.6rem; }
 .format-halfSheet.price-large .price-value { font-size: 4.4rem; }
 .format-halfSheet.price-xlarge .price-value { font-size: 5rem; }
@@ -208,14 +213,7 @@
   .format-fourUp.price-standard .price-value { font-size: 1.9rem; }
   .format-fourUp.price-large .price-value { font-size: 2.35rem; }
   .format-fourUp.price-xlarge .price-value { font-size: 2.8rem; }
-  .format-halfSheet .price-card-inner { grid-template-columns: 1fr; grid-template-rows: auto auto auto auto auto; }
-  .format-halfSheet .description-block,
-  .format-halfSheet .specs-block,
-  .format-halfSheet .price-value,
-  .format-halfSheet .meta-block,
-  .format-halfSheet .barcode-wrap,
-  .format-halfSheet .sign-logo-wrap { grid-column: auto; }
-  .format-halfSheet .price-value, .format-halfSheet .meta-line { text-align: left; }
+  .format-halfSheet .price-card-inner { gap: .18in; }
 }
 
 @media (max-width: 767px) {
@@ -252,17 +250,27 @@
   .format-avery5160 .price-card,
   .format-ulineS5047 .price-card { padding: .05in .06in .04in; }
   .format-avery5160 .product-description,
-  .format-ulineS5047 .product-description { font-size: 7pt; }
+  .format-ulineS5047 .product-description { font-size: 8.5pt; }
   .format-avery5160 .meta-line,
-  .format-ulineS5047 .meta-line { font-size: 4.1pt; }
-  .format-avery5160 .sign-logo-wrap,
-  .format-ulineS5047 .sign-logo-wrap { max-height: .08in; }
+  .format-ulineS5047 .meta-line { font-size: 5pt; }
   .format-avery5160.price-standard .price-value,
-  .format-ulineS5047.price-standard .price-value { font-size: 14pt; }
+  .format-ulineS5047.price-standard .price-value { font-size: 18pt; }
   .format-avery5160.price-large .price-value,
-  .format-ulineS5047.price-large .price-value { font-size: 17pt; }
+  .format-ulineS5047.price-large .price-value { font-size: 21pt; }
   .format-avery5160.price-xlarge .price-value,
-  .format-ulineS5047.price-xlarge .price-value { font-size: 19pt; }
+  .format-ulineS5047.price-xlarge .price-value { font-size: 24pt; }
+  .format-avery5160.barcode-none .price-card-inner,
+  .format-ulineS5047.barcode-none .price-card-inner { grid-template-rows: auto auto auto; align-content: center; gap: .03in; }
+  .format-avery5160.barcode-none .product-description,
+  .format-ulineS5047.barcode-none .product-description { font-size: 9.5pt; line-height: 1.05; }
+  .format-avery5160.barcode-none .meta-line,
+  .format-ulineS5047.barcode-none .meta-line { font-size: 5.5pt; line-height: 1.05; }
+  .format-avery5160.barcode-none.price-standard .price-value,
+  .format-ulineS5047.barcode-none.price-standard .price-value { font-size: 21pt; }
+  .format-avery5160.barcode-none.price-large .price-value,
+  .format-ulineS5047.barcode-none.price-large .price-value { font-size: 24pt; }
+  .format-avery5160.barcode-none.price-xlarge .price-value,
+  .format-ulineS5047.barcode-none.price-xlarge .price-value { font-size: 27pt; }
 
   .format-avery5163 .price-card,
   .format-avery8163 .price-card { padding: .14in .16in; }
@@ -280,19 +288,21 @@
   .format-avery8163.price-xlarge .price-value { font-size: 36pt; }
 
   .format-fourUp .price-card { padding: .25in; }
+  .format-fourUp .price-card-inner { gap: .18in; }
   .format-fourUp .product-description { font-size: 17pt; }
   .format-fourUp .meta-line { font-size: 8.5pt; }
   .format-fourUp .specs-block { font-size: 9.5pt; }
-  .format-fourUp .sign-logo-wrap { max-height: .45in; }
+  .format-fourUp .barcode-wrap { padding-top: .08in; }
   .format-fourUp.price-standard .price-value { font-size: 44pt; }
   .format-fourUp.price-large .price-value { font-size: 56pt; }
   .format-fourUp.price-xlarge .price-value { font-size: 66pt; }
 
   .format-halfSheet .price-card { padding: .25in; }
+  .format-halfSheet .price-card-inner { gap: .22in; }
   .format-halfSheet .product-description { font-size: 24pt; }
   .format-halfSheet .meta-line { font-size: 11pt; }
   .format-halfSheet .specs-block { font-size: 12.5pt; }
-  .format-halfSheet .sign-logo-wrap { max-height: .6in; }
+  .format-halfSheet .barcode-wrap { padding-top: .12in; }
   .format-halfSheet.price-standard .price-value { font-size: 72pt; }
   .format-halfSheet.price-large .price-value { font-size: 88pt; }
   .format-halfSheet.price-xlarge .price-value { font-size: 100pt; }

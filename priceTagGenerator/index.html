@@ -11,7 +11,7 @@
   <script src="https://kit.fontawesome.com/b65fbcdd34.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
   <link rel="stylesheet" href="../shared-theme.css?v=20260621-1">
-  <link rel="stylesheet" href="style.css?v=20260629-2">
+  <link rel="stylesheet" href="style.css?v=20260629-4">
 </head>
 <body>
   <div class="screen-only">
@@ -66,15 +66,14 @@
                   <div class="col-md-6">
                     <label class="form-label" for="barcodeDisplay">Barcode Display</label>
                     <select class="form-select" id="barcodeDisplay">
-                      <option value="textBarcode" selected>Text + Barcode</option>
-                      <option value="barcodeOnly">Barcode only</option>
-                      <option value="none">No barcode</option>
+                      <option value="barcodeOnly">Barcode</option>
+                      <option value="none" selected>No barcode</option>
                     </select>
                   </div>
-                  <div class="col-12">
-                    <div class="form-check layout-check">
-                      <input class="form-check-input" id="includeLogo" type="checkbox">
-                      <label class="form-check-label" for="includeLogo">Include CSU Bookstore logo</label>
+                  <div class="col-md-6">
+                    <div class="form-check barcode-text-check">
+                      <input class="form-check-input" id="showBarcodeText" type="checkbox">
+                      <label class="form-check-label" for="showBarcodeText">Show Barcode Text</label>
                     </div>
                   </div>
                   <div class="col-12">
@@ -93,7 +92,7 @@
                 <div class="entry-panel mt-4" id="pastePanel">
                   <label class="form-label" for="excelPaste">Paste price tag data from Excel</label>
                   <textarea class="form-control excel-paste" id="excelPaste" rows="8" placeholder="CSU Rams T-Shirt	24.99	123456	RAM-TS-001	123456&#10;CSU Rams Gaming Laptop	1299.99	555444	LTP-15-RTX	555444"></textarea>
-                  <div class="field-note mt-2">Paste tab-separated rows in this order: Description | Price | SKU / Part Number | Manufacturer Model Number | Barcode Value. Barcode Value is optional.</div>
+                  <div class="field-note mt-2">Paste tab-separated rows in this order: Description | Price | SKU / UPC | MFG MOD | Barcode Value. Barcode Value is optional.</div>
                 </div>
 
                 <div class="entry-panel mt-4 d-none" id="manualPanel">
@@ -107,16 +106,16 @@
                       <input class="form-control" id="manualPrice" type="text" inputmode="decimal" maxlength="20" placeholder="24.99">
                     </div>
                     <div>
-                      <label class="form-label" for="manualSku">SKU / Part Number</label>
+                      <label class="form-label" for="manualSku">SKU / UPC</label>
                       <input class="form-control" id="manualSku" type="text" maxlength="60" placeholder="123456">
                     </div>
                     <div>
-                      <label class="form-label" for="manualManufacturerModel">Manufacturer Model Number</label>
+                      <label class="form-label" for="manualManufacturerModel">MFG MOD</label>
                       <input class="form-control" id="manualManufacturerModel" type="text" maxlength="80" placeholder="RAM-TS-001">
                     </div>
                     <div>
                       <label class="form-label" for="manualBarcodeValue">Barcode Value</label>
-                      <input class="form-control" id="manualBarcodeValue" type="text" maxlength="80" placeholder="Optional: defaults to SKU / Part Number">
+                      <input class="form-control" id="manualBarcodeValue" type="text" maxlength="80" placeholder="Optional: defaults to SKU / UPC">
                     </div>
                     <div class="manual-specs-field">
                       <label class="form-label" for="manualTechSpecs">Tech Specs / Product Notes</label>
@@ -187,6 +186,6 @@
   </div>
 
   <div class="print-area" id="printArea" aria-label="Printable price tags and price signs"></div>
-  <script src="script.js?v=20260629-2"></script>
+  <script src="script.js?v=20260629-4"></script>
 </body>
 </html>
