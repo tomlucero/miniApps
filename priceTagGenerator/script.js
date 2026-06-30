@@ -422,25 +422,15 @@
     const logo = document.createElement("img");
     logo.className = "sign-logo";
     logo.alt = "CSU Bookstore";
-    const handleLoad = () => {
+    const preloader = new Image();
+    preloader.addEventListener("load", () => {
+      logo.src = LOGO_PATH;
       logo.classList.add("is-ready");
-      logo.classList.remove("is-hidden");
-    };
-    const handleError = () => {
+    }, { once: true });
+    preloader.addEventListener("error", () => {
       logo.classList.add("is-hidden");
-      logo.classList.remove("is-ready");
-      logo.removeAttribute("src");
-    };
-
-    logo.addEventListener("load", handleLoad, { once: true });
-    logo.addEventListener("error", handleError, { once: true });
-    logo.src = LOGO_PATH;
-
-    if (logo.complete) {
-      if (logo.naturalWidth > 0) handleLoad();
-      else handleError();
-    }
-
+    }, { once: true });
+    preloader.src = LOGO_PATH;
     return logo;
   }
 

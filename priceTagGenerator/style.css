@@ -79,14 +79,13 @@
 .sign-logo-wrap { display: none; align-items: center; justify-content: flex-end; min-height: 0; }
 .sign-logo {
   display: block;
-  visibility: hidden;
   width: auto;
   height: auto;
   max-width: 42%;
   max-height: 100%;
   object-fit: contain;
 }
-.sign-logo.is-ready { visibility: visible; }
+.sign-logo:not(.is-ready) { display: none; }
 .sign-logo.is-hidden { display: none !important; }
 
 .description-block { min-width: 0; }
