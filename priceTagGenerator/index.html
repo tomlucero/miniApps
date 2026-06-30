@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Price Tag Generator | CSU Bookstore</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/b65fbcdd34.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+  <link rel="stylesheet" href="../shared-theme.css?v=20260621-1">
+  <link rel="stylesheet" href="style.css?v=20260629-2">
+</head>
+<body>
+  <div class="screen-only">
+    <header class="suite-hero">
+      <div class="suite-hero-image" role="img" aria-label="Colorado State University Lory Student Center"></div>
+      <div class="suite-hero-inner">
+        <div>
+          <a class="suite-back" href="../index.html">&larr; Return to Toolbox</a>
+          <p class="suite-eyebrow">Retail pricing helper</p>
+          <h1>Price Tag Generator</h1>
+          <p class="suite-lead">Create compact shelf tags, 4-up signs, and half-sheet product signs with client-side barcode support.</p>
+        </div>
+        <img class="suite-logo" src="../productListingHTMLBuilder/images/bookstoreLogo.png" alt="CSU Bookstore logo">
+      </div>
+    </header>
+
+    <main class="workspace-band">
+      <div class="container">
+        <div class="row g-4 align-items-start">
+          <div class="col-xl-5">
+            <form class="card setup-card" id="tagForm" novalidate>
+              <div class="card-body p-4">
+                <div class="panel-title mb-4">
+                  <div>
+                    <p class="suite-eyebrow">Print setup</p>
+                    <h2>Format and content</h2>
+                  </div>
+                  <button class="btn btn-outline-secondary btn-sm" id="resetButton" type="button">Reset</button>
+                </div>
+
+                <div class="row g-3">
+                  <div class="col-12">
+                    <label class="form-label" for="labelTemplate">Print Format</label>
+                    <select class="form-select" id="labelTemplate"></select>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label" for="startingRow">Starting Row</label>
+                    <select class="form-select" id="startingRow"></select>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label" for="startingColumn">Starting Column</label>
+                    <select class="form-select" id="startingColumn"></select>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label" for="priceSize">Price Size</label>
+                    <select class="form-select" id="priceSize">
+                      <option value="standard" selected>Standard</option>
+                      <option value="large">Large</option>
+                      <option value="xlarge">Extra Large</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label" for="barcodeDisplay">Barcode Display</label>
+                    <select class="form-select" id="barcodeDisplay">
+                      <option value="textBarcode" selected>Text + Barcode</option>
+                      <option value="barcodeOnly">Barcode only</option>
+                      <option value="none">No barcode</option>
+                    </select>
+                  </div>
+                  <div class="col-12">
+                    <div class="form-check layout-check">
+                      <input class="form-check-input" id="includeLogo" type="checkbox">
+                      <label class="form-check-label" for="includeLogo">Include CSU Bookstore logo</label>
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <fieldset>
+                      <legend class="form-label mb-2">Price Tag Entry Method</legend>
+                      <div class="method-toggle" role="radiogroup" aria-label="Price tag entry method">
+                        <input class="btn-check" id="pasteMethod" name="entryMethod" type="radio" value="paste" checked>
+                        <label class="btn btn-outline-secondary" for="pasteMethod">Paste from Excel</label>
+                        <input class="btn-check" id="manualMethod" name="entryMethod" type="radio" value="manual">
+                        <label class="btn btn-outline-secondary" for="manualMethod">Add manually</label>
+                      </div>
+                    </fieldset>
+                  </div>
+                </div>
+
+                <div class="entry-panel mt-4" id="pastePanel">
+                  <label class="form-label" for="excelPaste">Paste price tag data from Excel</label>
+                  <textarea class="form-control excel-paste" id="excelPaste" rows="8" placeholder="CSU Rams T-Shirt	24.99	123456	RAM-TS-001	123456&#10;CSU Rams Gaming Laptop	1299.99	555444	LTP-15-RTX	555444"></textarea>
+                  <div class="field-note mt-2">Paste tab-separated rows in this order: Description | Price | SKU / Part Number | Manufacturer Model Number | Barcode Value. Barcode Value is optional.</div>
+                </div>
+
+                <div class="entry-panel mt-4 d-none" id="manualPanel">
+                  <div class="manual-grid">
+                    <div>
+                      <label class="form-label" for="manualDescription">Description</label>
+                      <input class="form-control" id="manualDescription" type="text" maxlength="140" placeholder="CSU Rams T-Shirt">
+                    </div>
+                    <div>
+                      <label class="form-label" for="manualPrice">Price</label>
+                      <input class="form-control" id="manualPrice" type="text" inputmode="decimal" maxlength="20" placeholder="24.99">
+                    </div>
+                    <div>
+                      <label class="form-label" for="manualSku">SKU / Part Number</label>
+                      <input class="form-control" id="manualSku" type="text" maxlength="60" placeholder="123456">
+                    </div>
+                    <div>
+                      <label class="form-label" for="manualManufacturerModel">Manufacturer Model Number</label>
+                      <input class="form-control" id="manualManufacturerModel" type="text" maxlength="80" placeholder="RAM-TS-001">
+                    </div>
+                    <div>
+                      <label class="form-label" for="manualBarcodeValue">Barcode Value</label>
+                      <input class="form-control" id="manualBarcodeValue" type="text" maxlength="80" placeholder="Optional: defaults to SKU / Part Number">
+                    </div>
+                    <div class="manual-specs-field">
+                      <label class="form-label" for="manualTechSpecs">Tech Specs / Product Notes</label>
+                      <textarea class="form-control" id="manualTechSpecs" rows="4" placeholder="Short paragraph or bullet list, one item per line"></textarea>
+                    </div>
+                  </div>
+                  <div class="action-row mt-3">
+                    <button class="btn btn-primary" id="addItemButton" type="button"><i class="fa-solid fa-plus" aria-hidden="true"></i> Add Item</button>
+                  </div>
+                </div>
+
+                <div class="list-panel mt-4 d-none" id="listPanel">
+                  <div class="list-panel-head">
+                    <div>
+                      <p class="suite-eyebrow">Queue</p>
+                      <h3>Items to print</h3>
+                    </div>
+                    <span class="queue-count" id="queueCount">0 items</span>
+                  </div>
+                  <div class="manual-empty" id="manualEmpty">No manual items added yet.</div>
+                  <div class="manual-list" id="manualList"></div>
+                </div>
+
+                <div class="form-status mt-3" id="formStatus" role="status" aria-live="polite"></div>
+
+                <div class="action-row mt-4">
+                  <button class="btn btn-primary" type="submit"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> Generate Tags</button>
+                  <button class="btn btn-outline-secondary" id="printButton" type="button" disabled><i class="fa-solid fa-print" aria-hidden="true"></i> Print</button>
+                  <button class="btn btn-outline-secondary" id="newSheetButton" type="button" disabled><i class="fa-solid fa-file-circle-plus" aria-hidden="true"></i> Another Sheet</button>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <div class="col-xl-7">
+            <section class="card preview-panel" aria-labelledby="previewHeading">
+              <div class="preview-panel-head">
+                <div>
+                  <p class="suite-eyebrow">Sheet preview</p>
+                  <h2 id="previewHeading">Shelf tags and price signs</h2>
+                </div>
+                <span class="sheet-count" id="sheetCount">0 sheets</span>
+              </div>
+
+              <div class="print-reminder">
+                <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+                <strong>Print at 100% scale / Actual Size. Do not use Fit to Page.</strong>
+              </div>
+
+              <dl class="summary-grid">
+                <div><dt>Total Items</dt><dd id="totalRequested">0</dd></div>
+                <div><dt>Total Generated</dt><dd id="totalGenerated">0</dd></div>
+                <div><dt>Starting Position</dt><dd id="startingPosition">Row 1, Column 1</dd></div>
+                <div><dt>Format</dt><dd id="templateName">—</dd></div>
+              </dl>
+
+              <div class="preview-empty" id="previewEmpty">
+                <i class="fa-regular fa-address-card" aria-hidden="true"></i>
+                <h3>No printable pages generated yet</h3>
+                <p>Add products, choose a format, then generate the sheet.</p>
+              </div>
+              <div class="screen-preview" id="screenPreview"></div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="print-area" id="printArea" aria-label="Printable price tags and price signs"></div>
+  <script src="script.js?v=20260629-2"></script>
+</body>
+</html>
