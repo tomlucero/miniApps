@@ -421,15 +421,26 @@
   function makeLogoImage() {
     const logo = document.createElement("img");
     logo.className = "sign-logo";
-    logo.src = LOGO_PATH;
     logo.alt = "CSU Bookstore";
-    logo.addEventListener("load", () => {
+    const handleLoad = () => {
       logo.classList.add("is-ready");
-    }, { once: true });
-    logo.addEventListener("error", () => {
+      logo.classList.remove("is-hidden");
+    };
+    const handleError = () => {
       logo.classList.add("is-hidden");
+      logo.classList.remove("is-ready");
       logo.removeAttribute("src");
-    }, { once: true });
+    };
+
+    logo.addEventListener("load", handleLoad, { once: true });
+    logo.addEventListener("error", handleError, { once: true });
+    logo.src = LOGO_PATH;
+
+    if (logo.complete) {
+      if (logo.naturalWidth > 0) handleLoad();
+      else handleError();
+    }
+
     return logo;
   }
 
