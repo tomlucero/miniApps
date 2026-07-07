@@ -149,8 +149,8 @@
   let generatedCount = 0;
   let manualItems = [];
   const ICON_MAP = {
-    ramLine: { className: "fa-ram-line", label: "Ram Line Art" },
-    aggieA: { className: "fa-aggie-a", label: "Aggie A" },
+    ramLine: { className: "fa-kit fa-csuramhead", label: "Ram Line Art" },
+    aggieA: { className: "fa-kit csu-aggie-a", label: "Aggie A" },
     book: { className: "fa-solid fa-book", label: "Book" },
     laptop: { className: "fa-solid fa-laptop", label: "Laptop" },
     gift: { className: "fa-solid fa-gift", label: "Gift" },
