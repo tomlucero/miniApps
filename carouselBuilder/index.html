@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="bk-carousel.css">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="../shared-theme.css?v=20260621-1">
 </head>
@@ -39,14 +40,11 @@
           </div>
         </div>
         <div class="panel-body import-tools">
-          <label for="sourceCode">Paste carousel code here <span>Existing `.carousel-item` markup will be converted into editable slides.</span></label>
+          <label for="sourceCode">Paste carousel code here <span>Existing `bk-carousel` markup will be converted into editable slides.</span></label>
           <textarea id="sourceCode" spellcheck="false"></textarea>
-          <div class="settings-grid">
+          <div class="settings-grid settings-grid--two">
             <label for="carouselId">Carousel ID
-              <input id="carouselId" value="carouselExampleCaptions">
-            </label>
-            <label for="defaultInterval">Default interval
-              <input id="defaultInterval" type="number" min="1000" step="500" value="8000">
+              <input id="carouselId" value="bkHomeHeroOverlayCarousel">
             </label>
             <label for="commentDisabled">Disabled slides
               <select id="commentDisabled">
@@ -89,60 +87,105 @@
   </div>
 
   <script>
-    const sampleCode = `<div id="carouselExampleCaptions" class="carousel slide" data-bs-ride="carousel">
+    const sampleCode = `<!--
+  CSU Bookstore homepage carousel
+  CSS dependency: upload/link bk-carousel.css before this HTML block.
+  JS dependency: Bootstrap 5 carousel JS, already supplied by MBS Insite.
+
+  Image guidance:
+  - Desktop image: wide hero crop, example 2400 x 900 px.
+  - Mobile image: separate mobile crop, example 1100 x 900 px or another approved mobile composition.
+  - Every slide should include both the mobile <source> and the desktop/default <img>.
+
+  Content guidance:
+  - Eyebrow is optional. Remove the <p class="bk-carousel__eyebrow">...</p> line when it does not add useful context.
+  - Use one <h1> on the homepage. For additional slides, change h1 to h2 if heading structure becomes a concern.
+  - Keep button text short and action-focused.
+  - To add a fourth slide, uncomment both the fourth indicator button and the fourth carousel-item block.
+-->
+<section class="bk-carousel-block">
+<div id="bkHomeHeroOverlayCarousel" class="bk-carousel bk-carousel--full carousel slide" data-bs-ride="false" aria-label="Featured Bookstore campaigns">
 <div class="carousel-indicators">
-<button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-<button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="1" aria-label="Slide 2"></button>
-<button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="2" aria-label="Slide 3"></button>
-<button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="3" aria-label="Slide 4"></button>
-<!--button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="4" aria-label="Slide 5"></button-->
+<button type="button" data-bs-target="#bkHomeHeroOverlayCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+<button type="button" data-bs-target="#bkHomeHeroOverlayCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+<button type="button" data-bs-target="#bkHomeHeroOverlayCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+<!-- Fourth slide indicator: uncomment when the fourth carousel-item is active.
+      <button type="button" data-bs-target="#bkHomeHeroOverlayCarousel" data-bs-slide-to="3" aria-label="Slide 4"></button>
+      -->
 </div>
 <div class="carousel-inner">
-<!--FIRST SLIDE-->
-<div class="carousel-item active" data-bs-interval="8000">
-<img src="/SiteImages/109-SchoolImages/109-diploma-frame-1920x750.jpg" class="carousel-img d-block" style="border: 1px solid black" alt="A smiling graduate poses next to a picture of a CSU Diploma Frame.">
-<div class="carousel-caption d-md-block">
-<h5>You Earned It! Now Frame It!</h5>
-<p>Protect and display your diploma with a high quality frame!</p>
-<a href="/diploma-frames" class="btn btn-primary">Learn More</a></div>
+<!-- Slide 1 -->
+<div class="carousel-item active">
+<div class="bk-carousel__media" aria-hidden="true">
+<picture>
+<source media="(max-width: 767px)" srcset="/SiteImages/109-SchoolImages/109-X26-SummertimeRam-1100x900.jpg">
+<img src="/SiteImages/109-SchoolImages/109-X26-SummertimeRam-2400x900-NEW.jpg" alt="A stuffed ram with sunglasses looks is on a background with Poudre Canyon and the CSU Lagoon.">
+</picture>
 </div>
-<!--SECOND SLIDE-->
-<div class="carousel-item" data-bs-interval="8000">
-<img src="/SiteImages/109-SchoolImages/109-S25-yard-signs-1920x750.jpg" class="carousel-img d-block" alt="CSU graduation-themed yard signs on a front lawn, including a ‘Congratulations Graduate’ sign, a Ram logo sign, and a ‘Home of a Future Ram’ sign.">
-<div class="carousel-caption d-md-block">
-<h5>Make a STALWART Statement on Your Yard!</h5>
-<p>Order your custom yard sign for springtime celebrations!</p>
-<a href="/shop/merch/yard-signs" class="btn btn-primary">Order Today</a>
-</div>
-</div>
-<div class="carousel-item" data-bs-interval="8000">
-<img src="/SiteImages/109-SchoolImages/109-celebration-cam-1920x750.jpg" class="carousel-img d-block" alt="Various CSU Rams Clothing Items, including beanies and sweatshirts - appear on a light blue background. Text reads SPRING SALE with ornamental flowers in the background.">
-<div class="carousel-caption d-md-block">
-<h5><span style="color: rgb(200, 195, 114);"><em class="fa-kit fa-csuramhead"></em></span> Celebrate with CSU Spirit <span style="color: rgb(200, 195, 114);"><em class="fa-kit fa-csuramhead fa-flip-horizontal"></em></span></h5>
-<p>Balloons, decorations, and party supplies for campus celebrations</p>
-<a href="/shop/gifts/party" class="btn btn-primary">Shop Party Supplies</a>
+<div class="container bk-carousel__content">
+<div class="bk-carousel__panel">
+<p class="bk-carousel__eyebrow">Welcome to CSU</p>
+<h1 class="bk-carousel__title">Find Your <span class="bk-carousel__highlight">New Start</span> Energy</h1>
+<p class="bk-carousel__text">The CSU Bookstore has CSU Rams Gear, course materials, gifts, supplies, and essentials for campus life.</p>
+<div class="bk-carousel__actions">
+<a class="bk-carousel__btn bk-carousel__btn--light" href="/shop/apparel">Shop Rams Apparel <span class="bk-carousel__arrow" aria-hidden="true"></span></a>
+<a class="bk-carousel__btn bk-carousel__btn--orange" href="/SelectTermDept">Find Course Materials <span class="bk-carousel__arrow" aria-hidden="true"></span></a>
 </div>
 </div>
-<!--FOURTH SLIDE-->
-<div class="carousel-item" data-bs-interval="8000">
-<img src="/SiteImages/109-SchoolImages/109-macbook-neo-frontpage.jpg" class="carousel-img d-block" style="border: 1px solid black" alt="MacBook Neo laptops in silver, blush, citrus, and indigo colors displayed partially open in a fan arrangement.">
-<div class="carousel-caption d-md-block">
-<h5>MacBook Neo</h5>
-<p>Love at first Mac. Starting at $499 with RAMTech Education Discounts</p>
-<a href="/shop/electronics/apple/Apple-MacBook-Neo-13-inch-A18-Pro" class="btn btn-primary">Order Today!</a></div>
 </div>
 </div>
-<button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
-<em class="fa-solid fa-chevron-left fa-2xl" aria-hidden="true"></em>
-<span class="visually-hidden">Previous</span>
+<!-- Slide 2 -->
+<div class="carousel-item">
+<div class="bk-carousel__media" aria-hidden="true">
+<picture>
+<source media="(max-width: 767px)" srcset="/SiteImages/109-SchoolImages/109-S26-TextbookPreorder-1100x900.jpg">
+<img src="/SiteImages/109-SchoolImages/109-S26-TextbookPreorder-2400x900-REDO.jpg" alt="Cam the Ram stuffed animal sits on a stack of books">
+</picture>
+</div>
+<div class="container bk-carousel__content">
+<div class="bk-carousel__panel">
+<p class="bk-carousel__eyebrow">Course Materials</p>
+<h2 class="bk-carousel__title">Preorder Your Course Materials</h2>
+<p class="bk-carousel__text">Skip the textbook hunt. We'll get your books ready.</p>
+<div class="bk-carousel__actions">
+<a class="bk-carousel__btn bk-carousel__btn--orange" href="/preorder">Preorder Today <span class="bk-carousel__arrow" aria-hidden="true"></span></a>
+</div>
+</div>
+</div>
+</div>
+<!-- Slide 3 -->
+<div class="carousel-item">
+<div class="bk-carousel__media" aria-hidden="true">
+<picture>
+<source media="(max-width: 767px)" srcset="/SiteImages/109-SchoolImages/109-S26-MacbookNeo-1100x900.jpg">
+<img src="/SiteImages/109-SchoolImages/109-S26-Macbook-2400x900.jpg" alt="four macbook neos in different colors are illustrated.">
+</picture>
+</div>
+<div class="container bk-carousel__content">
+<div class="bk-carousel__panel">
+<p class="bk-carousel__eyebrow">RAMTech</p>
+<h2 class="bk-carousel__title">Love at First Mac</h2>
+<p class="bk-carousel__text">MacBook Neo now available at RAMTech</p>
+<div class="bk-carousel__actions">
+<a class="bk-carousel__btn bk-carousel__btn--light" href="/shop/electronics/apple/Apple-MacBook-Neo-13-inch-A18-Pro">Shop MacBook Neo <span class="bk-carousel__arrow" aria-hidden="true"></span></a>
+</div>
+</div>
+</div>
+</div>
+</div>
+<button class="carousel-control-prev" type="button" data-bs-target="#bkHomeHeroOverlayCarousel" data-bs-slide="prev">
+<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+<span class="visually-hidden">Previous campaign</span>
 </button>
-<button class="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
-<em class="fa-solid fa-chevron-right fa-2xl" aria-hidden="true"></em>
-<span class="visually-hidden">Next</span>
+<button class="carousel-control-next" type="button" data-bs-target="#bkHomeHeroOverlayCarousel" data-bs-slide="next">
+<span class="carousel-control-next-icon" aria-hidden="true"></span>
+<span class="visually-hidden">Next campaign</span>
 </button>
-</div>`;
+</div>
+</section>`;
 
     const previewImageHost = "https://bookstore.colostate.edu";
+    const buttonStyles = ["light", "orange"];
 
     const state = {
       slides: [],
@@ -153,7 +196,6 @@
       sourceCode: document.querySelector("#sourceCode"),
       slideList: document.querySelector("#slideList"),
       carouselId: document.querySelector("#carouselId"),
-      defaultInterval: document.querySelector("#defaultInterval"),
       commentDisabled: document.querySelector("#commentDisabled"),
       previewStage: document.querySelector("#previewStage"),
       previewDots: document.querySelector("#previewDots"),
@@ -173,17 +215,29 @@
         .replace(/>/g, "&gt;");
     }
 
+    function escapeHtml(value) {
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+
     function makeSlide(overrides = {}) {
       return {
         enabled: true,
-        image: "",
+        desktopImage: "",
+        mobileImage: "",
         alt: "",
-        titleHtml: "",
+        eyebrow: "",
+        headline: "",
+        highlight: "",
         description: "",
-        link: "",
-        button: "Shop Now",
-        interval: els.defaultInterval.value || "8000",
-        border: false,
+        primaryLink: "",
+        primaryText: "",
+        primaryStyle: "light",
+        secondaryLink: "",
+        secondaryText: "",
+        secondaryStyle: "orange",
         ...overrides
       };
     }
@@ -196,10 +250,18 @@
       return `${previewImageHost}/${value}`;
     }
 
+    function desktopOrFallback(slide) {
+      return cleanText(slide.desktopImage) || cleanText(slide.mobileImage);
+    }
+
+    function mobileOrFallback(slide) {
+      return cleanText(slide.mobileImage) || cleanText(slide.desktopImage);
+    }
+
     function parseSlidesFromCode(code) {
       const parser = new DOMParser();
       const doc = parser.parseFromString(`<div id="parse-root">${code}</div>`, "text/html");
-      const carousel = doc.querySelector(".carousel");
+      const carousel = doc.querySelector(".bk-carousel");
       const foundId = carousel && carousel.id ? carousel.id : "";
       if (foundId) els.carouselId.value = foundId;
 
@@ -222,21 +284,39 @@
     }
 
     function slideFromElement(item, enabled) {
-      const img = item.querySelector("img");
-      const title = item.querySelector("h5");
-      const description = item.querySelector("p");
-      const link = item.querySelector("a");
+      const picture = item.querySelector("picture");
+      const mobileSource = picture ? picture.querySelector("source") : null;
+      const desktopImage = picture ? picture.querySelector("img") : item.querySelector("img");
+      const eyebrow = item.querySelector(".bk-carousel__eyebrow");
+      const title = item.querySelector(".bk-carousel__title");
+      const highlight = title ? title.querySelector(".bk-carousel__highlight") : null;
+      const description = item.querySelector(".bk-carousel__text");
+      const buttons = Array.from(item.querySelectorAll(".bk-carousel__btn"));
+      const primary = buttons[0] || null;
+      const secondary = buttons[1] || null;
+
       return makeSlide({
         enabled,
-        image: img ? img.getAttribute("src") || "" : "",
-        alt: img ? img.getAttribute("alt") || "" : "",
-        titleHtml: title ? title.innerHTML.trim() : "",
+        desktopImage: desktopImage ? desktopImage.getAttribute("src") || "" : "",
+        mobileImage: mobileSource ? mobileSource.getAttribute("srcset") || "" : "",
+        alt: desktopImage ? desktopImage.getAttribute("alt") || "" : "",
+        eyebrow: eyebrow ? cleanText(eyebrow.textContent) : "",
+        headline: title ? cleanText(title.textContent) : "",
+        highlight: highlight ? cleanText(highlight.textContent) : "",
         description: description ? cleanText(description.textContent) : "",
-        link: link ? link.getAttribute("href") || "" : "",
-        button: link ? cleanText(link.textContent) : "",
-        interval: item.getAttribute("data-bs-interval") || els.defaultInterval.value || "8000",
-        border: img ? String(img.getAttribute("style") || "").includes("border") : false
+        primaryLink: primary ? primary.getAttribute("href") || "" : "",
+        primaryText: primary ? cleanText(primary.textContent) : "",
+        primaryStyle: detectButtonStyle(primary),
+        secondaryLink: secondary ? secondary.getAttribute("href") || "" : "",
+        secondaryText: secondary ? cleanText(secondary.textContent) : "",
+        secondaryStyle: detectButtonStyle(secondary, "orange")
       });
+    }
+
+    function detectButtonStyle(button, fallback = "light") {
+      if (!button) return fallback;
+      if (button.classList.contains("bk-carousel__btn--orange")) return "orange";
+      return "light";
     }
 
     function render() {
@@ -264,6 +344,10 @@
       return state.slides.filter(slide => slide.enabled);
     }
 
+    function buttonStyleOptions(selected) {
+      return buttonStyles.map(style => `<option value="${style}"${style === selected ? " selected" : ""}>${style === "light" ? "Light" : "Orange"}</option>`).join("");
+    }
+
     function renderSlideForms() {
       els.slideList.innerHTML = "";
       state.slides.forEach((slide, index) => {
@@ -271,10 +355,10 @@
         card.className = "slide-card";
         card.innerHTML = `
           <div class="slide-summary">
-            <img class="slide-thumb" src="${escapeAttr(previewImageUrl(slide.image))}" alt="">
+            <img class="slide-thumb" src="${escapeAttr(previewImageUrl(slide.desktopImage))}" alt="">
             <div>
-              <div class="slide-title">Slide ${index + 1}: ${cleanText(stripTags(slide.titleHtml)) || "Untitled"}</div>
-              <div class="slide-meta">${slide.enabled ? "Included" : "Disabled"} · ${slide.link || "No link yet"}</div>
+              <div class="slide-title">Slide ${index + 1}: ${escapeHtml(cleanText(slide.headline) || "Untitled")}</div>
+              <div class="slide-meta">${slide.enabled ? "Included" : "Disabled"} · ${slide.primaryLink || slide.secondaryLink || "No link yet"}</div>
             </div>
             <div class="slide-actions">
               <button class="btn icon" type="button" data-action="up" title="Move slide up">&#8593;</button>
@@ -284,45 +368,60 @@
             </div>
           </div>
           <div class="slide-fields">
-            <label class="wide">Image path
-              <input data-field="image" value="${escapeAttr(slide.image)}" placeholder="/SiteImages/109-SchoolImages/example-1920x750.jpg">
+            <label>Desktop image
+              <input data-field="desktopImage" value="${escapeAttr(slide.desktopImage)}" placeholder="/SiteImages/109-SchoolImages/example-2400x900.jpg">
+            </label>
+            <label>Mobile image
+              <input data-field="mobileImage" value="${escapeAttr(slide.mobileImage)}" placeholder="/SiteImages/109-SchoolImages/example-1100x900.jpg">
             </label>
             <label class="wide">Alt text
               <input data-field="alt" value="${escapeAttr(slide.alt)}" placeholder="Describe the image for accessibility">
             </label>
-            <label class="wide">Headline HTML
-              <input data-field="titleHtml" value="${escapeAttr(slide.titleHtml)}" placeholder="Carousel headline">
+            <label>Eyebrow
+              <input data-field="eyebrow" value="${escapeAttr(slide.eyebrow)}" placeholder="Optional category label">
             </label>
-            <label class="wide">Body copy
+            <label>Highlight word
+              <input data-field="highlight" value="${escapeAttr(slide.highlight)}" placeholder="Optional text to accent in headline">
+            </label>
+            <label class="wide">Headline
+              <input data-field="headline" value="${escapeAttr(slide.headline)}" placeholder="Carousel headline">
+            </label>
+            <label class="wide">Additional info
               <input data-field="description" value="${escapeAttr(slide.description)}" placeholder="Short supporting message">
             </label>
-            <label>Button link
-              <input data-field="link" value="${escapeAttr(slide.link)}" placeholder="/shop/example">
-            </label>
             <label>Button text
-              <input data-field="button" value="${escapeAttr(slide.button)}" placeholder="Shop Now">
+              <input data-field="primaryText" value="${escapeAttr(slide.primaryText)}" placeholder="Shop Now">
+            </label>
+            <label>Button link
+              <input data-field="primaryLink" value="${escapeAttr(slide.primaryLink)}" placeholder="/shop/example">
+            </label>
+            <label>Button style
+              <select data-field="primaryStyle">${buttonStyleOptions(slide.primaryStyle)}</select>
+            </label>
+            <label>Secondary button text
+              <input data-field="secondaryText" value="${escapeAttr(slide.secondaryText)}" placeholder="Optional second button">
+            </label>
+            <label>Secondary button link
+              <input data-field="secondaryLink" value="${escapeAttr(slide.secondaryLink)}" placeholder="/shop/example-two">
+            </label>
+            <label>Secondary style
+              <select data-field="secondaryStyle">${buttonStyleOptions(slide.secondaryStyle)}</select>
             </label>
             <div class="inline-fields wide">
-              <label>Interval
-                <input data-field="interval" type="number" min="1000" step="500" value="${escapeAttr(slide.interval)}">
-              </label>
               <label class="check-row">
                 <input data-field="enabled" type="checkbox" ${slide.enabled ? "checked" : ""}>
                 Include slide
-              </label>
-              <label class="check-row">
-                <input data-field="border" type="checkbox" ${slide.border ? "checked" : ""}>
-                Add black border
               </label>
             </div>
           </div>
         `;
 
         card.querySelectorAll("[data-field]").forEach(field => {
-          field.addEventListener("input", () => {
+          const eventName = field.tagName === "SELECT" ? "change" : "input";
+          field.addEventListener(eventName, () => {
             const key = field.dataset.field;
             slide[key] = field.type === "checkbox" ? field.checked : field.value;
-            if (key === "image") {
+            if (key === "desktopImage") {
               const thumb = card.querySelector(".slide-thumb");
               thumb.src = previewImageUrl(field.value);
             }
@@ -336,12 +435,6 @@
 
         els.slideList.appendChild(card);
       });
-    }
-
-    function stripTags(html) {
-      const div = document.createElement("div");
-      div.innerHTML = html || "";
-      return div.textContent || div.innerText || "";
     }
 
     function runSlideAction(action, index) {
@@ -372,28 +465,40 @@
         return;
       }
 
-      const img = document.createElement("img");
-      img.src = previewImageUrl(slide.image);
-      img.alt = slide.alt;
-      img.onerror = () => {
-        img.style.display = "none";
-        if (!els.previewStage.querySelector(".preview-fallback")) {
-          const fallback = document.createElement("div");
-          fallback.className = "preview-fallback";
-          fallback.textContent = slide.image ? `Preview image was not found at ${previewImageUrl(slide.image)}` : "Add an image path to preview this slide.";
-          els.previewStage.prepend(fallback);
-        }
-      };
-      els.previewStage.appendChild(img);
-
-      const caption = document.createElement("div");
-      caption.className = "caption";
-      caption.innerHTML = `
-        <h3>${slide.titleHtml || "Carousel headline"}</h3>
-        <p>${escapeHtml(slide.description || "Short supporting message")}</p>
-        ${slide.link && slide.button ? `<a href="${escapeAttr(slide.link)}">${escapeHtml(slide.button)}</a>` : ""}
+      const previewShell = document.createElement("div");
+      previewShell.className = "preview-carousel-shell";
+      previewShell.innerHTML = `
+        <section class="bk-carousel-block">
+          <div class="bk-carousel carousel slide" data-bs-ride="false" aria-label="Preview carousel">
+            <div class="carousel-inner">
+              ${buildSlideMarkup(slide, true, true)}
+            </div>
+            <button class="carousel-control-prev" type="button" aria-label="Previous preview slide">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            </button>
+            <button class="carousel-control-next" type="button" aria-label="Next preview slide">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            </button>
+          </div>
+        </section>
       `;
-      els.previewStage.appendChild(caption);
+      els.previewStage.appendChild(previewShell);
+
+      const previewImage = els.previewStage.querySelector(".bk-carousel__media img");
+      const previewSource = els.previewStage.querySelector(".bk-carousel__media source");
+      if (previewSource) previewSource.srcset = previewImageUrl(mobileOrFallback(slide));
+      if (previewImage) {
+        previewImage.src = previewImageUrl(desktopOrFallback(slide));
+        previewImage.onerror = () => {
+          previewImage.style.display = "none";
+          if (!els.previewStage.querySelector(".preview-fallback")) {
+            const fallback = document.createElement("div");
+            fallback.className = "preview-fallback";
+            fallback.textContent = desktopOrFallback(slide) ? `Preview image was not found at ${previewImageUrl(desktopOrFallback(slide))}` : "Add a desktop image path to preview this slide.";
+            els.previewStage.prepend(fallback);
+          }
+        };
+      }
 
       slides.forEach((_, index) => {
         const dot = document.createElement("span");
@@ -402,15 +507,8 @@
       });
     }
 
-    function escapeHtml(value) {
-      return String(value || "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;");
-    }
-
     function generateCode() {
-      const id = (els.carouselId.value || "carouselExampleCaptions").trim();
+      const id = (els.carouselId.value || "bkHomeHeroOverlayCarousel").trim();
       const included = state.slides.filter(slide => slide.enabled);
       const includeComments = els.commentDisabled.value === "comments";
       const disabled = state.slides.filter(slide => !slide.enabled);
@@ -424,18 +522,34 @@
       if (includeComments) {
         disabled.forEach((_, index) => {
           const slideNumber = included.length + index + 1;
-          indicatorLines.push(`<!--button type="button" data-bs-target="${target}" data-bs-slide-to="${slideNumber - 1}" aria-label="Slide ${slideNumber}"></button-->`);
+          indicatorLines.push(`<!-- <button type="button" data-bs-target="${target}" data-bs-slide-to="${slideNumber - 1}" aria-label="Slide ${slideNumber}"></button> -->`);
         });
       }
 
-      const slideLines = included.map((slide, index) => buildSlideMarkup(slide, index === 0));
+      const slideLines = included.map((slide, index) => `<!-- Slide ${index + 1} -->\n${buildSlideMarkup(slide, index === 0, index === 0)}`);
       if (includeComments) {
         disabled.forEach(slide => {
-          slideLines.push(`<!-- ${buildSlideMarkup(slide, false).replace(/-->/g, "--&gt;")} -->`);
+          slideLines.push(`<!--\n${indentLines(buildSlideMarkup(slide, false, false), 0)}\n-->`);
         });
       }
 
-      return `<div id="${escapeAttr(id)}" class="carousel slide" data-bs-ride="carousel">
+      return `<!--
+  CSU Bookstore homepage carousel
+  CSS dependency: upload/link bk-carousel.css before this HTML block.
+  JS dependency: Bootstrap 5 carousel JS, already supplied by MBS Insite.
+
+  Image guidance:
+  - Desktop image: wide hero crop, example 2400 x 900 px.
+  - Mobile image: separate mobile crop, example 1100 x 900 px or another approved mobile composition.
+  - Every slide should include both the mobile <source> and the desktop/default <img>.
+
+  Content guidance:
+  - Eyebrow is optional. Remove the <p class="bk-carousel__eyebrow">...</p> line when it does not add useful context.
+  - Use one <h1> on the homepage. For additional slides, change h1 to h2 if heading structure becomes a concern.
+  - Keep button text short and action-focused.
+-->
+<section class="bk-carousel-block">
+<div id="${escapeAttr(id)}" class="bk-carousel bk-carousel--full carousel slide" data-bs-ride="false" aria-label="Featured Bookstore campaigns">
 <div class="carousel-indicators">
 ${indicatorLines.join("\n")}
 </div>
@@ -443,31 +557,67 @@ ${indicatorLines.join("\n")}
 ${slideLines.join("\n")}
 </div>
 <button class="carousel-control-prev" type="button" data-bs-target="${target}" data-bs-slide="prev">
-<em class="fa-solid fa-chevron-left fa-2xl" aria-hidden="true"></em>
-<span class="visually-hidden">Previous</span>
+<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+<span class="visually-hidden">Previous campaign</span>
 </button>
 <button class="carousel-control-next" type="button" data-bs-target="${target}" data-bs-slide="next">
-<em class="fa-solid fa-chevron-right fa-2xl" aria-hidden="true"></em>
-<span class="visually-hidden">Next</span>
+<span class="carousel-control-next-icon" aria-hidden="true"></span>
+<span class="visually-hidden">Next campaign</span>
 </button>
+</div>
+</section>`;
+    }
+
+    function buildSlideMarkup(slide, active, isFirst) {
+      const activeClass = active ? " active" : "";
+      const headingTag = isFirst ? "h1" : "h2";
+      const actions = buildCodeActions(slide);
+      return `<div class="carousel-item${activeClass}">
+<div class="bk-carousel__media" aria-hidden="true">
+<picture>
+<source media="(max-width: 767px)" srcset="${escapeAttr(mobileOrFallback(slide))}">
+<img src="${escapeAttr(desktopOrFallback(slide))}" alt="${escapeAttr(slide.alt)}">
+</picture>
+</div>
+<div class="container bk-carousel__content">
+<div class="bk-carousel__panel">
+${slide.eyebrow ? `<p class="bk-carousel__eyebrow">${escapeHtml(slide.eyebrow)}</p>\n` : ""}<${headingTag} class="bk-carousel__title">${headlineForCode(slide)}</${headingTag}>
+${slide.description ? `<p class="bk-carousel__text">${escapeHtml(slide.description)}</p>\n` : ""}${actions}
+</div>
+</div>
 </div>`;
     }
 
-    function buildSlideMarkup(slide, active) {
-      const activeClass = active ? " active" : "";
-      const interval = slide.interval || els.defaultInterval.value || "8000";
-      const borderStyle = slide.border ? ` style="border: 1px solid black"` : "";
-      const link = slide.link && slide.button
-        ? `<a href="${escapeAttr(slide.link)}" class="btn btn-primary">${escapeHtml(slide.button)}</a>`
-        : "";
-      return `<div class="carousel-item${activeClass}" data-bs-interval="${escapeAttr(interval)}">
-<img src="${escapeAttr(slide.image)}" class="carousel-img d-block"${borderStyle} alt="${escapeAttr(slide.alt)}">
-<div class="carousel-caption d-md-block">
-<h5>${slide.titleHtml || ""}</h5>
-<p>${escapeHtml(slide.description || "")}</p>
-${link}
-</div>
-</div>`;
+    function headlineForCode(slide) {
+      const headline = cleanText(slide.headline);
+      const highlight = cleanText(slide.highlight);
+      if (!headline) return "";
+      if (!highlight) return escapeHtml(headline);
+
+      const index = headline.toLowerCase().indexOf(highlight.toLowerCase());
+      if (index === -1) return escapeHtml(headline);
+
+      const before = headline.slice(0, index);
+      const match = headline.slice(index, index + highlight.length);
+      const after = headline.slice(index + highlight.length);
+      return `${escapeHtml(before)}<span class="bk-carousel__highlight">${escapeHtml(match)}</span>${escapeHtml(after)}`;
+    }
+
+    function buildCodeActions(slide) {
+      const buttons = [];
+      if (slide.primaryText && slide.primaryLink) buttons.push(codeButtonMarkup(slide.primaryText, slide.primaryLink, slide.primaryStyle));
+      if (slide.secondaryText && slide.secondaryLink) buttons.push(codeButtonMarkup(slide.secondaryText, slide.secondaryLink, slide.secondaryStyle));
+      if (!buttons.length) return "";
+      return `<div class="bk-carousel__actions">\n${buttons.join("\n")}\n</div>\n`;
+    }
+
+    function codeButtonMarkup(text, link, style) {
+      return `<a class="bk-carousel__btn bk-carousel__btn--${escapeAttr(style)}" href="${escapeAttr(link)}">${escapeHtml(text)} <span class="bk-carousel__arrow" aria-hidden="true"></span></a>`;
+    }
+
+    function indentLines(value, count) {
+      const pad = " ".repeat(count);
+      return String(value || "").split("\n").map(line => `${pad}${line}`).join("\n");
     }
 
     function setStatus(message) {
@@ -517,7 +667,7 @@ ${link}
     document.querySelector("#nextSlide").addEventListener("click", () => goPreview(1));
     document.querySelector("#previewPrev").addEventListener("click", () => goPreview(-1));
     document.querySelector("#previewNext").addEventListener("click", () => goPreview(1));
-    [els.carouselId, els.defaultInterval, els.commentDisabled].forEach(input => input.addEventListener("input", render));
+    [els.carouselId, els.commentDisabled].forEach(input => input.addEventListener("input", render));
 
     els.sourceCode.value = sampleCode;
     parseSlidesFromCode(sampleCode);

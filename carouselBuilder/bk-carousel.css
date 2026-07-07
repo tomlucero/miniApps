@@ -1,0 +1,328 @@
+/*
+  CSU Bookstore Carousel
+  File: bk-carousel.css
+  Purpose: Scoped hero carousel styles for MBS Insite / Bootstrap 5.
+*/
+
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap");
+
+.bk-carousel {
+  --bk-carousel-font: "Poppins", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --bk-carousel-green: #1e4d2b;
+  --bk-carousel-green-dark: #14351f;
+  --bk-carousel-gold: #c8c372;
+  --bk-carousel-lime: #cffc00;
+  --bk-carousel-orange: #d9782d;
+  --bk-carousel-focus: #ffbf00;
+  --bk-carousel-radius: 6px;
+  --bk-carousel-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+  background: var(--bk-carousel-green);
+  color: #ffffff;
+  font-family: var(--bk-carousel-font);
+  isolation: isolate;
+  overflow: hidden;
+  position: relative;
+}
+
+.bk-carousel--full {
+  left: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  max-width: 100vw;
+  right: 50%;
+  width: 100vw;
+}
+
+.bk-carousel .carousel,
+.bk-carousel .carousel-inner,
+.bk-carousel .carousel-item {
+  height: 100%;
+}
+
+.bk-carousel .carousel-item {
+  min-height: clamp(32rem, 52vw, 44rem);
+  position: relative;
+}
+
+.bk-carousel__media {
+  inset: 0;
+  position: absolute;
+}
+
+.bk-carousel__media::after {
+  background: transparent;
+  content: "";
+  inset: 0;
+  position: absolute;
+}
+
+.bk-carousel__media picture,
+.bk-carousel__media img {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+.bk-carousel__media img {
+  object-fit: cover;
+  object-position: center center;
+}
+
+.bk-carousel__content {
+  display: flex;
+  justify-content: flex-end;
+  min-height: clamp(32rem, 52vw, 44rem);
+  position: relative;
+  z-index: 2;
+}
+
+.bk-carousel__panel {
+  align-self: center;
+  background: rgba(20, 53, 31, 0.9);
+  border-left: 10px solid var(--bk-carousel-lime);
+  box-shadow: var(--bk-carousel-shadow);
+  margin-block: 2rem;
+  max-width: 44rem;
+  padding: clamp(1.5rem, 4vw, 3rem);
+}
+
+.bk-carousel__eyebrow {
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  margin: 0 0 0.5rem;
+  text-transform: uppercase;
+}
+
+.bk-carousel__title {
+  color: #ffffff;
+  font-size: clamp(2.2rem, 6vw, 4.8rem);
+  font-weight: 800;
+  letter-spacing: 0;
+  line-height: 0.98;
+  margin: 0 0 1rem;
+}
+
+.bk-carousel__highlight {
+  background: var(--bk-carousel-lime);
+  box-decoration-break: clone;
+  color: var(--bk-carousel-green);
+  display: inline;
+  line-height: 1.24;
+  padding: 0.04em 0.22em;
+  -webkit-box-decoration-break: clone;
+}
+
+.bk-carousel__text {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: clamp(1rem, 1.5vw, 1.22rem);
+  line-height: 1.65;
+  margin: 0 0 1.5rem;
+}
+
+.bk-carousel__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.bk-carousel__btn {
+  align-items: center;
+  border: 2px solid transparent;
+  border-radius: var(--bk-carousel-radius);
+  display: inline-flex;
+  font-weight: 800;
+  gap: 0.55rem;
+  justify-content: center;
+  line-height: 1.1;
+  min-height: 2.75rem;
+  padding: 0.78rem 1.05rem;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
+}
+
+.bk-carousel__btn:hover,
+.bk-carousel__btn:focus {
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+
+.bk-carousel__btn:focus-visible,
+.bk-carousel .carousel-control-prev:focus-visible,
+.bk-carousel .carousel-control-next:focus-visible,
+.bk-carousel .carousel-indicators [data-bs-target]:focus-visible {
+  outline: 3px solid var(--bk-carousel-focus);
+  outline-offset: 3px;
+}
+
+.bk-carousel__btn--light {
+  background: #ffffff;
+  border-color: #ffffff;
+  color: var(--bk-carousel-green);
+}
+
+.bk-carousel__btn--light:hover,
+.bk-carousel__btn--light:focus {
+  background: var(--bk-carousel-lime);
+  border-color: var(--bk-carousel-lime);
+  color: var(--bk-carousel-green);
+}
+
+.bk-carousel__btn--orange {
+  background: var(--bk-carousel-orange);
+  border-color: var(--bk-carousel-orange);
+  color: #ffffff;
+}
+
+.bk-carousel__btn--orange:hover,
+.bk-carousel__btn--orange:focus {
+  background: #b75f20;
+  border-color: #b75f20;
+  color: #ffffff;
+}
+
+.bk-carousel__arrow {
+  align-items: center;
+  background: currentColor;
+  border-radius: 999px;
+  display: inline-flex;
+  height: 1.35rem;
+  justify-content: center;
+  width: 1.35rem;
+}
+
+.bk-carousel__arrow::before {
+  border-right: 2px solid #ffffff;
+  border-top: 2px solid #ffffff;
+  content: "";
+  height: 0.42rem;
+  transform: rotate(45deg) translate(-1px, 1px);
+  width: 0.42rem;
+}
+
+.bk-carousel .carousel-control-prev,
+.bk-carousel .carousel-control-next {
+  opacity: 1;
+  width: clamp(2.75rem, 6vw, 4rem);
+  z-index: 7;
+}
+
+.bk-carousel .carousel-control-prev-icon,
+.bk-carousel .carousel-control-next-icon {
+  background-color: rgba(20, 53, 31, 0.85);
+  border-radius: 999px;
+  height: 2.5rem;
+  width: 2.5rem;
+}
+
+.bk-carousel .carousel-indicators {
+  margin-bottom: 1rem;
+  z-index: 8;
+}
+
+.bk-carousel .carousel-indicators [data-bs-target] {
+  border: 0;
+  border-radius: 999px;
+  height: 0.75rem;
+  opacity: 1;
+  width: 0.75rem;
+}
+
+.bk-carousel .carousel-indicators .active {
+  background-color: var(--bk-carousel-gold);
+}
+
+@media (max-width: 991.98px) {
+  .bk-carousel .carousel-item {
+    background: var(--bk-carousel-green-dark);
+    min-height: 0;
+  }
+
+  .bk-carousel__media {
+    height: clamp(18rem, 70vw, 25rem);
+    inset: auto;
+    position: relative;
+  }
+
+  .bk-carousel__media::after {
+    background: transparent;
+  }
+
+  .bk-carousel__content {
+    align-items: stretch;
+    background: var(--bk-carousel-green-dark);
+    justify-content: center;
+    min-height: 0;
+    padding: 0 1rem 1.2rem;
+  }
+
+  .bk-carousel__panel {
+    align-self: auto;
+    background: rgba(20, 53, 31, 0.92);
+    border-left-width: 5px;
+    box-shadow: 0 -10px 26px rgba(0, 0, 0, 0.18);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: -2.5rem auto 0;
+    max-width: 24rem;
+    min-height: 14.25rem;
+    padding: 1rem;
+    position: relative;
+    text-shadow: none;
+    width: min(100%, 24rem);
+    z-index: 2;
+  }
+
+  .bk-carousel__eyebrow {
+    font-size: 0.68rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .bk-carousel__title {
+    font-size: clamp(1.5rem, 7.6vw, 2.05rem);
+    line-height: 1.04;
+    margin-bottom: 0.65rem;
+  }
+
+  .bk-carousel__text {
+    font-size: 0.88rem;
+    line-height: 1.42;
+    margin-bottom: 0.85rem;
+  }
+
+  .bk-carousel .carousel-control-prev,
+  .bk-carousel .carousel-control-next {
+    bottom: auto;
+    height: 4rem;
+    top: calc(clamp(18rem, 70vw, 25rem) / 2);
+    transform: translateY(-50%);
+    width: 3.5rem;
+  }
+
+  .bk-carousel .carousel-control-prev-icon,
+  .bk-carousel .carousel-control-next-icon {
+    height: 2.75rem;
+    width: 2.75rem;
+  }
+
+  .bk-carousel .carousel-indicators {
+    bottom: 0.55rem;
+    top: auto;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .bk-carousel__actions {
+    flex-direction: column;
+  }
+
+  .bk-carousel__btn {
+    font-size: 0.82rem;
+    min-height: 2.5rem;
+    padding: 0.65rem 0.8rem;
+    width: 100%;
+  }
+}
