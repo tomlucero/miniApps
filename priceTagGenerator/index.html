@@ -11,7 +11,7 @@
   <script src="https://kit.fontawesome.com/b65fbcdd34.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
   <link rel="stylesheet" href="../shared-theme.css?v=20260621-1">
-  <link rel="stylesheet" href="style.css?v=20260629-4">
+  <link rel="stylesheet" href="style.css?v=20260707-2">
 </head>
 <body>
   <div class="screen-only">
@@ -64,6 +64,35 @@
                     </select>
                   </div>
                   <div class="col-md-6">
+                    <label class="form-label" for="signType">Sign Type</label>
+                    <select class="form-select" id="signType">
+                      <option value="regular" selected>Regular</option>
+                      <option value="sale">Sale</option>
+                      <option value="clearance">Clearance</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label" for="printStyle">Print Style</label>
+                    <select class="form-select" id="printStyle">
+                      <option value="color" selected>Color</option>
+                      <option value="bw">Black &amp; White</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label" for="iconSelect">Icon</label>
+                    <select class="form-select" id="iconSelect">
+                      <option value="none" selected>None</option>
+                      <option value="ramLine">Ram Line Art</option>
+                      <option value="aggieA">Aggie A</option>
+                      <option value="book">Book</option>
+                      <option value="laptop">Laptop</option>
+                      <option value="gift">Gift</option>
+                      <option value="saleTag">Sale Tag</option>
+                      <option value="clearance">Clearance</option>
+                      <option value="graduation">Graduation</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6">
                     <label class="form-label" for="barcodeDisplay">Barcode Display</label>
                     <select class="form-select" id="barcodeDisplay">
                       <option value="barcodeOnly">Barcode</option>
@@ -92,7 +121,7 @@
                 <div class="entry-panel mt-4" id="pastePanel">
                   <label class="form-label" for="excelPaste">Paste price tag data from Excel</label>
                   <textarea class="form-control excel-paste" id="excelPaste" rows="8" placeholder="CSU Rams T-Shirt	24.99	123456	RAM-TS-001	123456&#10;CSU Rams Gaming Laptop	1299.99	555444	LTP-15-RTX	555444"></textarea>
-                  <div class="field-note mt-2">Paste tab-separated rows in this order: Description | Price | SKU / UPC | MFG MOD | Barcode Value. Barcode Value is optional.</div>
+                  <div class="field-note mt-2">Paste tab-separated rows in either format: Description | Regular Price | SKU / UPC | MFG MOD | Barcode Value | Tech Specs, or Description | Regular Price | Sale Price | SKU / UPC | MFG MOD | Barcode Value | Tech Specs. Barcode Value, Sale Price, and Tech Specs are optional.</div>
                 </div>
 
                 <div class="entry-panel mt-4 d-none" id="manualPanel">
@@ -102,8 +131,12 @@
                       <input class="form-control" id="manualDescription" type="text" maxlength="140" placeholder="CSU Rams T-Shirt">
                     </div>
                     <div>
-                      <label class="form-label" for="manualPrice">Price</label>
+                      <label class="form-label" for="manualPrice">Regular Price</label>
                       <input class="form-control" id="manualPrice" type="text" inputmode="decimal" maxlength="20" placeholder="24.99">
+                    </div>
+                    <div>
+                      <label class="form-label" for="manualSalePrice">Sale Price</label>
+                      <input class="form-control" id="manualSalePrice" type="text" inputmode="decimal" maxlength="20" placeholder="Optional: 19.99">
                     </div>
                     <div>
                       <label class="form-label" for="manualSku">SKU / UPC</label>
@@ -119,7 +152,14 @@
                     </div>
                     <div class="manual-specs-field">
                       <label class="form-label" for="manualTechSpecs">Tech Specs / Product Notes</label>
-                      <textarea class="form-control" id="manualTechSpecs" rows="4" placeholder="Short paragraph or bullet list, one item per line"></textarea>
+                      <div class="editor-toolbar" role="toolbar" aria-label="Notes formatting tools">
+                        <button class="btn btn-outline-secondary btn-sm" type="button" data-editor-command="bold"><i class="fa-solid fa-bold" aria-hidden="true"></i> Bold</button>
+                        <button class="btn btn-outline-secondary btn-sm" type="button" data-editor-command="italic"><i class="fa-solid fa-italic" aria-hidden="true"></i> Italic</button>
+                        <button class="btn btn-outline-secondary btn-sm" type="button" data-editor-command="insertUnorderedList"><i class="fa-solid fa-list-ul" aria-hidden="true"></i> Bullets</button>
+                        <button class="btn btn-outline-secondary btn-sm" type="button" data-editor-command="insertOrderedList"><i class="fa-solid fa-list-ol" aria-hidden="true"></i> Numbers</button>
+                      </div>
+                      <div class="form-control rich-editor" id="manualTechSpecs" contenteditable="true" role="textbox" aria-multiline="true" data-placeholder="Short paragraph or bullet list"></div>
+                      <div class="field-note mt-2">Basic formatting only: bold, italic, bullets, and numbered lists.</div>
                     </div>
                   </div>
                   <div class="action-row mt-3">
@@ -186,6 +226,6 @@
   </div>
 
   <div class="print-area" id="printArea" aria-label="Printable price tags and price signs"></div>
-  <script src="script.js?v=20260629-4"></script>
+  <script src="script.js?v=20260707-2"></script>
 </body>
 </html>

@@ -120,6 +120,9 @@
   const startingRow = document.getElementById("startingRow");
   const startingColumn = document.getElementById("startingColumn");
   const priceSize = document.getElementById("priceSize");
+  const signType = document.getElementById("signType");
+  const printStyle = document.getElementById("printStyle");
+  const iconSelect = document.getElementById("iconSelect");
   const barcodeDisplay = document.getElementById("barcodeDisplay");
   const showBarcodeText = document.getElementById("showBarcodeText");
   const excelPaste = document.getElementById("excelPaste");
@@ -128,6 +131,7 @@
   const listPanel = document.getElementById("listPanel");
   const manualDescription = document.getElementById("manualDescription");
   const manualPrice = document.getElementById("manualPrice");
+  const manualSalePrice = document.getElementById("manualSalePrice");
   const manualSku = document.getElementById("manualSku");
   const manualManufacturerModel = document.getElementById("manualManufacturerModel");
   const manualBarcodeValue = document.getElementById("manualBarcodeValue");
@@ -144,6 +148,17 @@
   let availableTemplates = [];
   let generatedCount = 0;
   let manualItems = [];
+  const ICON_MAP = {
+    ramLine: { className: "fa-ram-line", label: "Ram Line Art" },
+    aggieA: { className: "fa-aggie-a", label: "Aggie A" },
+    book: { className: "fa-solid fa-book", label: "Book" },
+    laptop: { className: "fa-solid fa-laptop", label: "Laptop" },
+    gift: { className: "fa-solid fa-gift", label: "Gift" },
+    saleTag: { className: "fa-solid fa-tags", label: "Sale Tag" },
+    clearance: { className: "fa-solid fa-percent", label: "Clearance" },
+    graduation: { className: "fa-solid fa-graduation-cap", label: "Graduation" }
+  };
+  const ALLOWED_TAGS = new Set(["P", "BR", "STRONG", "EM", "UL", "OL", "LI"]);
 
   function selectedMethod() {
     return form.elements.entryMethod.value;
@@ -262,6 +277,16 @@
     return Number(cleaned).toFixed(2);
   }
 
+  function looksLikePrice(value) {
+    if (!sanitizeInlineText(value)) return false;
+    return /^\$?\d[\d,]*(\.\d{1,2})?$/.test(sanitizeInlineText(value));
+  }
+
+  function normalizeOptionalPrice(value) {
+    if (!sanitizeInlineText(value)) return "";
+    return normalizePrice(value);
+  }
+
   function normalizeSpecs(value) {
     const cleaned = sanitizeText(value);
     if (!cleaned) return "";
@@ -272,17 +297,86 @@
       .join("\n");
   }
 
+  function sanitizeSpecsHtml(value) {
+    if (!value) return "";
+    const template = document.createElement("template");
+    template.innerHTML = value;
+
+    const cleanNode = (node) => {
+      if (node.nodeType === Node.TEXT_NODE) return document.createTextNode(node.textContent || "");
+      if (node.nodeType !== Node.ELEMENT_NODE) return document.createTextNode("");
+
+      const tagName = node.tagName.toUpperCase();
+      if (!ALLOWED_TAGS.has(tagName)) {
+        const fragment = document.createDocumentFragment();
+        Array.from(node.childNodes).forEach((child) => {
+          fragment.appendChild(cleanNode(child));
+        });
+        return fragment;
+      }
+
+      const clean = document.createElement(tagName.toLowerCase());
+      Array.from(node.childNodes).forEach((child) => {
+        clean.appendChild(cleanNode(child));
+      });
+      return clean;
+    };
+
+    const fragment = document.createDocumentFragment();
+    Array.from(template.content.childNodes).forEach((child) => {
+      fragment.appendChild(cleanNode(child));
+    });
+    const wrapper = document.createElement("div");
+    wrapper.appendChild(fragment);
+    const normalized = wrapper.innerHTML
+      .replace(/<p><\/p>/g, "")
+      .replace(/<(strong|em|li)>\s*<\/\1>/g, "")
+      .trim();
+    return normalized;
+  }
+
+  function htmlToPlainText(value) {
+    if (!value) return "";
+    const wrapper = document.createElement("div");
+    wrapper.innerHTML = value;
+    return sanitizeText(wrapper.textContent || "");
+  }
+
+  function editorHasContent() {
+    return sanitizeText(manualTechSpecs.textContent || "").length > 0;
+  }
+
+  function clearEditor() {
+    manualTechSpecs.innerHTML = "";
+  }
+
+  function getEditorHtml() {
+    return sanitizeSpecsHtml(manualTechSpecs.innerHTML);
+  }
+
   function normalizeItem(item, indexLabel) {
     const description = sanitizeInlineText(item.description);
-    const price = normalizePrice(item.price);
+    const regularPrice = normalizePrice(item.regularPrice ?? item.price);
+    const salePrice = normalizeOptionalPrice(item.salePrice);
     const sku = sanitizeInlineText(item.sku);
     const manufacturerModel = sanitizeInlineText(item.manufacturerModel);
     const barcodeValue = sanitizeInlineText(item.barcodeValue) || sku;
-    const techSpecs = normalizeSpecs(item.techSpecs);
+    const techSpecsHtml = item.techSpecsHtml
+      ? sanitizeSpecsHtml(item.techSpecsHtml)
+      : (() => {
+        const normalizedText = normalizeSpecs(item.techSpecs);
+        if (!normalizedText) return "";
+        if (normalizedText.includes("\n")) {
+          const items = normalizedText.split("\n").map((line) => `<li>${line.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</li>`).join("");
+          return `<ul>${items}</ul>`;
+        }
+        return `<p>${normalizedText.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</p>`;
+      })();
+    const techSpecs = htmlToPlainText(techSpecsHtml);
     if (!description) throw new Error(`${indexLabel}: Description is required.`);
     if (!sku) throw new Error(`${indexLabel}: SKU / UPC is required.`);
     if (!manufacturerModel) throw new Error(`${indexLabel}: MFG MOD is required.`);
-    return { description, price, sku, manufacturerModel, barcodeValue, techSpecs };
+    return { description, regularPrice, salePrice, sku, manufacturerModel, barcodeValue, techSpecs, techSpecsHtml };
   }
 
   function parseExcelItems() {
@@ -292,15 +386,17 @@
     return rows.map((row, index) => {
       const columns = row.split("\t");
       if (columns.length < 4) {
-        throw new Error(`Row ${index + 1} must include Description, Price, SKU / UPC, and MFG MOD in separate Excel columns.`);
+        throw new Error(`Row ${index + 1} must include Description, Regular Price, SKU / UPC, and MFG MOD in separate Excel columns.`);
       }
+      const usesSalePriceColumn = columns.length >= 5 && looksLikePrice(columns[2]);
       return normalizeItem({
         description: columns[0],
-        price: columns[1],
-        sku: columns[2],
-        manufacturerModel: columns[3],
-        barcodeValue: columns[4] || "",
-        techSpecs: columns[5] || ""
+        regularPrice: columns[1],
+        salePrice: usesSalePriceColumn ? columns[2] : "",
+        sku: usesSalePriceColumn ? columns[3] : columns[2],
+        manufacturerModel: usesSalePriceColumn ? columns[4] : columns[3],
+        barcodeValue: usesSalePriceColumn ? (columns[5] || "") : (columns[4] || ""),
+        techSpecs: usesSalePriceColumn ? (columns[6] || "") : (columns[5] || "")
       }, `Row ${index + 1}`);
     });
   }
@@ -329,7 +425,10 @@
       title.textContent = item.description;
       const meta = document.createElement("div");
       meta.className = "manual-item-meta";
-      meta.textContent = `$${item.price} | SKU / UPC: ${item.sku} | MFG MOD: ${item.manufacturerModel} | Barcode: ${item.barcodeValue}`;
+      const priceSummary = item.salePrice
+        ? `Regular: $${item.regularPrice} | Sale: $${item.salePrice}`
+        : `Regular: $${item.regularPrice}`;
+      meta.textContent = `${priceSummary} | SKU / UPC: ${item.sku} | MFG MOD: ${item.manufacturerModel} | Barcode: ${item.barcodeValue}`;
       info.append(title, meta);
       if (item.techSpecs) {
         const specs = document.createElement("div");
@@ -353,20 +452,22 @@
     try {
       const item = normalizeItem({
         description: manualDescription.value,
-        price: manualPrice.value,
+        regularPrice: manualPrice.value,
+        salePrice: manualSalePrice.value,
         sku: manualSku.value,
         manufacturerModel: manualManufacturerModel.value,
         barcodeValue: manualBarcodeValue.value,
-        techSpecs: manualTechSpecs.value
+        techSpecsHtml: getEditorHtml()
       }, "Manual item");
       manualItems.push(item);
       renderManualItems();
       manualDescription.value = "";
       manualPrice.value = "";
+      manualSalePrice.value = "";
       manualSku.value = "";
       manualManufacturerModel.value = "";
       manualBarcodeValue.value = "";
-      manualTechSpecs.value = "";
+      clearEditor();
       showStatus("Manual item added.", "success");
       if (generatedCount) clearPreview();
       manualDescription.focus();
@@ -449,27 +550,62 @@
     return 2;
   }
 
+  function currentSignLabel(template) {
+    if (signType.value === "regular") return "";
+    if (template.id === "avery5160" || template.id === "ulineS5047") return "";
+    return signType.value === "sale" ? "Sale" : "Clearance";
+  }
+
+  function shouldUseAlternatePrice(item) {
+    return signType.value !== "regular" && Boolean(item.salePrice);
+  }
+
+  function currentPrimaryPrice(item) {
+    return shouldUseAlternatePrice(item) ? item.salePrice : item.regularPrice;
+  }
+
+  function buildIcon() {
+    const config = ICON_MAP[iconSelect.value];
+    if (!config) return null;
+    const wrapper = document.createElement("span");
+    wrapper.className = "product-icon";
+    wrapper.setAttribute("aria-hidden", "true");
+    const icon = document.createElement("i");
+    icon.className = config.className;
+    wrapper.appendChild(icon);
+    return wrapper;
+  }
+
   function buildSpecsBlock(item, template) {
-    if (!item.techSpecs || template.specsMode === "hidden") return null;
-    const lines = item.techSpecs.split("\n").filter(Boolean);
+    if (!item.techSpecsHtml || template.specsMode === "hidden") return null;
     const wrapper = document.createElement("div");
     wrapper.className = "specs-block";
+    const templateEl = document.createElement("template");
+    templateEl.innerHTML = item.techSpecsHtml;
+    const nodes = Array.from(templateEl.content.childNodes);
 
-    let visibleLines = lines;
-    if (template.specsMode === "short") visibleLines = lines.slice(0, 3);
+    nodes.forEach((node) => {
+      if (template.specsMode !== "short") {
+        wrapper.appendChild(node.cloneNode(true));
+        return;
+      }
 
-    const looksLikeList = visibleLines.length > 1;
-    if (looksLikeList) {
-      const list = document.createElement("ul");
-      visibleLines.forEach((line) => {
-        const itemNode = document.createElement("li");
-        itemNode.textContent = line.replace(/^[\u2022\-*]\s*/, "");
-        list.appendChild(itemNode);
-      });
-      wrapper.appendChild(list);
-    } else {
+      if (node.nodeType !== Node.ELEMENT_NODE) return;
+      const tagName = node.tagName.toUpperCase();
+      if (tagName === "UL" || tagName === "OL") {
+        const nextList = document.createElement(tagName.toLowerCase());
+        Array.from(node.children).slice(0, 3).forEach((child) => {
+          nextList.appendChild(child.cloneNode(true));
+        });
+        if (nextList.children.length) wrapper.appendChild(nextList);
+      } else if (!wrapper.childNodes.length) {
+        wrapper.appendChild(node.cloneNode(true));
+      }
+    });
+
+    if (!wrapper.childNodes.length && item.techSpecs) {
       const paragraph = document.createElement("p");
-      paragraph.textContent = visibleLines[0] || "";
+      paragraph.textContent = item.techSpecs;
       wrapper.appendChild(paragraph);
     }
     return wrapper;
@@ -479,21 +615,62 @@
     const card = document.createElement("article");
     const barcodeMode = barcodeDisplay.value;
     const renderBarcodeText = barcodeMode !== "none" && showBarcodeText.checked;
-    card.className = `price-card ${template.layoutClass} price-${priceSize.value} barcode-${barcodeMode} ${renderBarcodeText ? "barcode-text-on" : "barcode-text-off"}`;
+    card.className = `price-card ${template.layoutClass} price-${priceSize.value} barcode-${barcodeMode} sign-${signType.value} print-${printStyle.value} ${renderBarcodeText ? "barcode-text-on" : "barcode-text-off"}`;
 
     const inner = document.createElement("div");
     inner.className = "price-card-inner";
+    const accent = document.createElement("div");
+    accent.className = "sign-accent";
 
     const descriptionBlock = document.createElement("div");
     descriptionBlock.className = "description-block";
+    const header = document.createElement("div");
+    header.className = "sign-header";
+    const icon = buildIcon();
+    if (icon) header.appendChild(icon);
+    const productHead = document.createElement("div");
+    productHead.className = "product-head";
+    const signLabel = currentSignLabel(template);
+    if (signLabel) {
+      const badge = document.createElement("span");
+      badge.className = "sign-badge";
+      badge.textContent = signLabel;
+      productHead.appendChild(badge);
+    }
     const description = document.createElement("p");
     description.className = "product-description";
     description.textContent = item.description;
-    descriptionBlock.appendChild(description);
+    productHead.appendChild(description);
+    header.appendChild(productHead);
+    descriptionBlock.appendChild(header);
+
+    const priceBlock = document.createElement("div");
+    priceBlock.className = "price-block";
+    const usesAlternatePrice = shouldUseAlternatePrice(item);
+    if (usesAlternatePrice) {
+      const was = document.createElement("div");
+      was.className = "was-price";
+      const wasLabel = document.createElement("span");
+      wasLabel.className = "was-price-label";
+      wasLabel.textContent = "Was";
+      const wasValue = document.createElement("span");
+      wasValue.className = "was-price-value";
+      wasValue.textContent = formatPrice(item.regularPrice);
+      was.append(wasLabel, wasValue);
+      priceBlock.appendChild(was);
+    }
 
     const price = document.createElement("div");
     price.className = "price-value";
-    price.textContent = formatPrice(item.price);
+    price.textContent = formatPrice(currentPrimaryPrice(item));
+    if (usesAlternatePrice) {
+      const nowLabel = document.createElement("div");
+      nowLabel.className = `now-price-label now-${signType.value}`;
+      nowLabel.textContent = signType.value === "sale" ? "Now" : "Clearance Price";
+      priceBlock.append(nowLabel, price);
+    } else {
+      priceBlock.appendChild(price);
+    }
 
     const meta = document.createElement("div");
     meta.className = "meta-block";
@@ -527,9 +704,9 @@
     }
 
     if (template.id === "halfSheet") {
-      inner.append(descriptionBlock, price, specsBlock || document.createElement("div"), meta, barcodeWrap);
+      inner.append(accent, descriptionBlock, priceBlock, specsBlock || document.createElement("div"), meta, barcodeWrap);
     } else {
-      inner.append(descriptionBlock, price, meta);
+      inner.append(accent, descriptionBlock, priceBlock, meta);
       if (specsBlock) inner.append(specsBlock);
       inner.append(barcodeWrap);
     }
@@ -619,6 +796,7 @@
     labelTemplate.value = availableTemplates[0]?.id || "";
     manualItems = [];
     excelPaste.value = "";
+    clearEditor();
     renderManualItems();
     populatePositionOptions();
     setEntryMode();
@@ -654,10 +832,21 @@
   });
   startingRow.addEventListener("change", updateSummaryPosition);
   startingColumn.addEventListener("change", updateSummaryPosition);
-  [priceSize, barcodeDisplay, showBarcodeText].forEach((element) => {
+  [priceSize, signType, printStyle, iconSelect, barcodeDisplay, showBarcodeText].forEach((element) => {
     element.addEventListener("change", () => {
       if (generatedCount) clearPreview();
     });
+  });
+  document.querySelectorAll("[data-editor-command]").forEach((button) => {
+    button.addEventListener("click", () => {
+      manualTechSpecs.focus();
+      document.execCommand(button.dataset.editorCommand, false);
+      manualTechSpecs.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+  });
+  manualTechSpecs.addEventListener("blur", () => {
+    const sanitized = getEditorHtml();
+    manualTechSpecs.innerHTML = sanitized;
   });
   document.querySelectorAll('input[name="entryMethod"]').forEach((input) => {
     input.addEventListener("change", setEntryMode);
