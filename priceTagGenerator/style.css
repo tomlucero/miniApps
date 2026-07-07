@@ -231,12 +231,12 @@
 }
 .price-card.sign-regular .sign-accent { display: none; }
 .price-card.print-color.sign-sale {
-  --accent-line: #d97706;
+  --accent-line: #D9782D;
   --accent-soft: rgba(217, 119, 6, .1);
   --badge-text: #9a3412;
 }
 .price-card.print-color.sign-clearance {
-  --accent-line: #eab308;
+  --accent-line: #FFC038;
   --accent-soft: rgba(234, 179, 8, .16);
   --badge-text: #854d0e;
 }
