@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Phone Order Tax Allocator | CSU Bookstore</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/b65fbcdd34.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="../shared-theme.css?v=20260621-1">
+  <link rel="stylesheet" href="style.css?v=20260708-1">
+</head>
+<body>
+  <header class="suite-hero">
+    <div class="suite-hero-image" role="img" aria-label="Colorado State University Lory Student Center"></div>
+    <div class="suite-hero-inner">
+      <div>
+        <a class="suite-back" href="../index.html">&larr; Return to Toolbox</a>
+        <p class="suite-eyebrow">Phone order helper</p>
+        <h1>Phone Order Tax Allocator</h1>
+        <p class="suite-lead">Split sales tax across phone-order items proportionally, keep rounding accurate, and get per-item totals instantly.</p>
+      </div>
+      <img class="suite-logo" src="../productListingHTMLBuilder/images/bookstoreLogo.png" alt="CSU Bookstore logo">
+    </div>
+  </header>
+
+  <main class="workspace-band">
+    <div class="container">
+      <div class="row g-4 align-items-start">
+        <div class="col-xl-4">
+          <section class="card setup-card" aria-labelledby="inputsHeading">
+            <div class="card-body p-4">
+              <div class="panel-title mb-4">
+                <div>
+                  <p class="suite-eyebrow">Order inputs</p>
+                  <h2 id="inputsHeading">Sales tax and item rows</h2>
+                </div>
+                <button class="btn btn-outline-secondary btn-sm" id="loadExampleButton" type="button">Load Example</button>
+              </div>
+
+              <div class="input-stack">
+                <div>
+                  <label class="form-label" for="totalTax">Total Sales Tax</label>
+                  <div class="money-field">
+                    <span>$</span>
+                    <input class="form-control" id="totalTax" type="text" inputmode="decimal" placeholder="1.56" aria-describedby="taxHelp">
+                  </div>
+                  <div class="field-note" id="taxHelp">Enter the full tax amount from the order. Negative adjustments are supported.</div>
+                </div>
+
+                <dl class="summary-grid">
+                  <div>
+                    <dt>Active Items</dt>
+                    <dd id="activeItemCount">0</dd>
+                  </div>
+                  <div>
+                    <dt>Subtotal</dt>
+                    <dd id="subtotalValue">$0.00</dd>
+                  </div>
+                  <div>
+                    <dt>Allocated Tax</dt>
+                    <dd id="allocatedTaxValue">$0.00</dd>
+                  </div>
+                  <div>
+                    <dt>Grand Total</dt>
+                    <dd id="grandTotalValue">$0.00</dd>
+                  </div>
+                </dl>
+
+                <div class="check-card" id="checkCard">
+                  <div>
+                    <p class="check-label">Allocation Check</p>
+                    <p class="check-value" id="allocationCheck">Balanced</p>
+                  </div>
+                  <p class="check-note" id="allocationNote">Allocated tax matches the entered sales tax.</p>
+                </div>
+
+                <div class="helper-card">
+                  <h3>How the allocation works</h3>
+                  <p>Each item gets its share of tax based on its price. The final filled item receives any rounding remainder so the total stays exact.</p>
+                </div>
+              </div>
+
+              <div class="action-row mt-4">
+                <button class="btn btn-primary" id="addRowButton" type="button"><i class="fa-solid fa-plus" aria-hidden="true"></i> Add Row</button>
+                <button class="btn btn-outline-secondary" id="copyButton" type="button"><i class="fa-solid fa-copy" aria-hidden="true"></i> Copy Results</button>
+                <button class="btn btn-outline-secondary" id="resetButton" type="button"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i> Reset</button>
+              </div>
+
+              <div class="form-status mt-3" id="formStatus" role="status" aria-live="polite"></div>
+            </div>
+          </section>
+        </div>
+
+        <div class="col-xl-8">
+          <section class="card worksheet-card" aria-labelledby="worksheetHeading">
+            <div class="worksheet-head">
+              <div>
+                <p class="suite-eyebrow">Allocation worksheet</p>
+                <h2 id="worksheetHeading">Item-level tax split</h2>
+              </div>
+              <span class="table-pill">Browser-based version of the Excel helper</span>
+            </div>
+
+            <div class="table-wrap">
+              <table class="allocation-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Item #</th>
+                    <th scope="col">Item Description</th>
+                    <th scope="col">Item Price</th>
+                    <th scope="col">Tax Allocation</th>
+                    <th scope="col">Item Total</th>
+                    <th scope="col">Row</th>
+                  </tr>
+                </thead>
+                <tbody id="itemsBody"></tbody>
+                <tfoot>
+                  <tr>
+                    <th scope="row" colspan="2">Totals</th>
+                    <td id="tableSubtotal">$0.00</td>
+                    <td id="tableAllocatedTax">$0.00</td>
+                    <td id="tableGrandTotal">$0.00</td>
+                    <td></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="script.js?v=20260708-1"></script>
+</body>
+</html>
