@@ -116,57 +116,57 @@ const approvedSnippets = [
   {
     id: "decalsOnly",
     label: "Decals Only",
-    html: `<div id="do"/></div>`,
+    html: `<div id="do"></div>`,
   },
   {
     id: "electronicsReturnPolicy",
     label: "Electronics Return Policy",
-    html: `<div id="erp"/></div>`,
+    html: `<div id="erp"></div>`,
   },
   {
     id: "dropShip",
     label: "Drop Ship",
-    html: `<div id="dropShip"</div>`,
+    html: `<div id="dropShip"></div>`,
   },
   {
     id: "aggiesBox",
     label: "Aggies Box",
-    html: `<div id="aggiesBox"</div>`,
+    html: `<div id="aggiesBox"></div>`,
   },
   {
     id: "juliaGash",
     label: "Julia Gash",
-    html: `<div id="juliaGash"</div>`,
+    html: `<div id="juliaGash"></div>`,
   },
   {
     id: "artEvans",
     label: "Art Evans",
-    html: `<div id="artEvans"</div>`,
+    html: `<div id="artEvans"></div>`,
   },
   {
     id: "firstGeneration",
     label: "First Generation",
-    html: `<div id="aboutFirstGen" /></div>`,
+    html: `<div id="aboutFirstGen"></div>`,
   },
   {
     id: "semesterAtSeaDetails",
     label: "Semester at Sea Details",
-    html: `<div id="semesterAtSeaDetails" /></div>`,
+    html: `<div id="semesterAtSeaDetails"></div>`,
   },
   {
     id: "tokyodachi",
     label: "Tokyodachi",
-    html: `<div id="tokyodachi"</div>`,
+    html: `<div id="tokyodachi"></div>`,
   },
   {
     id: "bookstoreExclusive",
     label: "Bookstore Exclusive",
-    html: `<div id="bookstoreExclusive"</div>`,
+    html: `<div id="bookstoreExclusive"></div>`,
   },
   {
     id: "operationHatTrick",
     label: "Operation Hat Trick",
-    html: `<div id="opHatTruck"</div>`,
+    html: `<div id="opHatTruck"></div>`,
   },
   {
     id: "departmentOrders",
