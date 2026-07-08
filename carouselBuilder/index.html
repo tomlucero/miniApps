@@ -104,7 +104,7 @@
   - To add a fourth slide, uncomment both the fourth indicator button and the fourth carousel-item block.
 -->
 <section class="bk-carousel-block">
-<div id="bkHomeHeroOverlayCarousel" class="bk-carousel bk-carousel--full carousel slide" data-bs-ride="false" aria-label="Featured Bookstore campaigns">
+<div id="bkHomeHeroOverlayCarousel" class="bk-carousel bk-carousel--full carousel slide" data-bs-ride="carousel" data-bs-interval="9000" data-bs-pause="hover" data-bs-touch="true" aria-label="Featured Bookstore campaigns">
 <div class="carousel-indicators">
 <button type="button" data-bs-target="#bkHomeHeroOverlayCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
 <button type="button" data-bs-target="#bkHomeHeroOverlayCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
@@ -124,12 +124,12 @@
 </div>
 <div class="container bk-carousel__content">
 <div class="bk-carousel__panel">
-<p class="bk-carousel__eyebrow">Welcome to CSU</p>
-<h1 class="bk-carousel__title">Find Your <span class="bk-carousel__highlight">New Start</span> Energy</h1>
-<p class="bk-carousel__text">The CSU Bookstore has CSU Rams Gear, course materials, gifts, supplies, and essentials for campus life.</p>
+<p class="bk-carousel__eyebrow">Summertime</p>
+<h1 class="bk-carousel__title"><span class="bk-carousel__highlight">Summertime</span> and the Living is Easy</h1>
+<p class="bk-carousel__text">Get geared up for summer with CSU Rams Apparel and Gifts</p>
 <div class="bk-carousel__actions">
 <a class="bk-carousel__btn bk-carousel__btn--light" href="/shop/apparel">Shop Rams Apparel <span class="bk-carousel__arrow" aria-hidden="true"></span></a>
-<a class="bk-carousel__btn bk-carousel__btn--orange" href="/SelectTermDept">Find Course Materials <span class="bk-carousel__arrow" aria-hidden="true"></span></a>
+<a class="bk-carousel__btn bk-carousel__btn--light" href="/shop/gifts">Shop CSU Gifts <span class="bk-carousel__arrow" aria-hidden="true"></span></a>
 </div>
 </div>
 </div>
@@ -145,7 +145,7 @@
 <div class="container bk-carousel__content">
 <div class="bk-carousel__panel">
 <p class="bk-carousel__eyebrow">Course Materials</p>
-<h2 class="bk-carousel__title">Preorder Your Course Materials</h2>
+<h2 class="bk-carousel__title"><span class="bk-carousel__highlight">Preorder</span> Your Course Materials</h2>
 <p class="bk-carousel__text">Skip the textbook hunt. We'll get your books ready.</p>
 <div class="bk-carousel__actions">
 <a class="bk-carousel__btn bk-carousel__btn--orange" href="/preorder">Preorder Today <span class="bk-carousel__arrow" aria-hidden="true"></span></a>
@@ -164,7 +164,7 @@
 <div class="container bk-carousel__content">
 <div class="bk-carousel__panel">
 <p class="bk-carousel__eyebrow">RAMTech</p>
-<h2 class="bk-carousel__title">Love at First Mac</h2>
+<h2 class="bk-carousel__title"><span class="bk-carousel__highlight">Love</span> at First Mac</h2>
 <p class="bk-carousel__text">MacBook Neo now available at RAMTech</p>
 <div class="bk-carousel__actions">
 <a class="bk-carousel__btn bk-carousel__btn--light" href="/shop/electronics/apple/Apple-MacBook-Neo-13-inch-A18-Pro">Shop MacBook Neo <span class="bk-carousel__arrow" aria-hidden="true"></span></a>
@@ -173,11 +173,11 @@
 </div>
 </div>
 </div>
-<button class="carousel-control-prev" type="button" data-bs-target="#bkHomeHeroOverlayCarousel" data-bs-slide="prev">
+<button class="carousel-control-prev" type="button" data-bs-target="#bkHomeHeroOverlayCarousel" data-bs-slide="prev" aria-label="Previous slide">
 <span class="carousel-control-prev-icon" aria-hidden="true"></span>
 <span class="visually-hidden">Previous campaign</span>
 </button>
-<button class="carousel-control-next" type="button" data-bs-target="#bkHomeHeroOverlayCarousel" data-bs-slide="next">
+<button class="carousel-control-next" type="button" data-bs-target="#bkHomeHeroOverlayCarousel" data-bs-slide="next" aria-label="Next slide">
 <span class="carousel-control-next-icon" aria-hidden="true"></span>
 <span class="visually-hidden">Next campaign</span>
 </button>
@@ -469,14 +469,14 @@
       previewShell.className = "preview-carousel-shell";
       previewShell.innerHTML = `
         <section class="bk-carousel-block">
-          <div class="bk-carousel carousel slide" data-bs-ride="false" aria-label="Preview carousel">
+          <div class="bk-carousel carousel slide" data-bs-ride="carousel" data-bs-interval="9000" data-bs-pause="hover" data-bs-touch="true" aria-label="Preview carousel">
             <div class="carousel-inner">
               ${buildSlideMarkup(slide, true, true)}
             </div>
-            <button class="carousel-control-prev" type="button" aria-label="Previous preview slide">
+            <button class="carousel-control-prev" type="button" aria-label="Previous slide">
               <span class="carousel-control-prev-icon" aria-hidden="true"></span>
             </button>
-            <button class="carousel-control-next" type="button" aria-label="Next preview slide">
+            <button class="carousel-control-next" type="button" aria-label="Next slide">
               <span class="carousel-control-next-icon" aria-hidden="true"></span>
             </button>
           </div>
@@ -549,18 +549,18 @@
   - Keep button text short and action-focused.
 -->
 <section class="bk-carousel-block">
-<div id="${escapeAttr(id)}" class="bk-carousel bk-carousel--full carousel slide" data-bs-ride="false" aria-label="Featured Bookstore campaigns">
+<div id="${escapeAttr(id)}" class="bk-carousel bk-carousel--full carousel slide" data-bs-ride="carousel" data-bs-interval="9000" data-bs-pause="hover" data-bs-touch="true" aria-label="Featured Bookstore campaigns">
 <div class="carousel-indicators">
 ${indicatorLines.join("\n")}
 </div>
 <div class="carousel-inner">
 ${slideLines.join("\n")}
 </div>
-<button class="carousel-control-prev" type="button" data-bs-target="${target}" data-bs-slide="prev">
+<button class="carousel-control-prev" type="button" data-bs-target="${target}" data-bs-slide="prev" aria-label="Previous slide">
 <span class="carousel-control-prev-icon" aria-hidden="true"></span>
 <span class="visually-hidden">Previous campaign</span>
 </button>
-<button class="carousel-control-next" type="button" data-bs-target="${target}" data-bs-slide="next">
+<button class="carousel-control-next" type="button" data-bs-target="${target}" data-bs-slide="next" aria-label="Next slide">
 <span class="carousel-control-next-icon" aria-hidden="true"></span>
 <span class="visually-hidden">Next campaign</span>
 </button>
