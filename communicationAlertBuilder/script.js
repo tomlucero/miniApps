@@ -41,7 +41,10 @@
     shoppingBag: { label: "Shopping Bag", className: "fa-solid fa-bag-shopping" },
     pickup: { label: "Box / Pickup", className: "fa-solid fa-box-open" },
     graduation: { label: "Graduation", className: "fa-solid fa-graduation-cap" },
-    laptop: { label: "Laptop", className: "fa-solid fa-laptop" }
+    laptop: { label: "Laptop", className: "fa-solid fa-laptop" },
+    ramHead: { label: "CSU Ram Head", className: "fa-kit fa-csuramhead" },
+    aggieA: { label: "Aggie A", className: "fa-kit fa-csu-aggie-a" },
+    semesterAtSea: { label: "Semester at Sea", className: "fa-solid fa-ship" }
   };
 
   const DEFAULTS = {
@@ -84,6 +87,7 @@
   const copyHtmlButton = document.getElementById("copyHtmlButton");
   const resetButton = document.getElementById("resetButton");
   const linkButton = document.getElementById("linkButton");
+  let savedSelection = null;
 
   function populateSelect(select, options) {
     Object.entries(options).forEach(([value, option]) => {
@@ -178,6 +182,24 @@
     if (iconChoice.value === "auto") return selectedAlertType().defaultIcon;
     if (iconChoice.value === "none") return "";
     return ICON_OPTIONS[iconChoice.value].className;
+  }
+
+  function saveSelection() {
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) return;
+    const range = selection.getRangeAt(0);
+    if (messageEditor.contains(range.commonAncestorContainer)) {
+      savedSelection = range.cloneRange();
+    }
+  }
+
+  function restoreSelection() {
+    if (!savedSelection) return false;
+    const selection = window.getSelection();
+    if (!selection) return false;
+    selection.removeAllRanges();
+    selection.addRange(savedSelection);
+    return true;
   }
 
   function buildMarkup(state) {
@@ -332,6 +354,7 @@
   }
 
   function insertLink() {
+    restoreSelection();
     const url = window.prompt("Enter the URL for this link:", "https://");
     if (!url) return;
     const safeHref = sanitizeLinkHref(url);
@@ -339,7 +362,10 @@
       showStatus("That link could not be used. Try https://, /path, #anchor, or mailto: links.", "error");
       return;
     }
+    messageEditor.focus();
+    restoreSelection();
     document.execCommand("createLink", false, safeHref);
+    saveSelection();
     updateOutput();
   }
 
@@ -369,14 +395,25 @@
   ].forEach((element) => element.addEventListener("input", updateOutput));
 
   messageEditor.addEventListener("input", updateOutput);
+  messageEditor.addEventListener("mouseup", saveSelection);
+  messageEditor.addEventListener("keyup", saveSelection);
+  messageEditor.addEventListener("focus", saveSelection);
   messageEditor.addEventListener("blur", () => {
     messageEditor.innerHTML = sanitizeMessageHtml(messageEditor.innerHTML);
     updateOutput();
   });
 
   document.querySelectorAll("[data-command]").forEach((button) => {
+    button.addEventListener("mousedown", (event) => {
+      event.preventDefault();
+      messageEditor.focus();
+      restoreSelection();
+    });
     button.addEventListener("click", () => {
+      messageEditor.focus();
+      restoreSelection();
       document.execCommand(button.dataset.command, false, null);
+      saveSelection();
       messageEditor.focus();
       updateOutput();
     });
