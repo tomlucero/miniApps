@@ -18,7 +18,6 @@ Many of the tools replace tasks that were previously completed using handwritten
 * **Tracking CSV Builder** – Creates tracking upload files for shipments and orders.
 * **Banner Ad Builder** – Creates structured homepage banner content.
 * **Carousel Builder** – Builds responsive carousel content for website updates.
-* **Communication Alert Builder** – Generates copy-and-paste HTML for CSU Bookstore communication alerts with preview, icons, scheduling, and display options.
 * **Customer Email Builder** – Generates customer-ready email templates and matching Insite notes.
 * **Email Builder Template Tool** – Creates reusable email templates used by Online Retail staff.
 * **Phone Order Tax Allocator** – Splits phone-order sales tax across items proportionally while preserving exact rounding totals.
