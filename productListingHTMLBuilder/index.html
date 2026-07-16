@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="app-version" content="1.0">
+    <meta name="app-version" content="1.1">
     <title>Product Description HTML Builder</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -210,19 +210,17 @@
                 </section>
 
                 <div class="mt-3">
-                  <label class="form-label" for="descriptionTemplate">Editable Description Text</label>
-                  <textarea class="form-control" id="descriptionTemplate" name="descriptionTemplate" rows="4"></textarea>
-                  <div class="form-text">
-                    Insert variables like {productName}, {fit}, or {additional}. Use the toolbar for links, bold, and italic text.
-                  </div>
+                  <label class="form-label" for="editorialLead">Editorial Lead</label>
+                  <textarea class="form-control" id="editorialLead" name="editorialLead" rows="2" placeholder="Example: A soft, everyday layer for cool mornings and game day plans."></textarea>
+                  <div class="form-text">Optional. Adds a short lead paragraph before the main description.</div>
                 </div>
 
                 <div class="mt-3">
-                  <div class="label-row">
-                    <label class="form-label" for="additional">Additional Description Notes</label>
-                    <span class="token-hint">{additional}</span>
+                  <label class="form-label" for="descriptionTemplate">Editable Description Text</label>
+                  <textarea class="form-control" id="descriptionTemplate" name="descriptionTemplate" rows="4"></textarea>
+                  <div class="form-text">
+                    Insert variables like {productName}, {brand}, or {fit}. Use the toolbar for links, bold, and italic text.
                   </div>
-                  <textarea class="form-control" id="additional" name="additional" rows="3" placeholder="Example: Great for cool mornings, class, and game day."></textarea>
                 </div>
 
                 <div class="mt-3">
@@ -230,6 +228,18 @@
                   <textarea class="form-control" id="features" name="features" rows="4" placeholder="Example: Kangaroo pocket&#10;Ribbed cuffs&#10;Embroidered campus logo"></textarea>
                   <div class="form-text">Add one feature per line. Commas stay inside the same bullet.</div>
                 </div>
+
+                <section class="custom-attributes mt-3" aria-labelledby="customAttributesHeading">
+                  <div class="section-title-row">
+                    <div>
+                      <h3 id="customAttributesHeading">Freeform Product Attributes</h3>
+                      <p class="section-helper">Optional custom specs for details that do not fit the standard fields.</p>
+                    </div>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" id="addCustomAttributeButton">Add Attribute</button>
+                  </div>
+                  <div id="customAttributes" class="custom-attribute-list"></div>
+                  <div class="form-text">Examples: Capacity: 20 oz., Pages: 200, Includes: Stylus and charging cable.</div>
+                </section>
 
                 <div class="mt-3">
                   <div class="label-row">

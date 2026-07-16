@@ -241,6 +241,12 @@ h1 {
   font-weight: 760;
 }
 
+.section-helper {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
 .variable-summary {
   display: flex;
   flex-wrap: wrap;
@@ -314,6 +320,25 @@ h1 {
 
 textarea {
   resize: vertical;
+}
+
+.custom-attributes {
+  padding: 16px;
+  background: #f8fbfc;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.custom-attribute-list {
+  display: grid;
+  gap: 10px;
+}
+
+.custom-attribute-row {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr) auto;
+  gap: 10px;
+  align-items: start;
 }
 
 .tox-tinymce {
@@ -475,6 +500,10 @@ textarea {
   }
 
   .copy-row {
+    grid-template-columns: 1fr;
+  }
+
+  .custom-attribute-row {
     grid-template-columns: 1fr;
   }
 
