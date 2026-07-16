@@ -595,6 +595,7 @@ function buildHtml() {
 
   if (attributeItems.length) {
     listingHtml.push(
+      `    <h4>Product Specifications</h4>`,
       `    <div class="attribute">`,
       `      <ul>`,
       ...attributeItems.map((item) => buildFeatureListItem(item, "        ")),
