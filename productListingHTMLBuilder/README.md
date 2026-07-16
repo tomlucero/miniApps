@@ -2,6 +2,8 @@
 
 A simple local web app for student employees who need to turn product listing notes into clean HTML for MBS/Insite product descriptions.
 
+**Current version:** 1.1
+
 ## Files
 
 - `index.html` - app structure and form fields
@@ -26,6 +28,8 @@ The generated HTML uses only these approved tags:
 - `span` only when it is exactly `<span class="productName">...</span>`
 - `ul` may include `class="prodFeatList"` for Product Features lists
 - `div` may include `class="csuProdDesc"` around the full listing
+- `div` may include layout wrappers: `bk-product-copy`, `bk-product-features`, `bk-product-details`, `attribute`, and `bk-care-instructions`
+- `p` may include `class="lead"` for the optional Editorial Lead
 - `div` only for approved snippet IDs and the Student Account Eligible snippet: `<div id="sa"></div>`
 
 The generator escapes typed notes so accidental HTML, styles, scripts, and unapproved tags do not get included in the output.
@@ -37,18 +41,44 @@ The app creates:
 - A short paragraph description
 - A `Product Features` heading
 - A bullet list using `<ul class="prodFeatList">`
-- A `Care Instructions` heading and paragraph when care information is entered
-- Optional approved code snippets appended at the end
-- The Student Account Eligible snippet when the checkbox is selected
+- Optional Editorial Lead output as `<p class="lead">...</p>`
+- Product specifications grouped in `<div class="attribute">`
+- A wrapped Care Instructions section when care information is entered
+- Optional approved code snippets inside the product copy section
+- The Student Account Eligible snippet inside the product copy section when the checkbox is selected
 - Editable suggested metadata for SEO title, meta description, and search keywords
 
-The product description content is wrapped in:
+The product description content is grouped for future CSS layout work:
 
 ```html
 <div class="csuProdDesc">
+  <div class="bk-product-copy">
+    <p class="lead">A soft, everyday layer for cool mornings and game day plans.</p>
+    <p><span class="productName">CSU Rams Hoodie</span> is an easy everyday pick.</p>
+    <div class="bk-product-features">
+      <h3>Product Features</h3>
+      <ul class="prodFeatList">
+        <li>Kangaroo pocket</li>
+      </ul>
+    </div>
+    <div id="departmentOrders"></div>
+    <div id="sa"></div>
+  </div>
+  <div class="bk-product-details">
+    <div class="attribute">
+      <ul>
+        <li><strong>Brand:</strong> Champion</li>
+      </ul>
+    </div>
+    <div class="bk-care-instructions">
+      <h3>Care Instructions</h3>
+      <p>Machine wash cold. Tumble dry low.</p>
+    </div>
+  </div>
+</div>
 ```
 
-This wrapper is reserved for future CSS updates.
+These wrappers separate editorial copy, product features, product specifications, and care instructions.
 
 Tone presets fill the editable description text field. Students can revise that text before copying so product listings do not all sound the same.
 
@@ -113,6 +143,8 @@ Student-entered feature bullets remain plain list items unless they are entered 
 
 Feature notes split into separate bullets on new lines or semicolons. Commas remain inside the same bullet, so text like `Great for breakfast, lunch, or dinner` stays together.
 
+Freeform Product Attributes let employees add extra specification bullets such as `Capacity: 20 oz.`, `Pages: 200`, or `Includes: Stylus and charging cable`. These are included in the same `<div class="attribute">` block as the standard product specifications.
+
 ## Tone Presets and Editable Description Text
 
 Tone preset starter copy lives inside each category in the `categoryConfigs` object in `script.js`.
@@ -138,7 +170,6 @@ Use these placeholders to insert product data into the description:
 - `{compatibility}`
 - `{batteries}`
 - `{care}`
-- `{additional}` - renders as its own paragraph when filled in
 
 Example template:
 
@@ -205,7 +236,7 @@ Current approved dropdown snippets:
 
 ## Student Account Eligible
 
-The `Student Account Eligible` checkbox appends this exact HTML to the end of the output:
+The `Student Account Eligible` checkbox appends this exact HTML inside the `.bk-product-copy` wrapper:
 
 ```html
 <div id="sa"></div>
