@@ -220,6 +220,11 @@ const approvedSnippets = [
     label: "Mountain Campus",
     html: `<div id="mountainCampus"></div>`,
   },
+  {
+    id: "inStorePickupOnly",
+    label: "In Store Pick-up - No Shipping",
+    html: `<div id="noShipping"></div>`,
+  },
 ];
 
 const approvedSnippetDivIds = [
