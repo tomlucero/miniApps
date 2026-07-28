@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="app-version" content="0.1">
+    <title>Avery 5266 Folder Label Builder | CSU Bookstore</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    >
+    <script src="https://kit.fontawesome.com/b65fbcdd34.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="../shared-theme.css?v=20260621-1">
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="intro-band">
+        <div class="hero-image" role="img" aria-label="Colorado State University Bookstore"></div>
+        <div class="container">
+          <div class="row align-items-end g-4">
+            <div class="col-lg-8">
+              <p class="eyebrow mb-2">Fulfillment helper</p>
+              <h1>Avery 5266 Folder Label Builder</h1>
+              <p class="lead mb-0">
+                Build clean folder-label ranges for Avery 5266 sheets, then print at actual size.
+              </p>
+            </div>
+            <div class="col-lg-4">
+              <div class="brand-mark">
+                <img src="../productListingHTMLBuilder/images/bookstoreLogo.png" alt="Bookstore logo">
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="workspace-band">
+        <div class="container">
+          <div class="row g-4">
+            <div class="col-xl-5">
+              <form id="labelForm" class="builder-panel" autocomplete="off">
+                <div class="panel-header">
+                  <div>
+                    <p class="eyebrow mb-2">Label setup</p>
+                    <h2>Sheet details</h2>
+                    <p>Enter the first number and how many folder ranges you need.</p>
+                  </div>
+                  <button type="button" class="btn btn-outline-secondary btn-sm" id="resetButton">Reset</button>
+                </div>
+
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label class="form-label" for="startNumber">Starting Number</label>
+                    <input class="form-control" id="startNumber" name="startNumber" type="number" min="0" step="1" value="210000">
+                    <div class="form-text">Example: 210000</div>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label" for="groupSize">Numbers Per Label</label>
+                    <input class="form-control" id="groupSize" name="groupSize" type="number" min="1" step="1" value="50">
+                    <div class="form-text">Use 50 for ranges like 210000 - 210049.</div>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label" for="labelCount">Number of Labels</label>
+                    <input class="form-control" id="labelCount" name="labelCount" type="number" min="1" max="300" step="1" value="30">
+                    <div class="form-text">30 fills one Avery 5266 sheet.</div>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label" for="startingRow">Starting Row</label>
+                    <select class="form-select" id="startingRow" name="startingRow"></select>
+                    <div class="form-text">Use a later row for partially used sheets.</div>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label" for="startingColumn">Starting Column</label>
+                    <select class="form-select" id="startingColumn" name="startingColumn"></select>
+                    <div class="form-text">Labels fill left-to-right from this column.</div>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label" for="prefixText">Prefix Text</label>
+                    <input class="form-control" id="prefixText" name="prefixText" type="text" placeholder="Optional">
+                    <div class="form-text">Adds text before every range.</div>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label" for="suffixText">Suffix Text</label>
+                    <input class="form-control" id="suffixText" name="suffixText" type="text" placeholder="Optional">
+                    <div class="form-text">Adds text after every range.</div>
+                  </div>
+                </div>
+
+                <div class="template-note mt-4">
+                  <span class="template-note-icon"><i class="fa-solid fa-folder-open" aria-hidden="true"></i></span>
+                  <span><strong>Avery 5266</strong><small>30 file folder labels per sheet &middot; 2 columns &times; 15 rows</small></span>
+                </div>
+
+                <section class="builder-section" aria-labelledby="formatHeading">
+                  <h3 id="formatHeading">Print Format</h3>
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <label class="form-label" for="fontSize">Font Size</label>
+                      <input class="form-control" id="fontSize" name="fontSize" type="number" min="8" max="24" step="1" value="14">
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label" for="fontWeight">Font Weight</label>
+                      <select class="form-select" id="fontWeight" name="fontWeight">
+                        <option value="700">Bold</option>
+                        <option value="600">Semi Bold</option>
+                        <option value="500">Medium</option>
+                        <option value="400">Regular</option>
+                      </select>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label" for="alignText">Text Align</label>
+                      <select class="form-select" id="alignText" name="alignText">
+                        <option value="center">Center</option>
+                        <option value="left">Left</option>
+                        <option value="right">Right</option>
+                      </select>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label" for="showGuides">Screen Guides</label>
+                      <select class="form-select" id="showGuides" name="showGuides">
+                        <option value="yes">Show label outlines</option>
+                        <option value="no">Hide label outlines</option>
+                      </select>
+                    </div>
+                  </div>
+                </section>
+
+                <section class="builder-section" aria-labelledby="calibrationHeading">
+                  <h3 id="calibrationHeading">Printer Calibration</h3>
+                  <p class="section-note">Print at 100% scale. If your printer drifts, adjust these slightly.</p>
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <label class="form-label" for="topOffset">Top Offset</label>
+                      <input class="form-control" id="topOffset" name="topOffset" type="number" step="0.01" value="0">
+                      <div class="form-text">Inches. Positive moves labels down.</div>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label" for="leftOffset">Left Offset</label>
+                      <input class="form-control" id="leftOffset" name="leftOffset" type="number" step="0.01" value="0">
+                      <div class="form-text">Inches. Positive moves labels right.</div>
+                    </div>
+                  </div>
+                </section>
+
+                <div id="formWarning" class="field-warning" role="alert"></div>
+
+                <div class="action-row">
+                  <button type="button" class="btn btn-primary" id="printButton">Print Labels</button>
+                  <button type="button" class="btn btn-outline-secondary" id="copyButton">Copy Label List</button>
+                </div>
+              </form>
+            </div>
+
+            <div class="col-xl-7">
+              <section class="output-panel">
+                <div class="panel-header">
+                  <div>
+                    <p class="eyebrow mb-2">Sheet preview</p>
+                    <h2>Folder labels</h2>
+                    <p id="sheetSummary">One sheet, 30 labels.</p>
+                  </div>
+                </div>
+
+                <div class="print-reminder">
+                  <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+                  <strong>Print at 100% scale / Actual Size. Do not use Fit to Page.</strong>
+                </div>
+
+                <div class="preview-toolbar">
+                  <span>Avery 5266</span>
+                  <span>2/3 in. x 3-7/16 in.</span>
+                  <span>30 per sheet</span>
+                </div>
+
+                <div id="printArea" class="print-area show-guides" aria-live="polite"></div>
+
+                <div class="list-output">
+                  <label class="form-label" for="labelList">Plain Label List</label>
+                  <textarea class="form-control" id="labelList" rows="8" readonly></textarea>
+                </div>
+              </section>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
