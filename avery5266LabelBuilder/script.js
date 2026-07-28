@@ -1,4 +1,5 @@
 const form = document.querySelector("#labelForm");
+const screenPreview = document.querySelector("#screenPreview");
 const printArea = document.querySelector("#printArea");
 const labelList = document.querySelector("#labelList");
 const sheetSummary = document.querySelector("#sheetSummary");
@@ -114,15 +115,18 @@ function makeElement(tagName, className, text) {
   return element;
 }
 
-function renderSheets(labels, data) {
-  printArea.innerHTML = "";
-  printArea.classList.toggle("show-guides", data.showGuides === "yes");
-  printArea.style.setProperty("--label-font-size", `${data.fontSize}pt`);
-  printArea.style.setProperty("--label-font-weight", data.fontWeight);
-  printArea.style.setProperty("--label-text-align", data.alignText);
-  printArea.style.setProperty("--top-offset", `${data.topOffset}in`);
-  printArea.style.setProperty("--left-offset", `${data.leftOffset}in`);
+function applySheetStyles(container, data) {
+  container.classList.toggle("show-guides", data.showGuides === "yes");
+  container.style.setProperty("--label-font-size", `${data.fontSize}pt`);
+  container.style.setProperty("--label-font-weight", data.fontWeight);
+  container.style.setProperty("--label-text-align", data.alignText);
+  container.style.setProperty("--top-offset", `${data.topOffset}in`);
+  container.style.setProperty("--left-offset", `${data.leftOffset}in`);
+}
 
+function renderSheetSet(container, labels, data) {
+  container.innerHTML = "";
+  applySheetStyles(container, data);
   const totalPositions = data.firstPosition - 1 + labels.length;
   const sheetCount = Math.max(1, Math.ceil(totalPositions / AVERY_5266_TEMPLATE.labelsPerSheet));
 
@@ -150,8 +154,15 @@ function renderSheets(labels, data) {
     }
 
     sheet.appendChild(grid);
-    printArea.appendChild(sheet);
+    container.appendChild(sheet);
   }
+
+  return sheetCount;
+}
+
+function renderSheets(labels, data) {
+  const sheetCount = renderSheetSet(screenPreview, labels, data);
+  renderSheetSet(printArea, labels, data);
 
   sheetSummary.textContent = `${sheetCount} ${sheetCount === 1 ? "sheet" : "sheets"}, ${labels.length} ${labels.length === 1 ? "label" : "labels"}, starting at row ${data.startingRow}, column ${data.startingColumn}.`;
 }
