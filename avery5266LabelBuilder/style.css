@@ -479,24 +479,50 @@ h1 {
 }
 
 @media print {
+  html,
   body {
+    width: 8.5in;
+    min-height: 0;
+    margin: 0 !important;
+    padding: 0 !important;
     background: #ffffff;
   }
 
-  body * {
-    visibility: hidden;
+  .intro-band,
+  .col-xl-5,
+  .output-panel > .panel-header,
+  .print-reminder,
+  .preview-toolbar,
+  .list-output {
+    display: none !important;
   }
 
-  #printArea,
-  #printArea * {
-    visibility: visible;
+  .app-shell,
+  .workspace-band,
+  .container,
+  .row,
+  .col-xl-7,
+  .output-panel {
+    display: block !important;
+    width: auto !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    background: #ffffff !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .row > * {
+    padding: 0 !important;
   }
 
   #printArea {
-    position: absolute;
-    inset: 0 auto auto 0;
     display: block;
-    width: auto;
+    width: 8.5in;
     max-height: none;
     overflow: visible;
     padding: 0;
@@ -509,11 +535,14 @@ h1 {
     width: 8.5in;
     height: 11in;
     margin: 0;
+    transform: none !important;
+    break-after: page;
     page-break-after: always;
     box-shadow: none;
   }
 
   .label-sheet:last-child {
+    break-after: auto;
     page-break-after: auto;
   }
 
