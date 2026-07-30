@@ -65,6 +65,10 @@
   };
 
   const ALLOWED_TAGS = new Set(["P", "STRONG", "EM", "UL", "OL", "LI", "A", "BR"]);
+  const TAG_ALIASES = {
+    B: "STRONG",
+    I: "EM"
+  };
   const formStatus = document.getElementById("formStatus");
   const alertType = document.getElementById("alertType");
   const iconChoice = document.getElementById("iconChoice");
@@ -87,6 +91,10 @@
   const copyHtmlButton = document.getElementById("copyHtmlButton");
   const resetButton = document.getElementById("resetButton");
   const linkButton = document.getElementById("linkButton");
+  const linkDialogBackdrop = document.getElementById("linkDialogBackdrop");
+  const linkUrlInput = document.getElementById("linkUrlInput");
+  const confirmLinkButton = document.getElementById("confirmLinkButton");
+  const cancelLinkButton = document.getElementById("cancelLinkButton");
   let savedSelection = null;
 
   function populateSelect(select, options) {
@@ -111,6 +119,27 @@
     formStatus.className = `form-status${type ? ` ${type}` : ""}`;
   }
 
+  function openLinkDialog() {
+    saveSelection();
+    if (!getSavedSelection()) {
+      showStatus("Highlight the text you want to link, then try again.", "error");
+      return;
+    }
+    linkUrlInput.value = "https://";
+    linkDialogBackdrop.hidden = false;
+    window.setTimeout(() => {
+      linkUrlInput.focus();
+      linkUrlInput.select();
+    }, 0);
+  }
+
+  function closeLinkDialog() {
+    linkDialogBackdrop.hidden = true;
+    linkUrlInput.value = "";
+    messageEditor.focus();
+    restoreSelection();
+  }
+
   function normalizeUrl(url) {
     const trimmed = url.trim();
     if (!trimmed) return "";
@@ -129,19 +158,37 @@
     const template = document.createElement("template");
     template.innerHTML = inputHtml;
 
+    function wrapInlineText(text) {
+      if (!text || !text.trim()) return null;
+      const paragraph = document.createElement("p");
+      paragraph.textContent = text.trim();
+      return paragraph;
+    }
+
     function sanitizeNode(node) {
       if (node.nodeType === Node.TEXT_NODE) {
         return document.createTextNode(node.textContent || "");
       }
 
       if (node.nodeType !== Node.ELEMENT_NODE) {
-        return document.createTextNode("");
+        return null;
       }
 
-      const tagName = node.tagName.toUpperCase();
+      const sourceTagName = node.tagName.toUpperCase();
+      const tagName = TAG_ALIASES[sourceTagName] || sourceTagName;
+
+      if (tagName === "DIV") {
+        const fragment = document.createDocumentFragment();
+        sanitizeChildren(node, fragment);
+        return fragment;
+      }
+
       if (!ALLOWED_TAGS.has(tagName)) {
         const fragment = document.createDocumentFragment();
-        Array.from(node.childNodes).forEach((child) => fragment.appendChild(sanitizeNode(child)));
+        Array.from(node.childNodes).forEach((child) => {
+          const cleanChild = sanitizeNode(child);
+          if (cleanChild) fragment.appendChild(cleanChild);
+        });
         return fragment;
       }
 
@@ -150,19 +197,66 @@
         const href = sanitizeLinkHref(node.getAttribute("href") || "");
         if (href) {
           cleanElement.setAttribute("href", href);
+          cleanElement.setAttribute("target", "_blank");
+          cleanElement.setAttribute("rel", "noreferrer noopener");
         } else {
           const fragment = document.createDocumentFragment();
-          Array.from(node.childNodes).forEach((child) => fragment.appendChild(sanitizeNode(child)));
+          Array.from(node.childNodes).forEach((child) => {
+            const cleanChild = sanitizeNode(child);
+            if (cleanChild) fragment.appendChild(cleanChild);
+          });
           return fragment;
         }
       }
 
-      Array.from(node.childNodes).forEach((child) => cleanElement.appendChild(sanitizeNode(child)));
+      Array.from(node.childNodes).forEach((child) => {
+        const cleanChild = sanitizeNode(child);
+        if (cleanChild) cleanElement.appendChild(cleanChild);
+      });
       return cleanElement;
     }
 
+    function sanitizeChildren(sourceNode, targetNode) {
+      let inlineBuffer = [];
+
+      function flushInlineBuffer() {
+        if (!inlineBuffer.length) return;
+        const paragraph = document.createElement("p");
+        inlineBuffer.forEach((node) => paragraph.appendChild(node));
+        targetNode.appendChild(paragraph);
+        inlineBuffer = [];
+      }
+
+      Array.from(sourceNode.childNodes).forEach((child) => {
+        const cleanNode = sanitizeNode(child);
+        if (!cleanNode) return;
+
+        if (cleanNode.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
+          Array.from(cleanNode.childNodes).forEach((fragmentChild) => {
+            if (fragmentChild.nodeType === Node.ELEMENT_NODE && ["P", "UL", "OL"].includes(fragmentChild.tagName)) {
+              flushInlineBuffer();
+              targetNode.appendChild(fragmentChild);
+            } else {
+              inlineBuffer.push(fragmentChild);
+            }
+          });
+          return;
+        }
+
+        if (cleanNode.nodeType === Node.ELEMENT_NODE && ["P", "UL", "OL"].includes(cleanNode.tagName)) {
+          flushInlineBuffer();
+          targetNode.appendChild(cleanNode);
+          return;
+        }
+
+        inlineBuffer.push(cleanNode);
+      });
+
+      flushInlineBuffer();
+    }
+
     const wrapper = document.createElement("div");
-    Array.from(template.content.childNodes).forEach((child) => wrapper.appendChild(sanitizeNode(child)));
+    sanitizeChildren(template.content, wrapper);
 
     Array.from(wrapper.querySelectorAll("p, ul, ol")).forEach((element) => {
       if (!element.textContent.trim() && !element.querySelector("br")) {
@@ -170,8 +264,12 @@
       }
     });
 
-    const cleaned = wrapper.innerHTML.trim();
-    return cleaned;
+    if (!wrapper.innerHTML.trim()) {
+      const fallback = wrapInlineText(template.content.textContent || "");
+      if (fallback) wrapper.appendChild(fallback);
+    }
+
+    return wrapper.innerHTML.trim();
   }
 
   function selectedAlertType() {
@@ -193,13 +291,46 @@
     }
   }
 
+  function getSavedSelection() {
+    if (!savedSelection) return null;
+    try {
+      return savedSelection.cloneRange();
+    } catch {
+      savedSelection = null;
+      return null;
+    }
+  }
+
   function restoreSelection() {
     if (!savedSelection) return false;
     const selection = window.getSelection();
     if (!selection) return false;
+    try {
+      selection.removeAllRanges();
+      selection.addRange(savedSelection);
+      return true;
+    } catch {
+      savedSelection = null;
+      return false;
+    }
+  }
+
+  function placeCaretAfter(node) {
+    const selection = window.getSelection();
+    if (!selection) return;
+    const range = document.createRange();
+    range.setStartAfter(node);
+    range.collapse(true);
     selection.removeAllRanges();
-    selection.addRange(savedSelection);
-    return true;
+    selection.addRange(range);
+    saveSelection();
+  }
+
+  function normalizeEditorContent() {
+    const sanitized = sanitizeMessageHtml(messageEditor.innerHTML);
+    if (messageEditor.innerHTML !== sanitized) {
+      messageEditor.innerHTML = sanitized;
+    }
   }
 
   function buildMarkup(state) {
@@ -320,7 +451,7 @@
     const isValid = validateState(state);
     const markup = buildMarkup(state);
     renderPreview(state, markup);
-    htmlOutput.textContent = markup;
+    htmlOutput.value = markup;
     updateScheduleSummary(state);
     copyHtmlButton.disabled = !isValid;
   }
@@ -346,26 +477,72 @@
 
   async function copyHtml() {
     try {
-      await navigator.clipboard.writeText(htmlOutput.textContent);
+      await navigator.clipboard.writeText(htmlOutput.value);
       showStatus("HTML copied to your clipboard.", "success");
     } catch {
       showStatus("Clipboard copy was blocked by the browser. You can still select and copy the HTML manually.", "error");
     }
   }
 
-  function insertLink() {
-    restoreSelection();
-    const url = window.prompt("Enter the URL for this link:", "https://");
-    if (!url) return;
+  function insertLink(url) {
     const safeHref = sanitizeLinkHref(url);
     if (!safeHref) {
       showStatus("That link could not be used. Try https://, /path, #anchor, or mailto: links.", "error");
       return;
     }
+
+    const range = getSavedSelection();
+    if (!range) {
+      showStatus("Highlight the text you want to link, then try again.", "error");
+      return;
+    }
+
+    if (!messageEditor.contains(range.commonAncestorContainer)) {
+      showStatus("Highlight the text you want to link, then try again.", "error");
+      return;
+    }
+
     messageEditor.focus();
     restoreSelection();
-    document.execCommand("createLink", false, safeHref);
+
+    const activeLink = range.commonAncestorContainer.nodeType === Node.ELEMENT_NODE
+      ? range.commonAncestorContainer.closest("a")
+      : range.commonAncestorContainer.parentElement?.closest("a");
+
+    if (activeLink && messageEditor.contains(activeLink)) {
+      activeLink.setAttribute("href", safeHref);
+      activeLink.setAttribute("target", "_blank");
+      activeLink.setAttribute("rel", "noreferrer noopener");
+      placeCaretAfter(activeLink);
+      updateOutput();
+      return;
+    }
+
+    const link = document.createElement("a");
+    link.setAttribute("href", safeHref);
+    link.setAttribute("target", "_blank");
+    link.setAttribute("rel", "noreferrer noopener");
+
+    if (range.collapsed) {
+      link.textContent = safeHref;
+      range.insertNode(link);
+    } else {
+      const contents = range.extractContents();
+      link.appendChild(contents);
+      range.insertNode(link);
+    }
+
+    placeCaretAfter(link);
+    updateOutput();
+    closeLinkDialog();
+  }
+
+  function applyEditorCommand(command) {
+    messageEditor.focus();
+    restoreSelection();
+    document.execCommand(command, false, null);
     saveSelection();
+    messageEditor.focus();
     updateOutput();
   }
 
@@ -394,12 +571,21 @@
     endDateInput
   ].forEach((element) => element.addEventListener("input", updateOutput));
 
+  document.addEventListener("selectionchange", () => {
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) return;
+    const range = selection.getRangeAt(0);
+    if (messageEditor.contains(range.commonAncestorContainer)) {
+      savedSelection = range.cloneRange();
+    }
+  });
+
   messageEditor.addEventListener("input", updateOutput);
   messageEditor.addEventListener("mouseup", saveSelection);
   messageEditor.addEventListener("keyup", saveSelection);
   messageEditor.addEventListener("focus", saveSelection);
   messageEditor.addEventListener("blur", () => {
-    messageEditor.innerHTML = sanitizeMessageHtml(messageEditor.innerHTML);
+    normalizeEditorContent();
     updateOutput();
   });
 
@@ -410,16 +596,33 @@
       restoreSelection();
     });
     button.addEventListener("click", () => {
-      messageEditor.focus();
-      restoreSelection();
-      document.execCommand(button.dataset.command, false, null);
-      saveSelection();
-      messageEditor.focus();
-      updateOutput();
+      applyEditorCommand(button.dataset.command);
     });
   });
 
-  linkButton.addEventListener("click", insertLink);
+  linkButton.addEventListener("click", (event) => {
+    event.preventDefault();
+    openLinkDialog();
+  });
+  confirmLinkButton.addEventListener("click", () => {
+    insertLink(linkUrlInput.value);
+  });
+  cancelLinkButton.addEventListener("click", closeLinkDialog);
+  linkUrlInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      insertLink(linkUrlInput.value);
+    }
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closeLinkDialog();
+    }
+  });
+  linkDialogBackdrop.addEventListener("click", (event) => {
+    if (event.target === linkDialogBackdrop) {
+      closeLinkDialog();
+    }
+  });
   copyHtmlButton.addEventListener("click", copyHtml);
   resetButton.addEventListener("click", resetBuilder);
 
