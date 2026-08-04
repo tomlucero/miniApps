@@ -312,42 +312,6 @@
   display: none;
 }
 
-.pdf-export-host {
-  position: fixed;
-  left: -10000px;
-  top: 0;
-  width: 10.5in;
-  background: #fff;
-  z-index: -1;
-}
-
-.pdf-export {
-  width: 10.5in;
-  min-width: 10.5in;
-  padding: 0;
-  background: #fff;
-}
-
-.pdf-export .availability-grid {
-  grid-template-columns: 58px 1fr;
-}
-
-.pdf-export .time-track,
-.pdf-export .day-track {
-  min-height: 520px;
-}
-
-.pdf-export .day-column {
-  min-width: 0;
-}
-
-.pdf-export .unavailable-block {
-  left: 4px;
-  right: 4px;
-  padding: 4px 5px;
-  box-shadow: none;
-}
-
 @media (max-width: 900px) {
   .day-checks {
     grid-template-columns: repeat(2, minmax(0, 1fr));

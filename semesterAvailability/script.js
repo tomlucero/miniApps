@@ -290,60 +290,6 @@
     return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
   }
 
-  function safeFileName(value) {
-    return value
-      .trim()
-      .replace(/[^a-z0-9]+/gi, "-")
-      .replace(/^-+|-+$/g, "")
-      .toLowerCase() || "semester-availability";
-  }
-
-  function pdfFileName() {
-    const name = safeFileName(fields.employeeName.value);
-    const semester = safeFileName(currentSemester().name);
-    return `${name}-${semester}-availability.pdf`;
-  }
-
-  function downloadPdf() {
-    if (!validateStudentDetails()) return;
-    render();
-    if (!window.html2pdf) {
-      formStatus.textContent = "PDF download library did not load. Use Print Grid and choose Save as PDF.";
-      return;
-    }
-
-    const exportHost = document.createElement("div");
-    exportHost.className = "pdf-export-host";
-    const source = printArea.firstElementChild.cloneNode(true);
-    source.classList.add("pdf-export");
-    exportHost.appendChild(source);
-    document.body.appendChild(exportHost);
-
-    const options = {
-      margin: 0.25,
-      filename: pdfFileName(),
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: {
-        scale: 2,
-        backgroundColor: "#ffffff",
-        useCORS: true,
-        scrollX: 0,
-        scrollY: 0
-      },
-      jsPDF: { unit: "in", format: "letter", orientation: "landscape" },
-      pagebreak: { mode: ["avoid-all"] }
-    };
-
-    formStatus.textContent = "Building PDF...";
-    window.html2pdf().set(options).from(source).save().then(function () {
-      formStatus.textContent = "PDF downloaded.";
-    }).catch(function () {
-      formStatus.textContent = "PDF download failed. Use Print Grid and choose Save as PDF.";
-    }).finally(function () {
-      exportHost.remove();
-    });
-  }
-
   form.addEventListener("submit", function (event) {
     event.preventDefault();
     formStatus.textContent = "";
@@ -425,8 +371,6 @@
       document.body.classList.remove("print-mode");
     }, 100);
   });
-
-  document.getElementById("downloadPdfButton").addEventListener("click", downloadPdf);
 
   document.getElementById("clearTimesButton").addEventListener("click", function () {
     blocks.splice(0, blocks.length);
