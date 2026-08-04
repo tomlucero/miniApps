@@ -312,14 +312,24 @@
       return;
     }
 
+    const exportHost = document.createElement("div");
+    exportHost.className = "pdf-export-host";
     const source = printArea.firstElementChild.cloneNode(true);
     source.classList.add("pdf-export");
+    exportHost.appendChild(source);
+    document.body.appendChild(exportHost);
 
     const options = {
       margin: 0.25,
       filename: pdfFileName(),
       image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { scale: 2, backgroundColor: "#ffffff" },
+      html2canvas: {
+        scale: 2,
+        backgroundColor: "#ffffff",
+        useCORS: true,
+        scrollX: 0,
+        scrollY: 0
+      },
       jsPDF: { unit: "in", format: "letter", orientation: "landscape" },
       pagebreak: { mode: ["avoid-all"] }
     };
@@ -329,6 +339,8 @@
       formStatus.textContent = "PDF downloaded.";
     }).catch(function () {
       formStatus.textContent = "PDF download failed. Use Print Grid and choose Save as PDF.";
+    }).finally(function () {
+      exportHost.remove();
     });
   }
 
