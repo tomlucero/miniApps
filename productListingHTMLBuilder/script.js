@@ -225,6 +225,11 @@ const approvedSnippets = [
     label: "In Store Pick-up - No Shipping",
     html: `<div id="noShipping"></div>`,
   },
+  {
+    id: "pac12",
+    label: "Pac 12",
+    html: `<div id="pac12"></div>`,
+  },
 ];
 
 const approvedSnippetDivIds = [
