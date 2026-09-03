@@ -77,6 +77,16 @@
     return `${month}/${day}/${year}`;
   }
 
+  function offsetDateInputValue(value, days) {
+    if (!value) return '';
+    const [year, month, day] = value.split('-').map(Number);
+    if ([year, month, day].some(Number.isNaN)) return '';
+    const date = new Date(year, month - 1, day, 12, 0, 0, 0);
+    if (Number.isNaN(date.getTime())) return '';
+    date.setDate(date.getDate() + days);
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+  }
+
   function today() {
     const date = new Date();
     return `${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}/${date.getFullYear()}`;
@@ -158,6 +168,10 @@
     $('dayOneFields').classList.toggle('d-none', !fields.dayOne);
     $('authorizedPickupFields').classList.toggle('d-none', !fields.authorizedPickup);
     $('deadlineFields').classList.toggle('d-none', !$('addDeadline').checked);
+    $('restockDate').readOnly = Boolean(fields.pickup);
+    if (fields.pickup) {
+      $('restockDate').value = offsetDateInputValue($('datePacked').value, 28);
+    }
   }
 
   function loadTemplateEditor() {
@@ -211,7 +225,7 @@
       originalPrice,
       packedDate: formatDate($('datePacked').value),
       firstReminderDate: formatDate($('firstReminderDate').value),
-      restockDate: formatDate($('restockDate').value),
+      restockDate: formatDate(fields.pickup ? offsetDateInputValue($('datePacked').value, 28) : $('restockDate').value),
       expectedRestockDate: formatDate($('expectedRestockDate').value),
       restockResponseDeadline: formatDate($('restockResponseDeadline').value),
       dayOneTitle: clean($('dayOneTitle').value, '[Day One Access title]'),
