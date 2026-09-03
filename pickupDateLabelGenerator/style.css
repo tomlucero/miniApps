@@ -68,10 +68,10 @@
 @page { size: letter portrait; margin: 0; }
 
 @media print {
-  html, body { margin: 0 !important; padding: 0 !important; background: #fff !important; }
-  .screen-only { display: none !important; }
-  .print-area { display: block !important; }
-  .label-sheet { box-sizing: border-box; width: var(--page-width); height: var(--page-height); padding: var(--margin-top) 0 0 var(--margin-left); grid-template-columns: repeat(var(--columns), var(--label-width)); grid-template-rows: repeat(var(--rows), var(--label-height)); column-gap: var(--column-gap); row-gap: var(--row-gap); break-after: page; page-break-after: always; }
+  html, body { width: 8.5in !important; height: auto !important; margin: 0 !important; padding: 0 !important; overflow: visible !important; background: #fff !important; }
+  body > :not(.print-area) { display: none !important; }
+  .print-area { display: block !important; width: 8.5in; margin: 0 !important; padding: 0 !important; }
+  .label-sheet { box-sizing: border-box; width: var(--page-width); height: calc(var(--page-height) - 0.01in); margin: 0 !important; padding: var(--margin-top) 0 0 var(--margin-left); overflow: hidden; grid-template-columns: repeat(var(--columns), var(--label-width)); grid-template-rows: repeat(var(--rows), var(--label-height)); column-gap: var(--column-gap); row-gap: var(--row-gap); break-after: page; page-break-after: always; }
   .label-sheet:last-child { break-after: auto; page-break-after: auto; }
   .pickup-label { padding: .08in .12in; }
   .pickup-label .label-line + .label-line { margin-top: .03in; }
