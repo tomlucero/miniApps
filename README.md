@@ -26,6 +26,7 @@ Many of the tools replace tasks that were previously completed using handwritten
 * **Pickup Date Label Generator** – Creates reminder and restock labels for pickup orders.
 * **Oversized / Secure Item Tag Generator** – Produces retrieval tags and documentation for oversized or secured merchandise.
 * **Dot Date Label Generator** – Creates printable date labels for operational workflows.
+* **Icon Dot Label Generator** – Creates printable Font Awesome icon dots for order signals and operational workflows.
 
 ### Artificial Intelligence
 
