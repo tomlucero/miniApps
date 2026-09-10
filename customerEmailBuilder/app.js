@@ -77,6 +77,13 @@
     return `${month}/${day}/${year}`;
   }
 
+  function formatShortDate(value) {
+    if (!value) return '[game date]';
+    const [, month, day] = value.split('-');
+    if (!month || !day) return '[game date]';
+    return `${Number(month)}/${Number(day)}`;
+  }
+
   function offsetDateInputValue(value, days) {
     if (!value) return '';
     const [year, month, day] = value.split('-').map(Number);
@@ -167,6 +174,7 @@
     $('firstReminderField').classList.toggle('d-none', !fields.finalPickup);
     $('dayOneFields').classList.toggle('d-none', !fields.dayOne);
     $('authorizedPickupFields').classList.toggle('d-none', !fields.authorizedPickup);
+    $('gameDayPickupFields').classList.toggle('d-none', !fields.gameDayPickup);
     $('deadlineFields').classList.toggle('d-none', !$('addDeadline').checked);
     $('restockDate').readOnly = Boolean(fields.pickup);
     if (fields.pickup) {
@@ -231,6 +239,7 @@
       dayOneTitle: clean($('dayOneTitle').value, '[Day One Access title]'),
       courseName: clean($('courseName').value, '[class/course]'),
       authorizedPerson: clean(authorizedPersonValue, '[authorized pickup person]'),
+      gameDate: formatShortDate($('gameDate').value),
       generatedDate: today()
     };
 
@@ -249,7 +258,9 @@
     }
 
     const renderedBody = renderTemplate(template.body, values);
-    let body = `${replaceTokens(config.sharedText.greeting, values)}\n\n${renderedBody}`;
+    let body = fields.skipGreeting
+      ? renderedBody
+      : `${replaceTokens(config.sharedText.greeting, values)}\n\n${renderedBody}`;
 
     if (fields.substitutions) {
       body += `\n\n${getSubstitutionList()}`;
