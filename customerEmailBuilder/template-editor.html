@@ -140,14 +140,15 @@
         restockExpected: ['{expectedRestockDate}', '{restockResponseDeadline}'],
         pickup: ['{packedDate}', '{restockDate}'],
         finalPickup: ['{firstReminderDate}'],
-        dayOne: ['{dayOneTitle}', '{courseName}']
+        dayOne: ['{dayOneTitle}', '{courseName}'],
+        gameDayPickup: ['{gameDate}']
       };
       const sampleValues = {
         orderNumber: '209000', customer: 'Morgan Lee', employee: 'Taylor',
         item: 'Sample Item', originalPrice: '$24.99',
         expectedRestockDate: '06/28/2026', restockResponseDeadline: '06/24/2026',
         packedDate: '06/08/2026', firstReminderDate: '06/10/2026', restockDate: '06/24/2026',
-        dayOneTitle: 'Sample Digital Textbook', courseName: 'CHEM 111'
+        dayOneTitle: 'Sample Digital Textbook', courseName: 'CHEM 111', gameDate: '9/12'
       };
 
       function restoreSavedDraft() {

@@ -175,6 +175,13 @@
               <div class="form-text" id="authorizedPersonRequirement">Enter the authorized person’s full name to enable copying.</div>
             </section>
 
+            <section id="gameDayPickupFields" class="mt-4 d-none">
+              <div class="section-kicker mb-1">Game day pickup</div>
+              <h3 class="h6 mb-3">Game details</h3>
+              <label class="form-label" for="gameDate">Game Date</label>
+              <input class="form-control" id="gameDate" type="date">
+            </section>
+
             <div class="mt-4">
               <label class="form-label" for="customNote">Optional custom note</label>
               <textarea class="form-control" id="customNote" rows="3" placeholder="Add any order-specific information..."></textarea>
@@ -224,12 +231,12 @@
                   <div>
                     <label class="form-label" for="editorBody">Email message</label>
                     <textarea class="form-control" id="editorBody" rows="5"></textarea>
-                    <div class="form-text">Available placeholders: {item}, {packedDate}, {firstReminderDate}, {restockDate}, {expectedRestockDate}, {restockResponseDeadline}, {dayOneTitle}, {courseName}, {orderNumber}</div>
+                    <div class="form-text">Available placeholders: {item}, {packedDate}, {firstReminderDate}, {restockDate}, {expectedRestockDate}, {restockResponseDeadline}, {dayOneTitle}, {courseName}, {gameDate}, {orderNumber}</div>
                   </div>
                   <div>
                     <label class="form-label" for="editorNote">Insite action</label>
                     <textarea class="form-control" id="editorNote" rows="3"></textarea>
-                    <div class="form-text">Available placeholders: {item}, {packedDate}, {firstReminderDate}, {restockDate}, {expectedRestockDate}, {restockResponseDeadline}, {dayOneTitle}, {courseName}</div>
+                    <div class="form-text">Available placeholders: {item}, {packedDate}, {firstReminderDate}, {restockDate}, {expectedRestockDate}, {restockResponseDeadline}, {dayOneTitle}, {courseName}, {gameDate}</div>
                   </div>
                   <div class="d-flex flex-wrap gap-2">
                     <button class="btn btn-sm btn-outline-danger" id="resetTemplate" type="button">Reset selected template</button>

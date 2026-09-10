@@ -66,6 +66,17 @@ window.CUSTOMER_EMAIL_BUILDER_CONFIG = {
         "pickup": true
       }
     },
+    "gameDayPickup": {
+      "label": "Game day Pickup",
+      "subject": "Game day pickup instructions for CSU Bookstore order #{orderNumber}",
+      "body": "Dear {customer},\n\nThank you for ordering your CSU Rams gear from the CSU Bookstore. We are sending a quick reminder about your order and pick-up instructions for {gameDate}, since your order includes merchandise we believe you purchased in anticipation of the football game.\n\nOur emails instruct you to go to the pick-up counter on the lower level of the bookstore to retrieve your order. This counter is unstaffed on weekends. Please go to the Customer Service Counter on the lower level of the CSU Bookstore, where our customer service staff will retrieve your order for you. Please have order #{orderNumber} ready for our staff.\n\nPlease note: Your order is ready for pickup at the CSU Bookstore inside the Lory Student Center. In-store pick-up at the team stores at Canvas Stadium is not available through the CSU Bookstore.\n\nWe will be open at 9 a.m. on Saturday to meet your game-day needs. Please remember that gameday parking regulations are in effect all day Saturday.\n\nIf you have any further questions, please respond to this email.",
+      "note": "Sent game day pickup instructions for order #{orderNumber}; game date {gameDate}",
+      "fields": {
+        "gameDayPickup": true,
+        "skipGreeting": true,
+        "skipReplyHelp": true
+      }
+    },
     "finalPickupReminder": {
       "label": "Final Pickup Reminder",
       "subject": "Final pickup reminder for your CSU Bookstore order #{orderNumber}",
