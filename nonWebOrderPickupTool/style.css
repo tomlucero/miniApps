@@ -1,0 +1,84 @@
+.tool-band { padding: 36px 0 60px; }
+.form-panel, .preview-panel { overflow: hidden; }
+.form-panel { padding: 22px; }
+.panel-title { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 22px; }
+.panel-title h2, .preview-panel-head h2 { margin: 0; font-size: 1.2rem; font-weight: 800; }
+.form-control { resize: vertical; }
+.form-text { color: var(--suite-muted); font-size: .78rem; }
+.optional-label { margin-left: 4px; color: var(--suite-muted); font-size: .76rem; font-weight: 500; }
+.payment-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.payment-option { display: flex; align-items: flex-start; gap: 10px; min-height: 76px; padding: 13px; background: #fff; border: 1px solid #cbd5df; border-radius: 7px; cursor: pointer; }
+.payment-option:has(input:checked) { background: var(--suite-accent-soft); border-color: var(--suite-accent); box-shadow: 0 0 0 1px var(--suite-accent); }
+.payment-option input { margin-top: 4px; accent-color: var(--suite-accent); }
+.payment-option strong, .payment-option small { display: block; }
+.payment-option strong { color: var(--suite-ink); font-size: .9rem; }
+.payment-option small { margin-top: 3px; color: var(--suite-muted); font-size: .76rem; line-height: 1.35; }
+.payment-error { margin: 7px 0 0; color: var(--suite-danger); font-size: .84rem; }
+.form-status { min-height: 0; }
+.form-status.error { padding: 10px 12px; color: var(--suite-danger); background: var(--suite-danger-soft); border: 1px solid #f1aaa4; border-radius: 6px; }
+.action-row { flex-wrap: wrap; }
+.action-row .btn { display: inline-flex; align-items: center; gap: 8px; }
+.preview-panel-head { padding: 20px 22px; background: var(--suite-soft); border-bottom: 1px solid var(--suite-line); }
+.preview-badge { flex: 0 0 auto; padding: 5px 9px; color: var(--suite-accent-dark); background: var(--suite-accent-soft); border-radius: 999px; font-size: .78rem; font-weight: 750; }
+.preview-stage { padding: 22px; background: #eef2f5; }
+.pickup-sheet { box-sizing: border-box; width: 100%; aspect-ratio: 8.5 / 11; padding: 6%; color: #111; background: #fff; border: 1px solid #cbd5df; box-shadow: 0 10px 24px rgba(31, 41, 51, .1); font-family: Arial, Helvetica, sans-serif; }
+.document-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 5%; padding-bottom: 3%; border-bottom: 3px solid #111; }
+.document-head h2 { margin: 0; font-size: clamp(1.05rem, 3vw, 2rem); font-weight: 900; letter-spacing: .03em; }
+.document-head p { margin: .3em 0 0; font-size: clamp(.42rem, 1.1vw, .74rem); font-weight: 700; text-transform: uppercase; }
+.document-logo { width: 27%; max-height: 54px; object-fit: contain; object-position: right top; }
+.document-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2.4% 5%; margin-top: 4%; }
+.document-field { min-width: 0; padding-bottom: 2%; border-bottom: 1px solid #777; }
+.document-field.full { grid-column: 1 / -1; }
+.document-label { display: block; margin-bottom: .25em; font-size: clamp(.38rem, .85vw, .58rem); font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }
+.document-value { display: block; min-height: 1.4em; font-size: clamp(.58rem, 1.45vw, .95rem); font-weight: 700; line-height: 1.35; overflow-wrap: anywhere; white-space: pre-wrap; }
+.document-value.placeholder { color: #7b8490; font-weight: 500; }
+.items-field .document-value { min-height: 3.5em; }
+.notes-field .document-value { min-height: 2.2em; }
+.payment-banner { margin: 4% 0 0; padding: 3%; border: 4px double #111; text-align: center; }
+.payment-banner strong { display: block; font-size: clamp(.85rem, 2.8vw, 1.8rem); font-weight: 900; letter-spacing: .05em; line-height: 1.15; }
+.payment-banner span { display: block; margin-top: .35em; font-size: clamp(.38rem, .9vw, .62rem); font-weight: 700; text-transform: uppercase; }
+.confirmation { margin-top: 5%; padding-top: 3%; border-top: 2px solid #111; }
+.confirmation h3 { margin: 0 0 2%; font-size: clamp(.7rem, 1.8vw, 1.2rem); font-weight: 900; letter-spacing: .04em; }
+.confirmation p { margin: 0 0 5%; font-size: clamp(.45rem, 1.1vw, .74rem); }
+.signature-grid { display: grid; grid-template-columns: 1fr 28%; gap: 7%; }
+.signature-line { padding-top: 7%; border-bottom: 1px solid #111; }
+.signature-label { display: block; margin-top: .35em; font-size: clamp(.35rem, .75vw, .52rem); font-weight: 700; text-transform: uppercase; }
+.staff-line { width: 38%; margin-top: 5%; }
+.retention-note { margin: 5% 0 0; font-size: clamp(.36rem, .75vw, .52rem); font-style: italic; }
+.print-area { display: none; }
+
+@media (max-width: 575px) {
+  .panel-title, .preview-panel-head { align-items: flex-start !important; flex-direction: column; }
+  .payment-options { grid-template-columns: 1fr; }
+  .action-row .btn { width: 100%; justify-content: center; }
+  .preview-stage { padding: 10px; }
+}
+
+@page { size: letter portrait; margin: .45in; }
+
+@media print {
+  html, body { width: 8.5in; margin: 0 !important; padding: 0 !important; background: #fff !important; }
+  .screen-only { display: none !important; }
+  .print-area { display: block !important; }
+  .print-area .pickup-sheet { width: 7.6in; height: 10.1in; aspect-ratio: auto; padding: .35in; border: 0; box-shadow: none; }
+  .print-area .document-head { padding-bottom: .2in; }
+  .print-area .document-head h2 { font-size: 25pt; }
+  .print-area .document-head p { font-size: 9pt; }
+  .print-area .document-logo { width: 1.8in; max-height: .55in; }
+  .print-area .document-grid { gap: .16in .35in; margin-top: .28in; }
+  .print-area .document-field { padding-bottom: .08in; }
+  .print-area .document-label { font-size: 8pt; }
+  .print-area .document-value { font-size: 12pt; }
+  .print-area .items-field .document-value { min-height: .78in; }
+  .print-area .notes-field .document-value { min-height: .5in; }
+  .print-area .payment-banner { margin-top: .28in; padding: .18in; }
+  .print-area .payment-banner strong { font-size: 22pt; }
+  .print-area .payment-banner span { font-size: 9pt; }
+  .print-area .confirmation { margin-top: .34in; padding-top: .22in; }
+  .print-area .confirmation h3 { margin-bottom: .12in; font-size: 15pt; }
+  .print-area .confirmation p { margin-bottom: .42in; font-size: 10.5pt; }
+  .print-area .signature-line { padding-top: .22in; }
+  .print-area .signature-label { font-size: 8pt; }
+  .print-area .staff-line { margin-top: .3in; }
+  .print-area .retention-note { margin-top: .3in; font-size: 8pt; }
+}
