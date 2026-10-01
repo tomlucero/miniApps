@@ -23,6 +23,7 @@ Many of the tools replace tasks that were previously completed using handwritten
 * **Email Builder Template Tool** – Creates reusable email templates used by Online Retail staff.
 * **Phone Order Tax Allocator** – Splits phone-order sales tax across items proportionally while preserving exact rounding totals.
 * **Order Range Sign Generator** – Produces professional shelf and rack signs for order retrieval areas.
+* **Non Web Order Pick Up Tool** – Creates printable pickup paperwork for special orders without an InSite pickup record.
 * **Pickup Date Label Generator** – Creates reminder and restock labels for pickup orders.
 * **Oversized / Secure Item Tag Generator** – Produces retrieval tags and documentation for oversized or secured merchandise.
 * **Dot Date Label Generator** – Creates printable date labels for operational workflows.
