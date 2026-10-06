@@ -230,6 +230,11 @@ const approvedSnippets = [
     label: "Pac 12",
     html: `<div id="pac12"></div>`,
   },
+  {
+    id: "snowDays26",
+    label: "Snow Days",
+    html: `<div id="snowdays26"></div>`,
+  },
 ];
 
 const approvedSnippetDivIds = [
