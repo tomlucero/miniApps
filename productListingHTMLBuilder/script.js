@@ -233,7 +233,7 @@ const approvedSnippets = [
   {
     id: "snowDays26",
     label: "Snow Days",
-    html: `<div id="snowdays26"></div>`,
+    html: `<div id="snowDays26"></div>`,
   },
 ];
 
