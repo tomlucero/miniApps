@@ -17,12 +17,13 @@ const metadataCopyStatus = document.querySelector("#metadataCopyStatus");
 const metadataCopyButtons = document.querySelectorAll(".metadata-copy");
 const customAttributes = document.querySelector("#customAttributes");
 const addCustomAttributeButton = document.querySelector("#addCustomAttributeButton");
+const productVideoWarning = document.querySelector("#productVideoWarning");
 let descriptionEditor = null;
 
 const productNameLimit = 60;
 const seoTitleLimit = 60;
 const metaDescriptionLimit = 155;
-const appVersion = "1.1";
+const appVersion = "1.2.1";
 const metadataDirty = {
   seoTitle: false,
   metaDescription: false,
@@ -55,6 +56,8 @@ const fields = {
   batteries: document.querySelector("#batteries"),
   features: document.querySelector("#features"),
   care: document.querySelector("#care"),
+  customHtml: document.querySelector("#customHtml"),
+  productVideo: document.querySelector("#productVideo"),
 };
 
 const categoryConfigs = {
@@ -552,12 +555,58 @@ function getSelectedSnippetHtmlList(snippetIds) {
   return snippetIds.map(getSelectedSnippetHtml).filter(Boolean);
 }
 
+function getYouTubeVideoId(value) {
+  if (!value) {
+    return "";
+  }
+
+  try {
+    const url = new URL(value);
+    const hostname = url.hostname.toLowerCase().replace(/^www\./, "");
+    let videoId = "";
+
+    if (hostname === "youtu.be") {
+      videoId = url.pathname.split("/").filter(Boolean)[0] || "";
+    } else if (
+      hostname === "youtube.com" ||
+      hostname.endsWith(".youtube.com") ||
+      hostname === "youtube-nocookie.com" ||
+      hostname.endsWith(".youtube-nocookie.com")
+    ) {
+      if (url.pathname === "/watch") {
+        videoId = url.searchParams.get("v") || "";
+      } else {
+        const pathParts = url.pathname.split("/").filter(Boolean);
+        if (["embed", "shorts", "live"].includes(pathParts[0])) {
+          videoId = pathParts[1] || "";
+        }
+      }
+    }
+
+    return /^[A-Za-z0-9_-]{11}$/.test(videoId) ? videoId : "";
+  } catch (error) {
+    return "";
+  }
+}
+
+function buildProductVideo(data) {
+  const videoId = getYouTubeVideoId(data.productVideo);
+
+  if (!videoId) {
+    return "";
+  }
+
+  const productName = data.productName ? ` for ${data.productName}` : "";
+  return `<div class="bk-product-video">\n  <iframe src="https://www.youtube-nocookie.com/embed/${videoId}" title="Product video${escapeHtml(productName)}" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="display: block; width: 100%; aspect-ratio: 16 / 9; border: 0;"></iframe>\n</div>`;
+}
+
 function buildHtml() {
   const data = getFormData();
 
   const employeeComment = sanitizeComment(data.employeeName);
   const editorialLead = cleanValue(data.editorialLead);
   const richDescription = buildRichDescription(data);
+  const productVideo = buildProductVideo(data);
   const featureItems = buildFeatures(data);
   const { plainItems, attributeItems } = splitFeatureItems(featureItems);
   const html = [];
@@ -583,7 +632,23 @@ function buildHtml() {
       .split("\n")
       .filter(Boolean)
       .map((line) => `    ${line}`)
-      .join("\n"),
+      .join("\n")
+  );
+
+  if (data.customHtml) {
+    listingHtml.push(data.customHtml);
+  }
+
+  if (productVideo) {
+    listingHtml.push(
+      productVideo
+        .split("\n")
+        .map((line) => `    ${line}`)
+        .join("\n")
+    );
+  }
+
+  listingHtml.push(
     `    <div class="bk-product-features">`,
     `      <h3>Product Features</h3>`
   );
@@ -657,7 +722,7 @@ function getFormData() {
         return [key, descriptionEditor.getContent()];
       }
 
-      const preserveLineBreaks = key === "features" || key === "descriptionTemplate";
+      const preserveLineBreaks = key === "features" || key === "descriptionTemplate" || key === "customHtml";
       return [key, preserveLineBreaks ? input.value.trim() : cleanValue(input.value)];
     })
   );
@@ -804,9 +869,10 @@ function updateMetadata(data) {
   updateMetadataCounts();
 }
 
-function validateApprovedOutput(html) {
+function validateApprovedOutput(html, customHtml = "") {
+  const generatedHtml = customHtml ? html.replace(customHtml, "") : html;
   const allowedBasicTags = ["h3", "h4", "li", "strong", "em", "br"];
-  const tags = [...html.matchAll(/<(\/?)([a-z0-9]+)\b([^>]*)>/gi)];
+  const tags = [...generatedHtml.matchAll(/<(\/?)([a-z0-9]+)\b([^>]*)>/gi)];
 
   return tags.every((match) => {
     const isClosingTag = match[1] === "/";
@@ -825,7 +891,7 @@ function validateApprovedOutput(html) {
       return isClosingTag || attributes === "" || attributes === `class="prodFeatList"`;
     }
 
-    if (isClosingTag && (tagName === "span" || tagName === "div")) {
+    if (isClosingTag && (tagName === "span" || tagName === "div" || tagName === "iframe")) {
       return true;
     }
 
@@ -856,6 +922,7 @@ function validateApprovedOutput(html) {
           `class="bk-product-details"`,
           `class="attribute"`,
           `class="bk-care-instructions"`,
+          `class="bk-product-video"`,
         ].includes(attributes)
       ) {
         return true;
@@ -863,6 +930,11 @@ function validateApprovedOutput(html) {
 
       const idMatch = attributes.match(/^id="([^"]+)"\s*\/?$/);
       return Boolean(idMatch && approvedSnippetDivIds.includes(idMatch[1]));
+    }
+
+    if (tagName === "iframe") {
+      const expectedAttributes = /^src="https:\/\/www\.youtube-nocookie\.com\/embed\/[A-Za-z0-9_-]{11}" title="Product video(?: for [^"]*)?" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="display: block; width: 100%; aspect-ratio: 16 \/ 9; border: 0;"$/;
+      return expectedAttributes.test(attributes);
     }
 
     return false;
@@ -884,14 +956,19 @@ function updateProductNameLimitState() {
 function updateOutput() {
   const data = getFormData();
   const generatedHtml = buildHtml();
-  const outputIsValid = validateApprovedOutput(generatedHtml);
+  const hasVideoUrl = Boolean(data.productVideo);
+  const videoIsValid = !hasVideoUrl || Boolean(getYouTubeVideoId(data.productVideo));
+  const outputIsValid = validateApprovedOutput(generatedHtml, data.customHtml);
 
   htmlOutput.value = generatedHtml;
   preview.innerHTML = generatedHtml;
   updateMetadata(data);
   updateProductNameLimitState();
-  copyButton.disabled = !isProductNameValid() || !outputIsValid;
-  copyStatus.textContent = outputIsValid ? "" : "Output includes an unapproved tag. Check the approved snippets list.";
+  fields.productVideo.classList.toggle("is-invalid", !videoIsValid);
+  fields.productVideo.setAttribute("aria-invalid", String(!videoIsValid));
+  productVideoWarning.textContent = videoIsValid ? "" : "Enter a valid YouTube video URL (watch, share, Shorts, live, or embed).";
+  copyButton.disabled = !isProductNameValid() || !outputIsValid || !videoIsValid;
+  copyStatus.textContent = outputIsValid ? "" : "Output includes an unapproved generated tag. Check the approved snippets list.";
 }
 
 async function copyHtml() {

@@ -2,7 +2,7 @@
 
 A simple local web app for student employees who need to turn product listing notes into clean HTML for MBS/Insite product descriptions.
 
-**Current version:** 1.1
+**Current version:** 1.2.1
 
 ## Files
 
@@ -34,6 +34,10 @@ The generated HTML uses only these approved tags:
 
 The generator escapes typed notes so accidental HTML, styles, scripts, and unapproved tags do not get included in the output.
 
+The Custom HTML field is the intentional exception: its contents are trusted employee-provided markup and are included without escaping or filtering. Leave it empty to omit it entirely.
+
+The Product Video field accepts YouTube watch, share, Shorts, live, and embed URLs. Valid URLs are normalized to a privacy-enhanced `youtube-nocookie.com` iframe with a responsive 16:9 aspect ratio, lazy loading, an accessible title, and standard embed permissions. Invalid URLs show an inline message and prevent copying until corrected or removed.
+
 ## Output Format
 
 The app creates:
@@ -45,6 +49,8 @@ The app creates:
 - Product specifications grouped in `<div class="attribute">`
 - A wrapped Care Instructions section when care information is entered
 - Optional approved code snippets inside the product copy section
+- Optional custom HTML, preserved as entered after the main description
+- Optional responsive 16:9 YouTube video embeds after the main description
 - The Student Account Eligible snippet inside the product copy section when the checkbox is selected
 - Editable suggested metadata for SEO title, meta description, and search keywords
 

@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="app-version" content="1.1">
+    <meta name="app-version" content="1.2.1">
     <title>Product Description HTML Builder</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -227,6 +227,19 @@
                   <label class="form-label" for="features">Features</label>
                   <textarea class="form-control" id="features" name="features" rows="4" placeholder="Example: Kangaroo pocket&#10;Ribbed cuffs&#10;Embroidered campus logo"></textarea>
                   <div class="form-text">Add one feature per line. Commas stay inside the same bullet.</div>
+                </div>
+
+                <div class="mt-3">
+                  <label class="form-label" for="customHtml">Custom HTML</label>
+                  <textarea class="form-control code-input" id="customHtml" name="customHtml" rows="6" placeholder="Example: &lt;div id=&quot;specialProductNotice&quot;&gt;&lt;/div&gt;" spellcheck="false"></textarea>
+                  <div class="form-text">Optional. Added after the description exactly as entered. Use only HTML supported by the CSU Bookstore website.</div>
+                </div>
+
+                <div class="mt-3">
+                  <label class="form-label" for="productVideo">Product Video</label>
+                  <input class="form-control" id="productVideo" name="productVideo" type="url" placeholder="Example: https://www.youtube.com/watch?v=VIDEO_ID" aria-describedby="productVideoHelp productVideoWarning">
+                  <div id="productVideoHelp" class="form-text">Optional. Paste a YouTube watch, share, Shorts, live, or embed URL.</div>
+                  <div id="productVideoWarning" class="field-warning" role="alert"></div>
                 </div>
 
                 <section class="custom-attributes mt-3" aria-labelledby="customAttributesHeading">
