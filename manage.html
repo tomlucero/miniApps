@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Supply Manager</title>
+<style>
+  :root { --bg:#f6f7f9; --card:#fff; --text:#1c1f24; --muted:#6a7280; --accent:#1e6b3c; --err:#b3261e; --line:#d9dce1; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#14161a; --card:#1e2127; --text:#eceef1; --muted:#9aa3b0; --accent:#4cb77a; --err:#f2877f; --line:#343a44; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; padding:16px; background:var(--bg); color:var(--text);
+         font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  .card { max-width:520px; margin:16px auto; padding:20px; background:var(--card);
+          border-radius:14px; box-shadow:0 1px 4px rgba(0,0,0,.12); }
+  h1 { font-size:22px; margin:0 0 14px; }
+  .tabs { display:flex; gap:8px; margin-bottom:18px; }
+  .tab { flex:1; padding:12px 6px; font-size:15px; border-radius:10px; border:2px solid var(--line);
+         background:transparent; color:var(--text); touch-action:manipulation; }
+  .tab.on { border-color:var(--accent); color:var(--accent); font-weight:700; }
+  .field { margin-bottom:16px; }
+  .field label { display:block; font-size:14px; color:var(--muted); margin-bottom:6px; }
+  select, input[type=number] { width:100%; padding:14px; font-size:18px; border-radius:10px;
+         border:2px solid var(--line); background:var(--bg); color:var(--text); }
+  .hint { color:var(--muted); font-size:14px; margin-top:6px; min-height:18px; }
+  .note { color:var(--muted); font-size:14px; margin:0 0 16px; }
+  .countrow { display:grid; grid-template-columns:1fr 90px; gap:6px 12px; align-items:center;
+              padding:10px 0; border-bottom:1px solid var(--line); }
+  .countrow .nm { font-size:16px; font-weight:600; }
+  .countrow .ex { grid-column:1; font-size:13px; color:var(--muted); }
+  .countrow input { grid-column:2; grid-row:1 / span 2; padding:10px; font-size:18px; text-align:center; }
+  .go { width:100%; margin-top:18px; padding:18px; font-size:19px; font-weight:700; border:0;
+        border-radius:12px; background:var(--accent); color:#fff; touch-action:manipulation; }
+  .go:disabled { opacity:.5; }
+  #status { margin-top:14px; min-height:24px; font-size:16px; }
+  #status.ok { color:var(--accent); } #status.err { color:var(--err); }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>Supply Manager</h1>
+  <div class="tabs" id="tabs"></div>
+  <div id="form"><p class="note">Loading items...</p></div>
+  <div id="status" role="status"></div>
+</div>
+
+<script>
+// ---- EDIT THESE TWO LINES ----------------------------------------------------
+const ENDPOINT   = 'https://script.google.com/macros/s/AKfycbw3Kq0bw3Uzt3RBbR5aIgZ0MerR_DuEU2r_Ds-h8kpTHHZ9aTLfuIY2hzwL2VBfiI_G/exec';   // the Apps Script web app URL, ends in /exec
+const SHARED_KEY = 'XNuznYelaxb7kDe7GZ8efXz4luge';            // must match SHARED_KEY in Code.gs
+// ------------------------------------------------------------------------------
+
+const MODES = [['delivery', 'Delivery'], ['count', 'Shelf count'], ['undo', 'Undo a scan']];
+let items = [];
+let mode = 'delivery';
+let busy = false;
+
+const $ = id => document.getElementById(id);
+function setStatus(cls, text) { $('status').className = cls; $('status').textContent = text; }
+function el(tag, props, text) {
+  const e = document.createElement(tag);
+  Object.assign(e, props || {});
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+function field(labelText, control) {
+  const d = el('div', { className: 'field' });
+  const l = el('label', {}, labelText);
+  d.appendChild(l); d.appendChild(control);
+  d.labelEl = l;
+  return d;
+}
+function itemSelect() {
+  const s = el('select');
+  items.forEach(it => s.appendChild(Object.assign(el('option'), { value: it.id, textContent: it.name })));
+  return s;
+}
+function numberInput(value, min) {
+  return Object.assign(el('input'), { type: 'number', inputMode: 'numeric', min: String(min), step: '1', value: String(value) });
+}
+
+function renderTabs() {
+  const t = $('tabs');
+  t.textContent = '';
+  MODES.forEach(([key, label]) => {
+    const b = el('button', { type: 'button', className: 'tab' + (mode === key ? ' on' : '') }, label);
+    b.addEventListener('click', () => { mode = key; setStatus('', ''); render(); });
+    t.appendChild(b);
+  });
+}
+
+function render() {
+  renderTabs();
+  const f = $('form');
+  f.textContent = '';
+  if (!items.length) { f.appendChild(el('p', { className: 'note' }, 'No items loaded.')); return; }
+  if (mode === 'delivery') renderDelivery(f);
+  else if (mode === 'count') renderCount(f);
+  else renderUndo(f);
+}
+
+function renderDelivery(f) {
+  f.appendChild(el('p', { className: 'note' }, 'Log a shipment when it arrives, so the stock numbers go back up.'));
+  const sel = itemSelect();
+  const qty = numberInput(1, 1);
+  const hint = el('div', { className: 'hint' });
+  const selField = field('Item', sel);
+  const qtyField = field('Packs received', qty);
+  qtyField.appendChild(hint);
+  const go = el('button', { type: 'button', className: 'go' }, 'Log delivery');
+  f.appendChild(selField); f.appendChild(qtyField); f.appendChild(go);
+
+  const itemOf = () => items.find(x => x.id === sel.value);
+  function update() {
+    const it = itemOf();
+    const n = Number(qty.value);
+    if (it && it.pack) {
+      qtyField.labelEl.textContent = 'Packs received (1 pack = ' + it.pack + ')';
+      hint.textContent = n >= 1 ? '= ' + (n * it.pack) + ' units' : '';
+    } else {
+      qtyField.labelEl.textContent = 'Units received';
+      hint.textContent = '';
+    }
+  }
+  sel.addEventListener('change', update);
+  qty.addEventListener('input', update);
+  update();
+
+  go.addEventListener('click', () => {
+    const it = itemOf();
+    const n = Number(qty.value);
+    if (!it || !Number.isInteger(n) || n < 1) { setStatus('err', 'Enter a whole number of 1 or more.'); return; }
+    post('received', [{ item: it.id, qty: it.pack ? n * it.pack : n }], '', go);
+  });
+}
+
+function renderCount(f) {
+  f.appendChild(el('p', { className: 'note',
+    }, 'Count what is physically on the shelf and type it in. Leave an item blank to skip it. Your count replaces the calculated number.'));
+  const inputs = [];
+  items.forEach(it => {
+    const row = el('div', { className: 'countrow' });
+    row.appendChild(el('div', { className: 'nm' }, it.name));
+    row.appendChild(el('div', { className: 'ex' }, it.onHand === null ? '' : 'expected ' + it.onHand));
+    const inp = Object.assign(el('input'), { type: 'number', inputMode: 'numeric', min: '0', step: '1', placeholder: '--' });
+    row.appendChild(inp);
+    f.appendChild(row);
+    inputs.push([it, inp]);
+  });
+  const go = el('button', { type: 'button', className: 'go' }, 'Save counts');
+  f.appendChild(go);
+  go.addEventListener('click', () => {
+    const entries = [];
+    for (const [it, inp] of inputs) {
+      if (inp.value === '') continue;
+      const n = Number(inp.value);
+      if (!Number.isInteger(n) || n < 0) { setStatus('err', 'Check the count for ' + it.name + ' (whole number, 0 or more).'); return; }
+      entries.push({ item: it.id, qty: n });
+    }
+    if (!entries.length) { setStatus('err', 'Nothing entered yet.'); return; }
+    post('count', entries, 'shelf count', go);
+  });
+}
+
+function renderUndo(f) {
+  f.appendChild(el('p', { className: 'note' }, 'Scanned the wrong box? Undo it here. This adds a correction to the log instead of deleting anything.'));
+  const sel = itemSelect();
+  const qty = numberInput(1, 1);
+  f.appendChild(field('Item that was scanned by mistake', sel));
+  f.appendChild(field('How many to undo', qty));
+  const go = el('button', { type: 'button', className: 'go' }, 'Undo');
+  f.appendChild(go);
+  go.addEventListener('click', () => {
+    const n = Number(qty.value);
+    if (!Number.isInteger(n) || n < 1 || n > 50) { setStatus('err', 'Enter a whole number from 1 to 50.'); return; }
+    post('used', [{ item: sel.value, qty: -n }], 'undo', go);
+  });
+}
+
+async function post(type, entries, note, button) {
+  if (busy) return;
+  if (ENDPOINT.includes('PASTE')) { setStatus('err', 'This page has not been set up yet (no endpoint).'); return; }
+  busy = true; button.disabled = true;
+  setStatus('', 'Saving...');
+  try {
+    const res = await fetch(ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },   // avoids a CORS preflight
+      body: JSON.stringify({ key: SHARED_KEY, type: type, entries: entries, note: note })
+    });
+    const d = await res.json();
+    if (d.ok) {
+      setStatus('ok', 'Saved ' + d.count + (d.count === 1 ? ' entry.' : ' entries.'));
+      await loadItems();   // refreshes expected counts and clears the form
+    } else {
+      setStatus('err', 'Server said: ' + d.error);
+      button.disabled = false;
+    }
+  } catch (err) {
+    setStatus('err', 'Could not reach the server (' + err.message + '). It may not have saved; check the Log tab before retrying.');
+    button.disabled = false;
+  } finally {
+    busy = false;
+  }
+}
+
+async function loadItems() {
+  if (ENDPOINT.includes('PASTE')) { setStatus('err', 'This page has not been set up yet (no endpoint).'); render(); return; }
+  try {
+    const res = await fetch(ENDPOINT + '?action=items');
+    const d = await res.json();
+    if (!d.ok) throw new Error(d.error || 'bad response');
+    items = d.items;
+    render();
+  } catch (err) {
+    setStatus('err', 'Could not load the item list (' + err.message + ').');
+  }
+}
+
+renderTabs();
+loadItems();
+</script>
+</body>
+</html>

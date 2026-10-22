@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Log Supply Use</title>
+<style>
+  :root { --bg:#f6f7f9; --card:#fff; --text:#1c1f24; --muted:#6a7280; --accent:#1e6b3c; --err:#b3261e; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#14161a; --card:#1e2127; --text:#eceef1; --muted:#9aa3b0; --accent:#4cb77a; --err:#f2877f; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; padding:16px; background:var(--bg); color:var(--text);
+         font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  .card { max-width:420px; margin:24px auto; padding:24px 20px; background:var(--card);
+          border-radius:14px; box-shadow:0 1px 4px rgba(0,0,0,.12); text-align:center; }
+  .label { color:var(--muted); font-size:15px; margin:0 0 6px; }
+  .item  { font-size:30px; font-weight:700; margin:0 0 22px; word-break:break-word; }
+
+  .stepper { display:flex; align-items:center; justify-content:center; gap:16px; margin-bottom:22px; }
+  .stepper button { width:72px; height:72px; font-size:38px; line-height:1; border-radius:50%;
+                    border:2px solid var(--accent); background:transparent; color:var(--accent);
+                    touch-action:manipulation; }
+  .stepper button:disabled { border-color:var(--muted); color:var(--muted); opacity:.4; }
+  #qtyValue { min-width:80px; font-size:56px; font-weight:700; font-variant-numeric:tabular-nums; }
+
+  #confirm { width:100%; padding:18px; font-size:20px; font-weight:700; border:0;
+             border-radius:12px; background:var(--accent); color:#fff; touch-action:manipulation; }
+  #confirm:disabled { opacity:.45; }
+  #status { margin-top:16px; min-height:24px; font-size:16px; }
+  #status.ok  { color:var(--accent); }
+  #status.err { color:var(--err); }
+</style>
+</head>
+<body>
+<div class="card">
+  <p class="label">Confirm you used</p>
+  <p class="item" id="itemName">...</p>
+
+  <div class="stepper">
+    <button id="minus" aria-label="Fewer" type="button">&minus;</button>
+    <div id="qtyValue" aria-live="polite">1</div>
+    <button id="plus" aria-label="More" type="button">+</button>
+  </div>
+
+  <button id="confirm" type="button">Confirm</button>
+  <div id="status" role="status"></div>
+</div>
+
+<script>
+// ---- EDIT THESE TWO LINES ----------------------------------------------------
+const ENDPOINT   = 'https://script.google.com/macros/s/AKfycbw3Kq0bw3Uzt3RBbR5aIgZ0MerR_DuEU2r_Ds-h8kpTHHZ9aTLfuIY2hzwL2VBfiI_G/exec';   // the Apps Script web app URL, ends in /exec
+const SHARED_KEY = 'XNuznYelaxb7kDe7GZ8efXz4luge';            // must match SHARED_KEY in Code.gs
+// ------------------------------------------------------------------------------
+
+const MIN_QTY = 0, MAX_QTY = 20, DEFAULT_QTY = 1;
+
+// The item comes from the QR link: log.html?i=box-10x8x6
+const itemId = (new URLSearchParams(location.search).get('i') || '').slice(0, 40);
+
+const nameEl = document.getElementById('itemName');
+const minus = document.getElementById('minus');
+const plus = document.getElementById('plus');
+const qtyValue = document.getElementById('qtyValue');
+const btn = document.getElementById('confirm');
+const status = document.getElementById('status');
+
+let qty = DEFAULT_QTY;
+let saving = false;
+let valid = true;
+
+function setStatus(cls, text) { status.className = cls; status.textContent = text; }
+
+function render() {
+  qtyValue.textContent = qty;
+  minus.disabled = saving || qty <= MIN_QTY;
+  plus.disabled = saving || qty >= MAX_QTY;
+  btn.disabled = saving || !valid || qty < 1;
+}
+
+if (!itemId) {
+  valid = false;
+  nameEl.textContent = 'No item';
+  setStatus('err', 'This link has no item in it. Scan a shelf label.');
+} else {
+  nameEl.textContent = itemId.replace(/-/g, ' ').toUpperCase();   // shown until the real name loads
+}
+
+// Look up the friendly name. If the lookup fails, the page still works and the server checks the item.
+if (itemId && !ENDPOINT.includes('PASTE')) {
+  fetch(ENDPOINT + '?action=items')
+    .then(r => r.json())
+    .then(d => {
+      if (!d.ok || !Array.isArray(d.items)) return;
+      const it = d.items.find(x => x.id === itemId);
+      if (it) {
+        nameEl.textContent = it.name;
+      } else {
+        valid = false;
+        setStatus('err', 'This code is not recognized (' + itemId + '). Check the label.');
+        render();
+      }
+    })
+    .catch(() => {});
+}
+
+minus.addEventListener('click', () => { if (qty > MIN_QTY) { qty--; render(); } });
+plus.addEventListener('click', () => { if (qty < MAX_QTY) { qty++; render(); } });
+
+btn.addEventListener('click', async () => {
+  if (qty < 1 || !valid || saving) return;
+  if (ENDPOINT.includes('PASTE')) { setStatus('err', 'This page has not been set up yet (no endpoint).'); return; }
+  saving = true;
+  render();
+  setStatus('', 'Saving...');
+  try {
+    // text/plain avoids a CORS preflight, which Apps Script web apps do not answer
+    const res = await fetch(ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ key: SHARED_KEY, type: 'used', item: itemId, qty: qty })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      setStatus('ok', 'Logged ' + data.qty + ' × ' + (data.name || data.item));
+      qty = DEFAULT_QTY;   // ready for the next scan
+      render();            // show the reset right away (buttons stay locked until the timeout below)
+    } else {
+      setStatus('err', 'Server said: ' + data.error);
+    }
+  } catch (err) {
+    setStatus('err', 'Could not reach the server (' + err.message + '). It may not have saved; check before retrying.');
+  } finally {
+    setTimeout(() => { saving = false; render(); }, 1500);   // blocks accidental double taps
+  }
+});
+
+render();
+</script>
+</body>
+</html>
