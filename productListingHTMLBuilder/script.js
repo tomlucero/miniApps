@@ -1088,7 +1088,20 @@ customAttributes.addEventListener("click", (event) => {
 });
 copyButton.addEventListener("click", copyHtml);
 resetButton.addEventListener("click", () => {
+  // Remember the fields that should survive a reset
+  const preserved = {
+    employeeName: fields.employeeName.value,
+    tone: fields.tone.value,
+    category: fields.category.value,
+  };
+
   form.reset();
+
+  // Put them back before anything else reads their values
+  fields.employeeName.value = preserved.employeeName;
+  fields.tone.value = preserved.tone;
+  fields.category.value = preserved.category;
+
   customAttributes.innerHTML = "";
   resetMetadataDirtyState();
   updateCategoryFields();
