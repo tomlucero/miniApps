@@ -3,6 +3,7 @@ const preview = document.querySelector("#preview");
 const htmlOutput = document.querySelector("#htmlOutput");
 const copyButton = document.querySelector("#copyButton");
 const resetButton = document.querySelector("#resetButton");
+const keepOnReset = document.querySelector("#keepOnReset");
 const copyStatus = document.querySelector("#copyStatus");
 const productNameCounter = document.querySelector("#productNameCounter");
 const productNameWarning = document.querySelector("#productNameWarning");
@@ -1088,7 +1089,26 @@ customAttributes.addEventListener("click", (event) => {
 });
 copyButton.addEventListener("click", copyHtml);
 resetButton.addEventListener("click", () => {
+  // Remember the fields that should survive a reset
+  const keepFields = keepOnReset.checked;
+  const preserved = {
+    employeeName: fields.employeeName.value,
+    tone: fields.tone.value,
+    category: fields.category.value,
+  };
+
   form.reset();
+
+  // The checkbox is inside the form, so restore the user's choice too
+  keepOnReset.checked = keepFields;
+
+  // Put them back before anything else reads their values
+  if (keepFields) {
+    fields.employeeName.value = preserved.employeeName;
+    fields.tone.value = preserved.tone;
+    fields.category.value = preserved.category;
+  }
+
   customAttributes.innerHTML = "";
   resetMetadataDirtyState();
   updateCategoryFields();
