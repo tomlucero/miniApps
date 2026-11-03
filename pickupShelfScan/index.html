@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pickup Reminders | CSU Bookstore</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/b65fbcdd34.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="../shared-theme.css?v=20260621-1">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+  <header class="suite-hero">
+    <div class="suite-hero-image" role="img" aria-label="Colorado State University Lory Student Center"></div>
+    <div class="suite-hero-inner">
+      <div>
+        <a class="suite-back" href="../index.html">&larr; Return to Toolbox</a>
+        <p class="suite-eyebrow">Fulfillment helper</p>
+        <h1>Pickup Reminders</h1>
+        <p class="suite-lead">Turn a phone shelf scan into the Arc list, then sort every bag into restocks, reminders and waiting.</p>
+      </div>
+      <img class="suite-logo" src="../productListingHTMLBuilder/images/bookstoreLogo.png" alt="CSU Bookstore logo">
+    </div>
+  </header>
+
+  <main class="workspace-band">
+    <div class="container">
+      <div class="row g-4 align-items-stretch">
+        <!-- STEP 1 -->
+        <div class="col-lg-6">
+          <section class="card h-100" aria-labelledby="step1">
+            <div class="card-body p-4">
+              <div class="panel-title mb-3">
+                <div>
+                  <p class="suite-eyebrow">Step 1</p>
+                  <h2 id="step1">Get the shelf scan</h2>
+                </div>
+                <button class="btn btn-outline-secondary btn-sm" id="undoScan" type="button"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i> Undo last submit</button>
+              </div>
+              <p class="text-muted small">Scan every bag with the phone (<a href="scan.html" target="_blank" rel="noopener">scan page</a>), submit it, then load it here.</p>
+              <button class="btn btn-primary" id="loadScan" type="button"><i class="fa-solid fa-cloud-arrow-down" aria-hidden="true"></i> Load latest scan</button>
+              <div id="scanInfo" class="form-status mt-3" role="status"></div>
+              <div id="csvWrap" class="mt-3" hidden>
+                <label class="form-label" for="csvLine">PL IDs for Arc</label>
+                <textarea class="form-control font-monospace" id="csvLine" rows="3" readonly></textarea>
+                <div class="action-row mt-2">
+                  <button class="btn btn-primary" id="copyCsv" type="button"><i class="fa-solid fa-copy" aria-hidden="true"></i> Copy for Arc</button>
+                  <span id="copyStatus" class="text-muted small" role="status"></span>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- STEP 2 -->
+        <div class="col-lg-6">
+          <section class="card h-100" aria-labelledby="step2">
+            <div class="card-body p-4">
+              <div class="panel-title mb-3">
+                <div>
+                  <p class="suite-eyebrow">Step 2</p>
+                  <h2 id="step2">Upload the Arc file</h2>
+                </div>
+              </div>
+              <p class="text-muted small">The .xlsx Arc gives back. It stays on this computer; nothing in it is uploaded anywhere.</p>
+              <label class="drop-zone" id="drop">
+                <input type="file" id="arcFile" accept=".xlsx,.xls,.csv">
+                <i class="fa-solid fa-file-excel" aria-hidden="true"></i>
+                <span id="dropText"><strong>Choose the Arc file</strong> or drop it here</span>
+              </label>
+              <div class="row g-2 align-items-end mt-2">
+                <div class="col-sm-6">
+                  <label class="form-label" for="asOf">Count days as of</label>
+                  <input class="form-control" type="date" id="asOf">
+                </div>
+              </div>
+              <div id="fileInfo" class="form-status mt-3" role="status"></div>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <!-- RESULTS -->
+      <section id="results" class="mt-4" hidden>
+        <dl class="summary-grid" id="summary"></dl>
+        <div id="warnings"></div>
+
+        <section class="card bucket bucket-restock mb-4" id="bucketRestock" aria-labelledby="hRestock">
+          <div class="bucket-head">
+            <div>
+              <p class="suite-eyebrow">28+ days since packed</p>
+              <h2 id="hRestock">Restock these <span class="bucket-count" id="nRestock"></span></h2>
+            </div>
+            <div class="action-row">
+              <span class="done-progress" id="restockProgress"></span>
+              <button class="btn btn-outline-secondary btn-sm" id="printRestock" type="button"><i class="fa-solid fa-print" aria-hidden="true"></i> Print list</button>
+            </div>
+          </div>
+          <div class="card-body p-4 pt-3">
+            <p class="text-muted small mb-3">Pull each bag, refund it in Insite with the note, then tick <strong>Done</strong>. The customer's refund email goes out automatically.</p>
+            <div id="listRestock"></div>
+          </div>
+        </section>
+
+        <section class="card bucket bucket-remind mb-4" id="bucketRemind" aria-labelledby="hRemind">
+          <div class="bucket-head">
+            <div>
+              <p class="suite-eyebrow">14 to 27 days, no pink sticker</p>
+              <h2 id="hRemind">Needs reminder <span class="bucket-count" id="nRemind"></span></h2>
+            </div>
+          </div>
+          <div class="card-body p-4 pt-3">
+            <p class="text-muted small mb-3">Write the email, send it, put a pink sticker on the bag, then click <strong>Mark sent</strong>.</p>
+            <div id="listRemind" class="remind-cards"></div>
+          </div>
+        </section>
+
+        <section class="card bucket bucket-sent mb-4" id="bucketSent" aria-labelledby="hSent">
+          <div class="bucket-head">
+            <div>
+              <p class="suite-eyebrow">14 to 27 days, pink sticker</p>
+              <h2 id="hSent">Reminder already sent <span class="bucket-count" id="nSent"></span></h2>
+            </div>
+          </div>
+          <div class="card-body p-4 pt-3"><div id="listSent"></div></div>
+        </section>
+
+        <section class="card bucket bucket-wait mb-4" id="bucketWait" aria-labelledby="hWait">
+          <div class="bucket-head">
+            <div>
+              <p class="suite-eyebrow">Under 14 days</p>
+              <h2 id="hWait">Waiting <span class="bucket-count" id="nWait"></span></h2>
+            </div>
+          </div>
+          <div class="card-body p-4 pt-3"><div id="listWait"></div></div>
+        </section>
+      </section>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

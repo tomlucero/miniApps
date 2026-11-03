@@ -1,0 +1,80 @@
+/* Pickup Reminders (PC page). Built on Bootstrap + ../shared-theme.css like the other mini apps;
+   this file only adds what those two don't cover. */
+:root { --ps-pink: #c2255c; --ps-pink-soft: #fde4ee; }
+
+.workspace-band { padding: 28px 0 52px; }
+.panel-title, .bucket-head, .action-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.panel-title h2, .bucket-head h2 { margin: 0; font-size: 1.15rem; font-weight: 760; }
+.action-row { justify-content: flex-start; flex-wrap: wrap; gap: 10px; }
+.btn { display: inline-flex; align-items: center; gap: 7px; }
+
+/* Status lines (same look as the label generator) */
+.form-status { min-height: 0; font-size: .9rem; }
+.form-status.error, .form-status.success { padding: 10px 12px; border-radius: 6px; }
+.form-status.error { color: var(--suite-danger); background: var(--suite-danger-soft); border: 1px solid #f1aaa4; }
+.form-status.success { color: var(--suite-success); background: var(--suite-success-soft); border: 1px solid #b9e4d2; }
+
+/* File drop */
+.drop-zone { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 24px; text-align: center;
+             border: 2px dashed #cbd5df; border-radius: 8px; background: var(--suite-soft); cursor: pointer; font-weight: 500; }
+.drop-zone i { font-size: 1.6rem; color: var(--suite-accent); }
+.drop-zone.over { border-color: var(--suite-accent); background: var(--suite-accent-soft); }
+.drop-zone input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+
+/* Summary strip (same pattern as the label generator's summary grid) */
+.summary-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; margin: 0 0 16px; padding: 1px;
+                background: var(--suite-line); border-radius: 8px; overflow: hidden; }
+.summary-grid div { padding: 12px 16px; background: #fff; }
+.summary-grid dt { color: var(--suite-muted); font-size: .7rem; font-weight: 750; text-transform: uppercase; }
+.summary-grid dd { margin: 2px 0 0; font-size: 1.6rem; font-weight: 760; color: var(--suite-ink); }
+
+.ps-warn { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 12px; padding: 12px 14px; color: #7a4d00;
+           background: #fff8df; border: 1px solid #edcf76; border-radius: 8px; font-size: .88rem; }
+.ps-warn i { margin-top: 3px; }
+
+/* Buckets */
+.bucket { overflow: hidden; border-top: 4px solid var(--suite-line) !important; }
+.bucket-restock { border-top-color: var(--suite-danger) !important; }
+.bucket-remind  { border-top-color: var(--suite-accent) !important; }
+.bucket-sent    { border-top-color: var(--ps-pink) !important; }
+.bucket-head { padding: 18px 22px; background: var(--suite-soft); border-bottom: 1px solid var(--suite-line); flex-wrap: wrap; }
+.bucket-count { color: var(--suite-muted); font-weight: 500; }
+.done-progress { padding: 5px 10px; color: var(--suite-accent-dark); background: var(--suite-accent-soft); border-radius: 999px;
+                 font-size: .8rem; font-weight: 750; }
+.done-progress:empty { display: none; }
+
+/* Tables */
+.ps-table { margin: 0; font-size: .88rem; }
+.ps-table th { color: var(--suite-muted); font-size: .72rem; font-weight: 750; text-transform: uppercase; white-space: nowrap; }
+.ps-table td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ps-table .form-check-input { width: 1.3em; height: 1.3em; margin: 0; cursor: pointer; }
+.ps-table tr.is-done td { color: var(--suite-muted); }
+.ps-table tr.is-done td:not(:first-child):not(:last-child) { text-decoration: line-through; }
+.note-cell { display: flex; align-items: center; gap: 8px; }
+.note-text { font-size: .8rem; color: var(--suite-muted); }
+.empty-note { color: var(--suite-muted); font-style: italic; margin: 0; }
+
+/* Reminder cards */
+.remind-cards { display: grid; gap: 12px; }
+.remind-card { padding: 14px 16px; border: 1px solid var(--suite-line); border-left: 4px solid var(--suite-accent); border-radius: 6px; }
+.remind-card.done { border-left-color: var(--ps-pink); opacity: .65; }
+.remind-card h3 { margin: 0; font-size: 1.02rem; font-weight: 700; }
+.remind-meta { color: var(--suite-muted); font-size: .86rem; margin: 2px 0 0; }
+.remind-email { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 8px 0; font-size: .9rem; overflow-wrap: anywhere; }
+.remind-items { margin: 4px 0 0 18px; padding: 0; font-size: .86rem; }
+.btn-pink { color: var(--ps-pink) !important; border-color: var(--ps-pink) !important; background: #fff !important; }
+.btn-pink:hover { background: var(--ps-pink-soft) !important; }
+
+/* Print only the restock list */
+@media print {
+  body.printing-restock .suite-hero, body.printing-restock .workspace-band .row,
+  body.printing-restock #results > :not(#bucketRestock), body.printing-restock #bucketRestock .action-row button,
+  body.printing-restock .copy-note { display: none !important; }
+  body.printing-restock .card { box-shadow: none !important; border: 0 !important; }
+  body.printing-restock .ps-table .form-check-input { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+
+@media (max-width: 700px) {
+  .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .bucket-head { padding: 14px 16px; }
+}
