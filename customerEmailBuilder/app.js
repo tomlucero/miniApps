@@ -386,6 +386,21 @@
     });
   });
 
+  // Prefill from the link, e.g. from Pickup Reminders:
+  // index.html?template=pickupReminder&name=Maria%20Brask&order=211984&packed=2026-10-12
+  // Only fills fields that are in the link; a plain visit to the page is unchanged.
+  (function prefillFromLink() {
+    const params = new URLSearchParams(location.search);
+    const template = params.get('template');
+    if (template && config.templates[template]) templateSelect.value = template;
+    const name = params.get('name');
+    if (name) $('customerName').value = name.slice(0, 80);
+    const order = params.get('order');
+    if (order && /^\d{6}$/.test(order)) $('orderNumber').value = order;
+    const packed = params.get('packed');
+    if (packed && /^\d{4}-\d{2}-\d{2}$/.test(packed)) $('datePacked').value = packed;
+  })();
+
   loadTemplateEditor();
   generate();
 })();
