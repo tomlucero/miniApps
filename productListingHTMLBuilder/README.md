@@ -2,7 +2,7 @@
 
 A simple local web app for student employees who need to turn product listing notes into clean HTML for MBS/Insite product descriptions.
 
-**Current version:** 1.2.1
+**Current version:** 1.3.0
 
 ## Files
 
@@ -96,7 +96,7 @@ Suggested Metadata includes:
 
 - SEO Title, copied directly from Product Name with a 60-character live counter
 - Meta Description, limited to 155 characters with a live counter
-- Search Keywords, generated as 10-20 natural comma-separated terms
+- Search Keywords, generated as up to 20 comma-separated shopper-style search phrases
 
 Metadata generation is category-aware:
 
@@ -105,6 +105,15 @@ Metadata generation is category-aware:
 - Gifts emphasize use case, design, and recipient-friendly wording.
 - Tech emphasizes compatibility, batteries, and use case.
 - School supplies emphasize pack count, dimensions, and use case.
+
+Search keywords are built from **Product Type**, not the category:
+
+- School + product phrases first (`CSU shot glass`, `Colorado State shot glass`, `Rams shot glass`).
+- Common alternate names from a built-in synonym list (`shooter`, `shot`, `glass`; `hoodie` → `sweatshirt`, `hooded sweatshirt`).
+- Attribute phrases only when that field is filled in (`2 oz shot glass`, `clear shot glass`, `tumbler with lid` only if Lid / Straw mentions a lid).
+- No generic filler such as `campus store` or unrelated features.
+
+To add synonyms for a new product, extend `keywordSynonyms` in `script.js`.
 
 The metadata fields are editable before copying. Once a metadata field is manually edited, the app leaves that field alone until reset or category change.
 
