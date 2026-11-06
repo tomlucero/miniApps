@@ -24,7 +24,7 @@ let descriptionEditor = null;
 const productNameLimit = 60;
 const seoTitleLimit = 60;
 const metaDescriptionLimit = 155;
-const appVersion = "1.2.1";
+const appVersion = "1.3.0";
 const metadataDirty = {
   seoTitle: false,
   metaDescription: false,
@@ -807,39 +807,146 @@ function buildMetaDescription(data) {
   return truncateToLimit(`${sentence}.`, metaDescriptionLimit);
 }
 
-function buildSearchKeywords(data) {
-  const campusTerms = ["CSU", "Colorado State", "Rams", "campus store"];
-  const categoryTerms = {
-    clothing: ["apparel", "campus apparel", "college clothing", data.fit, data.material],
-    drinkware: ["drinkware", "tumbler", "water bottle", data.capacity, data.material, data.insulation, data.lidStraw, "lid", "straw", "insulated"],
-    gift: ["gift", "college gift", "campus gift", data.useCase, data.designFinish],
-    decal: ["decal", "sticker", "laptop sticker", "water bottle sticker", data.decalSize],
-    schoolSupply: ["school supply", "class supplies", "desk supplies", data.packCount, data.useCase, data.dimensions, "pack"],
-    tech: ["tech accessory", "electronics", data.compatibility, data.batteries, data.useCase],
-  };
-  const baseTerms = [
-    data.productName,
-    data.brand,
-    data.productType,
-    getCategoryLabel(data.category),
-    data.color,
-    data.material,
-    data.fit,
-    data.capacity,
-    data.insulation,
-    data.lidStraw,
-    data.dimensions,
-    data.decalSize,
-    data.packCount,
-    data.designFinish,
-    data.useCase,
-    data.compatibility,
-    ...splitListItems(data.features || "").slice(0, 4),
-    ...campusTerms,
-    ...(categoryTerms[data.category] || []),
-  ];
+// Search synonyms keyed by a phrase that can appear in Product Type.
+// Longer/more specific keys are checked first, so "shot glass" wins over "glass".
+const keywordSynonyms = {
+  "shot glass": ["shooter", "shot", "glass"],
+  "pint glass": ["beer glass", "pint", "glass"],
+  "wine glass": ["stemless wine glass", "glass"],
+  "rocks glass": ["whiskey glass", "lowball glass", "glass"],
+  "water bottle": ["bottle", "sports bottle"],
+  "travel mug": ["coffee tumbler", "mug", "cup"],
+  "can cooler": ["koozie", "can insulator"],
+  "tumbler": ["travel cup", "cup"],
+  "mug": ["coffee mug", "cup"],
+  "bottle": ["water bottle"],
+  "cup": ["tumbler"],
+  "quarter zip": ["1/4 zip", "pullover", "sweatshirt"],
+  "crewneck": ["crew sweatshirt", "sweatshirt"],
+  "hoodie": ["hooded sweatshirt", "sweatshirt", "hoody"],
+  "sweatshirt": ["crewneck", "pullover"],
+  "t-shirt": ["tee", "shirt"],
+  "tee": ["t-shirt", "shirt"],
+  "polo": ["golf shirt", "shirt"],
+  "jersey": ["shirt"],
+  "joggers": ["sweatpants", "pants"],
+  "sweatpants": ["joggers", "pants"],
+  "shorts": ["athletic shorts"],
+  "jacket": ["coat"],
+  "beanie": ["knit hat", "winter hat", "hat"],
+  "cap": ["hat", "baseball cap"],
+  "hat": ["cap"],
+  "socks": ["sock"],
+  "decal": ["sticker", "vinyl decal"],
+  "sticker": ["decal", "laptop sticker"],
+  "magnet": ["car magnet"],
+  "pennant": ["flag", "dorm decor"],
+  "flag": ["banner"],
+  "blanket": ["throw", "throw blanket"],
+  "keychain": ["key ring", "key chain"],
+  "lanyard": ["id holder", "key lanyard"],
+  "ornament": ["christmas ornament", "holiday ornament"],
+  "notebook": ["spiral notebook", "journal"],
+  "journal": ["notebook"],
+  "folder": ["pocket folder"],
+  "pen": ["pens", "ballpoint pen"],
+  "pencil": ["pencils"],
+  "backpack": ["bookbag", "bag"],
+  "tote": ["tote bag", "bag"],
+  "phone case": ["case"],
+  "charger": ["charging cable", "power"],
+  "power bank": ["portable charger", "battery pack"],
+  "earbuds": ["headphones"],
+  "headphones": ["earbuds"],
+  "speaker": ["bluetooth speaker"],
+};
 
-  return uniqueList(baseTerms).slice(0, 20).join(", ");
+const campusPrefixes = ["CSU", "Colorado State", "Rams"];
+
+function getKeywordSynonyms(productType) {
+  const type = productType.toLowerCase();
+  const keys = Object.keys(keywordSynonyms).sort((a, b) => b.length - a.length);
+  const matchedKey = keys.find((key) => new RegExp(`\\b${key}\\b`).test(type));
+
+  if (!matchedKey) {
+    return { coreTerm: type, synonyms: [] };
+  }
+
+  return { coreTerm: matchedKey, synonyms: keywordSynonyms[matchedKey] };
+}
+
+function isShortKeywordValue(value) {
+  return value && value.split(" ").length <= 3 && value.length <= 30 && !/[.!?]/.test(value);
+}
+
+function buildSearchKeywords(data) {
+  const productType = cleanValue(data.productType || "").toLowerCase();
+  const fallbackType = getCategoryLabel(data.category).toLowerCase();
+  const type = productType || fallbackType;
+  const { coreTerm, synonyms } = getKeywordSynonyms(type);
+  const terms = [];
+  const add = (...items) => terms.push(...items.filter(Boolean));
+  const withType = (modifier) => (isShortKeywordValue(modifier) && !type.includes(modifier.toLowerCase()) ? `${modifier.toLowerCase()} ${type}` : "");
+
+  // 1. What shoppers actually type: school + product.
+  add(...campusPrefixes.map((prefix) => `${prefix} ${type}`));
+  add(type);
+
+  if (coreTerm !== type) {
+    add(`CSU ${coreTerm}`, coreTerm);
+  }
+
+  // 2. Alternate names for the same product.
+  synonyms.slice(0, 3).forEach((synonym) => add(`CSU ${synonym}`));
+  add(...synonyms);
+
+  // 3. Attribute phrases, only when the field is filled in.
+  if (data.brand) {
+    add(`${data.brand} ${coreTerm}`, `CSU ${data.brand}`);
+  }
+
+  add(withType(data.color));
+
+  if (data.category === "clothing") {
+    add(withType(data.fit), withType(data.material));
+  }
+
+  if (data.category === "drinkware") {
+    add(withType(data.capacity));
+
+    if (/insulat|vacuum|double[- ]wall/i.test(data.insulation || "")) {
+      add(`insulated ${coreTerm}`);
+    }
+
+    if (/\blid\b/i.test(data.lidStraw || "")) {
+      add(`${coreTerm} with lid`);
+    }
+
+    if (/\bstraw\b/i.test(data.lidStraw || "")) {
+      add(`${coreTerm} with straw`);
+    }
+  }
+
+  if (data.category === "decal") {
+    add(withType(data.decalSize));
+  }
+
+  if (data.category === "schoolSupply") {
+    add(withType(data.packCount));
+  }
+
+  if (data.category === "tech" && isShortKeywordValue(data.compatibility)) {
+    add(`${data.compatibility} ${coreTerm}`);
+  }
+
+  if (data.category === "gift") {
+    add("CSU gift", isShortKeywordValue(data.useCase) ? `${data.useCase.toLowerCase()} gift` : "");
+  }
+
+  // 4. A couple of broad school terms to round it out.
+  add(`Colorado State University ${coreTerm}`, "CSU Rams");
+
+  return uniqueList(terms).slice(0, 20).join(", ");
 }
 
 function buildMetadata(data) {
