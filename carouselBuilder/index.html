@@ -53,6 +53,18 @@
               </select>
             </label>
           </div>
+          <div class="settings-grid settings-grid--two">
+            <label for="startDate">Start date
+              <input id="startDate" type="date">
+            </label>
+            <label for="endDate">End date
+              <input id="endDate" type="date">
+            </label>
+          </div>
+          <label for="evergreen">
+            <input id="evergreen" type="checkbox">
+            Evergreen fallback (no dates; shows only when no dated carousel is live)
+          </label>
           <div id="slideList" class="slide-list"></div>
         </div>
       </section>
@@ -189,13 +201,36 @@
 
     const state = {
       slides: [],
-      previewIndex: 0
+      previewIndex: 0,
+      idEditedByHand: false
     };
+
+    const DEFAULT_CAROUSEL_ID = "bkHomeHeroOverlayCarousel";
+    const SCHEDULE_GROUP = "home-hero";
+
+    // Every carousel block on a page needs its own ID, or the arrows and dots
+    // control the wrong carousel. Unless the ID was typed by hand, build it from the dates.
+    function suggestedId() {
+      if (els.evergreen.checked) return "bkHomeHero-evergreen";
+      const start = els.startDate.value.replace(/-/g, "");
+      return start ? `bkHomeHero-${start}` : DEFAULT_CAROUSEL_ID;
+    }
+
+    function scheduleAttributes() {
+      let attrs = ` data-schedule-group="${SCHEDULE_GROUP}"`;
+      if (els.evergreen.checked) return `${attrs} data-fallback`;
+      if (els.startDate.value) attrs += ` data-start="${escapeAttr(els.startDate.value)}"`;
+      if (els.endDate.value) attrs += ` data-end="${escapeAttr(els.endDate.value)}"`;
+      return attrs;
+    }
 
     const els = {
       sourceCode: document.querySelector("#sourceCode"),
       slideList: document.querySelector("#slideList"),
       carouselId: document.querySelector("#carouselId"),
+      startDate: document.querySelector("#startDate"),
+      endDate: document.querySelector("#endDate"),
+      evergreen: document.querySelector("#evergreen"),
       commentDisabled: document.querySelector("#commentDisabled"),
       previewStage: document.querySelector("#previewStage"),
       previewDots: document.querySelector("#previewDots"),
@@ -264,6 +299,13 @@
       const carousel = doc.querySelector(".bk-carousel");
       const foundId = carousel && carousel.id ? carousel.id : "";
       if (foundId) els.carouselId.value = foundId;
+      // A pasted block that still has the old shared ID gets a fresh unique one.
+      state.idEditedByHand = Boolean(foundId) && foundId !== DEFAULT_CAROUSEL_ID && !/^bkHomeHero-/.test(foundId);
+
+      const block = doc.querySelector(".bk-carousel-block");
+      els.startDate.value = block && block.getAttribute("data-start") || "";
+      els.endDate.value = block && block.getAttribute("data-end") || "";
+      els.evergreen.checked = Boolean(block && block.hasAttribute("data-fallback"));
 
       const activeSlides = Array.from(doc.querySelectorAll(".carousel-item")).map(item => slideFromElement(item, true));
       const commentSlides = [];
@@ -508,7 +550,8 @@
     }
 
     function generateCode() {
-      const id = (els.carouselId.value || "bkHomeHeroOverlayCarousel").trim();
+      if (!state.idEditedByHand) els.carouselId.value = suggestedId();
+      const id =(els.carouselId.value || "bkHomeHeroOverlayCarousel").trim();
       const included = state.slides.filter(slide => slide.enabled);
       const includeComments = els.commentDisabled.value === "comments";
       const disabled = state.slides.filter(slide => !slide.enabled);
@@ -548,7 +591,7 @@
   - Use one <h1> on the homepage. For additional slides, change h1 to h2 if heading structure becomes a concern.
   - Keep button text short and action-focused.
 -->
-<section class="bk-carousel-block">
+<section class="bk-carousel-block"${scheduleAttributes()}>
 <div id="${escapeAttr(id)}" class="bk-carousel bk-carousel--full carousel slide" data-bs-ride="carousel" data-bs-interval="9000" data-bs-pause="hover" data-bs-touch="true" aria-label="Featured Bookstore campaigns">
 <div class="carousel-indicators">
 ${indicatorLines.join("\n")}
@@ -667,7 +710,11 @@ ${slide.description ? `<p class="bk-carousel__text">${escapeHtml(slide.descripti
     document.querySelector("#nextSlide").addEventListener("click", () => goPreview(1));
     document.querySelector("#previewPrev").addEventListener("click", () => goPreview(-1));
     document.querySelector("#previewNext").addEventListener("click", () => goPreview(1));
-    [els.carouselId, els.commentDisabled].forEach(input => input.addEventListener("input", render));
+    els.carouselId.addEventListener("input", () => { state.idEditedByHand = true; });
+    [els.carouselId, els.commentDisabled, els.startDate, els.endDate, els.evergreen].forEach(input => {
+      input.addEventListener("input", render);
+      input.addEventListener("change", render);
+    });
 
     els.sourceCode.value = sampleCode;
     parseSlidesFromCode(sampleCode);
