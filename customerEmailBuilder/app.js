@@ -77,10 +77,10 @@
     return `${month}/${day}/${year}`;
   }
 
-  function formatShortDate(value) {
-    if (!value) return '[game date]';
+  function formatShortDate(value, fallback = '[game date]') {
+    if (!value) return fallback;
     const [, month, day] = value.split('-');
-    if (!month || !day) return '[game date]';
+    if (!month || !day) return fallback;
     return `${Number(month)}/${Number(day)}`;
   }
 
@@ -91,6 +91,11 @@
     const date = new Date(year, month - 1, day, 12, 0, 0, 0);
     if (Number.isNaN(date.getTime())) return '';
     date.setDate(date.getDate() + days);
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+  }
+
+  function todayInputValue() {
+    const date = new Date();
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
   }
 
@@ -175,6 +180,12 @@
     $('dayOneFields').classList.toggle('d-none', !fields.dayOne);
     $('authorizedPickupFields').classList.toggle('d-none', !fields.authorizedPickup);
     $('gameDayPickupFields').classList.toggle('d-none', !fields.gameDayPickup);
+    $('couponFields').classList.toggle('d-none', !fields.couponRedeemed && !fields.couponDeadline);
+    $('couponRedeemedField').classList.toggle('d-none', !fields.couponRedeemed);
+    $('couponDeadlineField').classList.toggle('d-none', !fields.couponDeadline);
+    if (fields.couponDeadline && !$('couponDeadline').value) {
+      $('couponDeadline').value = offsetDateInputValue(todayInputValue(), 2);
+    }
     $('deadlineFields').classList.toggle('d-none', !$('addDeadline').checked);
     $('restockDate').readOnly = Boolean(fields.pickup);
     if (fields.pickup) {
@@ -240,6 +251,8 @@
       courseName: clean($('courseName').value, '[class/course]'),
       authorizedPerson: clean(authorizedPersonValue, '[authorized pickup person]'),
       gameDate: formatShortDate($('gameDate').value),
+      couponRedeemedDate: formatShortDate($('couponRedeemedDate').value, '[redeemed date]'),
+      couponDeadline: formatDate($('couponDeadline').value),
       generatedDate: today()
     };
 

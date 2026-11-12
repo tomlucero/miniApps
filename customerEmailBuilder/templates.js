@@ -119,6 +119,35 @@ window.CUSTOMER_EMAIL_BUILDER_CONFIG = {
       "body": "To help support a more sustainable CSU, the CSU Bookstore is updating orders shipping to residence halls to Pick Up at Store. \n\nShipping to on-campus residence halls can result in unnecessary delays — sometimes adding an extra business day for delivery. By switching to in-store pickup, we can reduce packaging waste, lower delivery emissions, and get your order to you faster. \n\nYour order will be available for pickup at the CSU Bookstore inside the Lory Student Center during regular business hours. You may also have a friend or roommate pick up your order on your behalf — just provide them with your name and order number, and reply to this email to let us know they are authorized to do so. \n\n If you have a circumstance that makes in-store pickup difficult (such as illness, a mobility limitation, or a work-schedule conflict), simply reply to this email and we'll be happy to ship your order instead for our standard $9.99 shipping fee. Please note that shipping times may take 1-2 business days, as packages must first go through our carrier’s processing systems. \n\n Thank you for supporting a more sustainable and efficient campus community.",
       "note": "Emailed customer to notify of change to pick up at store (On campus delivery)",
       "fields": {}
+    },
+    "c2cEligibilityRequest": {
+      "label": "C2C35 coupon - Verify eligibility",
+      "subject": "Action Needed: Verify Eligibility for C2C35 Coupon Code for Order #{orderNumber}",
+      "body": "Thank you for your recent order from the CSU Bookstore.\n\nBefore we can apply the C2C35 coupon code to order #{orderNumber}, we need to confirm your eligibility. This code is reserved for current CSU faculty and staff.\n\nPlease reply to this email with your CSU department and CSU ID number to verify eligibility.\n\nIf we do not receive a response by {couponDeadline}, we will proceed with your order without the coupon discount.\n\nThank you for supporting the CSU Bookstore.",
+      "note": "Emailed customer to verify C2C35 coupon eligibility (CSU department and CSU ID); requested response by {couponDeadline}. If no response, order will proceed without the coupon discount",
+      "fields": {
+        "couponDeadline": true,
+        "skipReplyHelp": true
+      }
+    },
+    "c2cIneligible": {
+      "label": "C2C35 coupon - Ineligible",
+      "subject": "Update on Your C2C35 Coupon Code - CSU Bookstore Order #{orderNumber}",
+      "body": "Thank you for placing order #{orderNumber} from the CSU Bookstore website.\n\nThe C2C35 coupon code used at checkout is exclusively for current CSU faculty and staff. Based on the information provided, we are unable to verify eligibility for this discount.\n\nYour order will be processed at the regular price.\n\nIf you have any questions or believe this is in error, please respond with your CSU department and CSU ID number.\n\nWe appreciate your understanding and your support of the CSU Bookstore.",
+      "note": "Unable to verify C2C35 coupon eligibility; order will be processed at regular price. Emailed customer",
+      "fields": {
+        "skipReplyHelp": true
+      }
+    },
+    "c2cMultipleUse": {
+      "label": "C2C35 coupon - Already used",
+      "subject": "Reminder: C2C35 Coupon Code Limited to One-Time Use - Order #{orderNumber}",
+      "body": "Thank you for your continued support of the CSU Bookstore.\n\nOur records indicate you redeemed this coupon on {couponRedeemedDate}. This code is limited to a one-time use per eligible CSU employee.\n\nWe will remove the promo code from this order. If you believe this is an error, please email bookstoreorders@colostate.edu for assistance.\n\nWe appreciate your understanding and are glad to serve our CSU community. Please don’t hesitate to reach out with any questions.",
+      "note": "C2C35 coupon previously redeemed on {couponRedeemedDate}; removed promo code from order and emailed customer",
+      "fields": {
+        "couponRedeemed": true,
+        "skipReplyHelp": true
+      }
     }
   },
   "sharedText": {

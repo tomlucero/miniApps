@@ -182,6 +182,22 @@
               <input class="form-control" id="gameDate" type="date">
             </section>
 
+            <section id="couponFields" class="mt-4 d-none">
+              <div class="section-kicker mb-1">C2C35 coupon</div>
+              <h3 class="h6 mb-3">Coupon details</h3>
+              <div class="row g-3">
+                <div class="col-sm-6" id="couponRedeemedField">
+                  <label class="form-label" for="couponRedeemedDate">Previously redeemed on</label>
+                  <input class="form-control" id="couponRedeemedDate" type="date">
+                </div>
+                <div class="col-sm-6" id="couponDeadlineField">
+                  <label class="form-label" for="couponDeadline">Customer reply deadline</label>
+                  <input class="form-control" id="couponDeadline" type="date" aria-describedby="couponDeadlineHelp">
+                  <div class="form-text" id="couponDeadlineHelp">Defaults to 2 days from today.</div>
+                </div>
+              </div>
+            </section>
+
             <div class="mt-4">
               <label class="form-label" for="customNote">Optional custom note</label>
               <textarea class="form-control" id="customNote" rows="3" placeholder="Add any order-specific information..."></textarea>
