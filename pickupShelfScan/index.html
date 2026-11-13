@@ -92,7 +92,7 @@
         <section class="card bucket bucket-restock mb-4" id="bucketRestock" aria-labelledby="hRestock">
           <div class="bucket-head">
             <div>
-              <p class="suite-eyebrow">28+ days since packed</p>
+              <p class="suite-eyebrow" id="ruleRestock">21+ days since packed (28+ if packed before 11/13/2026)</p>
               <h2 id="hRestock">Restock these <span class="bucket-count" id="nRestock"></span></h2>
             </div>
             <div class="action-row">
@@ -109,7 +109,7 @@
         <section class="card bucket bucket-remind mb-4" id="bucketRemind" aria-labelledby="hRemind">
           <div class="bucket-head">
             <div>
-              <p class="suite-eyebrow">14 to 27 days, no pink sticker</p>
+              <p class="suite-eyebrow" id="ruleRemind">From day 14 until restock, no pink sticker</p>
               <h2 id="hRemind">Needs reminder <span class="bucket-count" id="nRemind"></span></h2>
             </div>
           </div>
@@ -122,7 +122,7 @@
         <section class="card bucket bucket-sent mb-4" id="bucketSent" aria-labelledby="hSent">
           <div class="bucket-head">
             <div>
-              <p class="suite-eyebrow">14 to 27 days, pink sticker</p>
+              <p class="suite-eyebrow" id="ruleSent">From day 14 until restock, pink sticker</p>
               <h2 id="hSent">Reminder already sent <span class="bucket-count" id="nSent"></span></h2>
             </div>
           </div>
@@ -132,7 +132,7 @@
         <section class="card bucket bucket-wait mb-4" id="bucketWait" aria-labelledby="hWait">
           <div class="bucket-head">
             <div>
-              <p class="suite-eyebrow">Under 14 days</p>
+              <p class="suite-eyebrow" id="ruleWait">Under 14 days</p>
               <h2 id="hWait">Waiting <span class="bucket-count" id="nWait"></span></h2>
             </div>
           </div>
