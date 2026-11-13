@@ -42,6 +42,7 @@
         <div class="panel-body import-tools">
           <label for="sourceCode">Paste carousel code here <span>Existing `bk-carousel` markup will be converted into editable slides.</span></label>
           <textarea id="sourceCode" spellcheck="false"></textarea>
+          <div class="row-actions" id="blockPicker" style="display:none" role="group" aria-label="Carousels found in pasted code"></div>
           <div class="settings-grid settings-grid--two">
             <label for="carouselId">Carousel ID
               <input id="carouselId" value="bkHomeHeroOverlayCarousel">
@@ -202,7 +203,8 @@
     const state = {
       slides: [],
       previewIndex: 0,
-      idEditedByHand: false
+      idEditedByHand: false,
+      blocks: []
     };
 
     const DEFAULT_CAROUSEL_ID = "bkHomeHeroOverlayCarousel";
@@ -322,7 +324,75 @@
       state.slides = slides.length ? slides : [makeSlide()];
       state.previewIndex = 0;
       render();
-      setStatus(`Imported ${state.slides.length} slide${state.slides.length === 1 ? "" : "s"}.`);
+      const kind = els.evergreen.checked
+        ? "evergreen fallback"
+        : (els.startDate.value || els.endDate.value)
+          ? `dated ${els.startDate.value || "..."} to ${els.endDate.value || "..."}`
+          : "no dates";
+      setStatus(`Imported ${state.slides.length} slide${state.slides.length === 1 ? "" : "s"} (${kind}).`);
+    }
+
+    // Splits pasted code into one piece per carousel block, so copying a whole
+    // box (dated block + evergreen block) does not merge into one big carousel.
+    function splitCarouselBlocks(code) {
+      const text = String(code);
+      // Hide comment contents so a commented-out <section> is not counted.
+      const masked = text.replace(/<!--[\s\S]*?-->/g, comment => " ".repeat(comment.length));
+      const starts = [];
+      const pattern = /<section\b[^>]*\bbk-carousel-block\b[^>]*>/g;
+      let match;
+      while ((match = pattern.exec(masked))) starts.push(match.index);
+      if (starts.length < 2) return [text];
+      return starts.map((start, index) => text.slice(start, index + 1 < starts.length ? starts[index + 1] : text.length));
+    }
+
+    function describeBlock(blockCode) {
+      const doc = new DOMParser().parseFromString(`<div>${blockCode}</div>`, "text/html");
+      const section = doc.querySelector(".bk-carousel-block");
+      const title = doc.querySelector(".bk-carousel__title");
+      const slideCount = doc.querySelectorAll(".carousel-item").length;
+      let kind = "No dates";
+      if (section && section.hasAttribute("data-fallback")) {
+        kind = "Evergreen";
+      } else if (section && (section.getAttribute("data-start") || section.getAttribute("data-end"))) {
+        kind = `${section.getAttribute("data-start") || "..."} to ${section.getAttribute("data-end") || "..."}`;
+      }
+      let headline = title ? cleanText(title.textContent) : "";
+      if (headline.length > 40) headline = `${headline.slice(0, 37)}...`;
+      return `${kind}${headline ? `: ${headline}` : ""} (${slideCount} slide${slideCount === 1 ? "" : "s"})`;
+    }
+
+    function renderBlockPicker(selectedIndex) {
+      const picker = document.querySelector("#blockPicker");
+      picker.innerHTML = "";
+      if (state.blocks.length < 2) {
+        picker.style.display = "none";
+        return;
+      }
+      picker.style.display = "";
+      const intro = document.createElement("span");
+      intro.className = "status";
+      intro.textContent = `Your paste has ${state.blocks.length} carousels. Pick one to edit:`;
+      picker.appendChild(intro);
+      state.blocks.forEach((blockCode, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = `btn small${index === selectedIndex ? " dark" : ""}`;
+        button.textContent = describeBlock(blockCode);
+        if (index === selectedIndex) button.setAttribute("aria-pressed", "true");
+        button.addEventListener("click", () => loadBlock(index));
+        picker.appendChild(button);
+      });
+    }
+
+    function loadBlock(index) {
+      renderBlockPicker(index);
+      parseSlidesFromCode(state.blocks[index]);
+    }
+
+    function importPastedCode(code) {
+      state.blocks = splitCarouselBlocks(code);
+      loadBlock(0);
     }
 
     function slideFromElement(item, enabled) {
@@ -692,9 +762,9 @@ ${slide.description ? `<p class="bk-carousel__text">${escapeHtml(slide.descripti
 
     document.querySelector("#loadSample").addEventListener("click", () => {
       els.sourceCode.value = sampleCode;
-      parseSlidesFromCode(sampleCode);
+      importPastedCode(sampleCode);
     });
-    document.querySelector("#importBtn").addEventListener("click", () => parseSlidesFromCode(els.sourceCode.value));
+    document.querySelector("#importBtn").addEventListener("click", () => importPastedCode(els.sourceCode.value));
     document.querySelector("#addTop").addEventListener("click", () => {
       state.slides.push(makeSlide());
       render();
@@ -717,7 +787,7 @@ ${slide.description ? `<p class="bk-carousel__text">${escapeHtml(slide.descripti
     });
 
     els.sourceCode.value = sampleCode;
-    parseSlidesFromCode(sampleCode);
+    importPastedCode(sampleCode);
   </script>
 </body>
 </html>
