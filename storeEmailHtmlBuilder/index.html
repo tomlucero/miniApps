@@ -45,6 +45,8 @@
                 <select class="form-select" id="templateType"></select>
               </div>
 
+              <p class="form-text mb-3">Formatting: <code>**bold**</code> &middot; start a line with <code>- </code> for a bullet &middot; <code>[link text](https://...)</code> for a link. Email addresses and https:// links are linked automatically. A blank line starts a new paragraph, and an empty field is left out of the email. Keep <code>&lt;&lt;&lt;CODES&gt;&gt;&gt;</code> exactly as they are.</p>
+
               <div class="row g-3" id="templateFields"></div>
 
               <hr class="my-4">
@@ -74,13 +76,6 @@
                       <input class="form-control" id="alertEnd" type="datetime-local">
                     </div>
                   </div>
-                </div>
-              </div>
-
-              <div class="optional-block mt-3" id="requestedPickupBlockControl">
-                <div class="form-check form-switch">
-                  <input class="form-check-input" id="includeRequestedPickup" type="checkbox">
-                  <label class="form-check-label" for="includeRequestedPickup">Include Requested Pickup Date Block</label>
                 </div>
               </div>
 
@@ -123,7 +118,6 @@
     </div>
   </main>
 
-  <script src="../store-info.js?v=20261113-1"></script>
-  <script src="script.js?v=20261113-2"></script>
+  <script src="script.js?v=20261113-3"></script>
 </body>
 </html>
