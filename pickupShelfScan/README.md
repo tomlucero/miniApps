@@ -8,9 +8,9 @@ PL ID list for Arc, reads the xlsx Arc gives back, and sorts every bag:
 
 | Bucket | Rule | What to do |
 |---|---|---|
-| Needs reminder | Packed 14 to 27 days ago, no pink sticker | Write reminder → send → pink sticker on bag → Mark sent |
-| Restock | Packed 28+ days ago | Print the list, pull the bags |
-| Reminder already sent | 14 to 27 days, has a pink sticker | Nothing |
+| Needs reminder | 14+ days since packed, not yet restock, no pink sticker | Write reminder → send → pink sticker on bag → Mark sent |
+| Restock | 21+ days since packed (28+ for bags packed before 11/13/2026) | Print the list, pull the bags |
+| Reminder already sent | Same window, has a pink sticker | Nothing |
 | Waiting | Under 14 days | Nothing |
 
 Reminders go by **PL ID** (one per bag), using that bag's pack date.
@@ -77,7 +77,8 @@ That keeps the same URL. "New deployment" makes a new URL, and the pages would n
   browser, in case the sheet can't be reached. The next shelf scan picks up the physical sticker anyway.
 - **Pack dates** are read as calendar days. Arc sends them as `2026-10-12` text; `10/12/2026` and real
   Excel dates also work. The "Count days as of" box changes "today" if you need to check a different day.
-- **Rules live at the top of `app.js`:** `REMIND_DAYS = 14`, `RESTOCK_DAYS = 28`, and the Arc separator `', '`.
+- **Rules live at the top of `app.js`:** `REMIND_DAYS = 14`, `RESTOCK_DAYS = 21`, and the Arc separator `', '`. Bags packed before `NEW_POLICY_START` (2026-11-13) were promised 28 days (`OLD_RESTOCK_DAYS`) and keep it; delete that grandfathering once those bags are gone.
+  The day ranges printed on the page follow those two numbers.
   The PL ID length (7) is at the top of `scan.html`.
 - **Email builder link:** `customerEmailBuilder/index.html?template=pickupReminder&name=...&order=...&packed=YYYY-MM-DD`
   fills those fields. A plain visit to the builder is unchanged.

@@ -7,7 +7,12 @@
   // ---------------------------------------------------------------------------
 
   const REMIND_DAYS  = 14;   // first reminder
-  const RESTOCK_DAYS = 28;   // pull from shelf and refund
+  const RESTOCK_DAYS = 21;   // pull from shelf and refund
+  // Bags packed BEFORE this date were promised the old 28 days, so they keep it.
+  // Once nothing packed before this date is left on the shelf (28 days later), delete these two lines
+  // and the restockDaysFor() helper below, and use RESTOCK_DAYS directly.
+  const OLD_RESTOCK_DAYS = 28;
+  const NEW_POLICY_START = '2026-11-13';   // YYYY-MM-DD, first pack date that gets 21 days
   const CSV_SEPARATOR = ', ';   // Arc takes "6227210, 6228949, ..."
   const EMAIL_BUILDER = '../customerEmailBuilder/index.html';
   // Insite note for a restock. {plId} and {date} are filled in; {date} is the day the tool is used.
@@ -57,6 +62,9 @@
   const pad = n => String(n).padStart(2, '0');
   const toIso = p => `${p.y}-${pad(p.m)}-${pad(p.d)}`;
   const toUs = p => `${pad(p.m)}/${pad(p.d)}/${p.y}`;   // 11/03/2026, same as the email builder
+  // Days before a bag is pulled, by the policy it was packed under.
+  function restockDaysFor(pack) { return toIso(pack) >= NEW_POLICY_START ? RESTOCK_DAYS : OLD_RESTOCK_DAYS; }
+
   function addDays(p, n) {
     const dt = new Date(Date.UTC(p.y, p.m - 1, p.d + n));
     return { y: dt.getUTCFullYear(), m: dt.getUTCMonth() + 1, d: dt.getUTCDate() };
@@ -235,7 +243,8 @@
       if (!bag.pack) { noDate.push(bag); return; }
       bag.days = today - dayNumber(bag.pack);
       bag.stickered = isStickered(bag.id);
-      if (bag.days >= RESTOCK_DAYS) buckets.restock.push(bag);
+      bag.restockDays = restockDaysFor(bag.pack);
+      if (bag.days >= bag.restockDays) buckets.restock.push(bag);
       else if (bag.days >= REMIND_DAYS) (bag.stickered ? buckets.sent : buckets.remind).push(bag);
       else buckets.wait.push(bag);
     });
@@ -249,7 +258,7 @@
     // Warnings
     const warn = [];
     if (!scan) {
-      warn.push('The shelf scan is not loaded, so pink stickers are unknown and every 14 to 27 day bag shows as "Needs reminder". Click <strong>Load latest scan</strong> above.');
+      warn.push(`The shelf scan is not loaded, so pink stickers are unknown and every bag from day ${REMIND_DAYS} until restock shows as "Needs reminder". Click <strong>Load latest scan</strong> above.`);
     } else {
       const scanned = new Set(scan.bags.map(b => b.id));
       const notInArc = scan.bags.filter(b => !arcBags.has(b.id)).map(b => b.id);
@@ -340,7 +349,7 @@
       card.className = 'remind-card';
       card.innerHTML = `
         <h3>${esc(fullName(b))}</h3>
-        <p class="remind-meta">PL ID <strong>${esc(b.id)}</strong> · Order #${esc(b.order)} · Packed ${esc(toUs(b.pack))} (${b.days} days) · Restock ${esc(toUs(addDays(b.pack, RESTOCK_DAYS)))}</p>
+        <p class="remind-meta">PL ID <strong>${esc(b.id)}</strong> · Order #${esc(b.order)} · Packed ${esc(toUs(b.pack))} (${b.days} days) · Restock ${esc(toUs(addDays(b.pack, b.restockDays)))}</p>
         <div class="remind-email"><span>${esc(b.email || 'No email in Arc file')}</span>
           ${b.email ? `<button class="btn btn-outline-secondary btn-sm" data-copy type="button">${COPY_EMAIL_LABEL}</button>` : ''}</div>
         <ul class="remind-items">${b.items.map(i => `<li>${esc(i)}</li>`).join('')}</ul>
@@ -382,6 +391,14 @@
     window.print();
     setTimeout(() => document.body.classList.remove('printing-restock'), 500);
   });
+
+  // The day ranges shown on the page follow REMIND_DAYS and RESTOCK_DAYS at the top of this file.
+  const [sy, sm, sd] = NEW_POLICY_START.split('-').map(Number);
+  const startUs = toUs({ y: sy, m: sm, d: sd });
+  $('ruleRestock').textContent = `${RESTOCK_DAYS}+ days since packed (${OLD_RESTOCK_DAYS}+ if packed before ${startUs})`;
+  $('ruleRemind').textContent = `From day ${REMIND_DAYS} until restock, no pink sticker`;
+  $('ruleSent').textContent = `From day ${REMIND_DAYS} until restock, pink sticker`;
+  $('ruleWait').textContent = `Under ${REMIND_DAYS} days`;
 
   if (configured()) loadScan();
 })();
