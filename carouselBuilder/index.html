@@ -66,6 +66,17 @@
             <input id="evergreen" type="checkbox">
             Evergreen fallback (no dates; shows only when no dated carousel is live)
           </label>
+          <div class="settings-grid settings-grid--two">
+            <label for="outputMode">Output
+              <select id="outputMode">
+                <option value="carousel">Carousel HTML (paste into Insite)</option>
+                <option value="evergreenFile">Evergreen slide file (bk-evergreen-slides.js)</option>
+              </select>
+            </label>
+            <label for="evergreenShow">Evergreen: slides shown per page load
+              <input id="evergreenShow" type="number" min="1" max="12" value="4">
+            </label>
+          </div>
           <div id="slideList" class="slide-list"></div>
         </div>
       </section>
@@ -233,6 +244,8 @@
       startDate: document.querySelector("#startDate"),
       endDate: document.querySelector("#endDate"),
       evergreen: document.querySelector("#evergreen"),
+      outputMode: document.querySelector("#outputMode"),
+      evergreenShow: document.querySelector("#evergreenShow"),
       commentDisabled: document.querySelector("#commentDisabled"),
       previewStage: document.querySelector("#previewStage"),
       previewDots: document.querySelector("#previewDots"),
@@ -391,6 +404,11 @@
     }
 
     function importPastedCode(code) {
+      if (/BKEvergreenSlides/.test(code)) {
+        importEvergreenFile(code);
+        return;
+      }
+      els.outputMode.value = "carousel";
       state.blocks = splitCarouselBlocks(code);
       loadBlock(0);
     }
@@ -619,7 +637,101 @@
       });
     }
 
+    // ---- Evergreen slide file (bk-evergreen-slides.js) ----
+    // The file is plain data. Keys are quoted, so it is valid JSON inside the
+    // assignment, which lets the builder read it back safely with JSON.parse.
+    function evergreenHeadline(slide) {
+      const headline = cleanText(slide.headline);
+      const highlight = cleanText(slide.highlight);
+      const index = highlight ? headline.toLowerCase().indexOf(highlight.toLowerCase()) : -1;
+      if (index === -1) return headline;
+      return `${headline.slice(0, index)}[${headline.slice(index, index + highlight.length)}]${headline.slice(index + highlight.length)}`;
+    }
+
+    function evergreenId(slide, index, used) {
+      let base = (slide.evergreen && slide.evergreen.id) ||
+        cleanText(slide.headline).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 30) ||
+        `slide-${index + 1}`;
+      let id = base;
+      let n = 2;
+      while (used.has(id)) id = `${base}-${n++}`;
+      used.add(id);
+      return id;
+    }
+
+    function generateEvergreenFile() {
+      const used = new Set();
+      const show = Math.max(1, Math.min(12, parseInt(els.evergreenShow.value, 10) || 4));
+      const slides = state.slides
+        .filter(slide => cleanText(slide.headline) && slide.desktopImage)
+        .map((slide, index) => {
+          const extra = slide.evergreen || {};
+          const out = { id: evergreenId(slide, index, used) };
+          if (!slide.enabled) out.disabled = true;
+          if (extra.pin) out.pin = true;
+          if (extra.endDate) out.endDate = extra.endDate;
+          out.desktopImage = slide.desktopImage;
+          out.mobileImage = slide.mobileImage || slide.desktopImage;
+          out.alt = slide.alt;
+          out.eyebrow = slide.eyebrow;
+          out.headline = evergreenHeadline(slide);
+          out.text = slide.description;
+          out.primaryText = slide.primaryText;
+          out.primaryLink = slide.primaryLink;
+          return out;
+        });
+      const body = JSON.stringify({ show, slides }, null, 2);
+      return `/*
+  CSU Bookstore Evergreen Slides (the pool)
+  File: bk-evergreen-slides.js
+  Made by the carousel builder (Output: Evergreen slide file).
+  bk-evergreen.js picks "show" slides from this list at random on each page load.
+  Per slide: pin true = always included, disabled true = skipped,
+  endDate "YYYY-MM-DD" = skipped after that day, [word] = highlighted word.
+*/
+window.BKEvergreenSlides = ${body};
+`;
+    }
+
+    function importEvergreenFile(code) {
+      const start = code.indexOf("{", code.indexOf("BKEvergreenSlides"));
+      const end = code.lastIndexOf("}");
+      let data;
+      try {
+        data = JSON.parse(code.slice(start, end + 1));
+      } catch (error) {
+        setStatus("Could not read that file. Paste a file made by this builder.");
+        return;
+      }
+      const list = Array.isArray(data.slides) ? data.slides : [];
+      state.slides = list.map(item => {
+        const match = String(item.headline || "").match(/\[([^\]]+)\]/);
+        const slide = makeSlide({
+          enabled: !item.disabled,
+          desktopImage: item.desktopImage || "",
+          mobileImage: item.mobileImage || "",
+          alt: item.alt || "",
+          eyebrow: item.eyebrow || "",
+          headline: String(item.headline || "").replace(/\[([^\]]+)\]/g, "$1"),
+          highlight: match ? match[1] : "",
+          description: item.text || "",
+          primaryLink: item.primaryLink || "",
+          primaryText: item.primaryText || ""
+        });
+        slide.evergreen = { id: item.id, pin: Boolean(item.pin), endDate: item.endDate || "" };
+        return slide;
+      });
+      if (!state.slides.length) state.slides = [makeSlide()];
+      els.evergreenShow.value = data.show || 4;
+      els.outputMode.value = "evergreenFile";
+      state.blocks = [];
+      state.previewIndex = 0;
+      render();
+      setStatus(`Imported ${list.length} evergreen slide${list.length === 1 ? "" : "s"}.`);
+    }
+
     function generateCode() {
+      if (els.outputMode.value === "evergreenFile") return generateEvergreenFile();
       if (!state.idEditedByHand) els.carouselId.value = suggestedId();
       const id =(els.carouselId.value || "bkHomeHeroOverlayCarousel").trim();
       const included = state.slides.filter(slide => slide.enabled);
@@ -781,7 +893,7 @@ ${slide.description ? `<p class="bk-carousel__text">${escapeHtml(slide.descripti
     document.querySelector("#previewPrev").addEventListener("click", () => goPreview(-1));
     document.querySelector("#previewNext").addEventListener("click", () => goPreview(1));
     els.carouselId.addEventListener("input", () => { state.idEditedByHand = true; });
-    [els.carouselId, els.commentDisabled, els.startDate, els.endDate, els.evergreen].forEach(input => {
+    [els.carouselId, els.commentDisabled, els.startDate, els.endDate, els.evergreen, els.outputMode, els.evergreenShow].forEach(input => {
       input.addEventListener("input", render);
       input.addEventListener("change", render);
     });
