@@ -360,9 +360,54 @@ const CANCEL_LINK = "[bookstore.colostate.edu/cancel](https://www.bookstore.colo
 const RETURNS_LINK = "[bookstore.colostate.edu/returns-exchanges](https://www.bookstore.colostate.edu/returns-exchanges)";
 
 // Field helper: key, label, default value, textarea rows (1 = single line).
-function f(key, label, value = "", rows) {
+function f(key, label, value = "", rows, extra = {}) {
   const autoRows = value.length > 220 ? 6 : value.length > 90 ? 3 : 1;
-  return { key, label, value, rows: rows || autoRows };
+  return { key, label, value, rows: rows || autoRows, ...extra };
+}
+
+/* ---------- Rental term details ----------
+ * Rental emails repeat the semester and dates in several places. Staff set
+ * them once in these fields; the wording uses the placeholders below.
+ *   {semester}      Summer 2026
+ *   {dueDate}       Friday, August 7, 2026
+ *   {dueDateShort}  August 7, 2026
+ *   {lateFeeDate}   August 12, 2026
+ *   {lateFee}       $25
+ *   {chargeDate}    August 14, 2026
+ */
+function rentalTermFields() {
+  return [
+    f("semester", "Semester", "Summer 2026", 1, { heading: "Rental term (change these each term)", half: true }),
+    f("lateFee", "Late fee amount", "$25", 1, { half: true }),
+    f("dueDate", "Due date", "2026-08-07", 1, { type: "date", third: true }),
+    f("lateFeeDate", "Late fee after", "2026-08-12", 1, { type: "date", third: true }),
+    f("chargeDate", "Charged to student account after", "2026-08-14", 1, { type: "date", third: true, note: "Use {semester}, {dueDate}, {dueDateShort}, {lateFeeDate}, {lateFee} and {chargeDate} in the wording below. They fill in from these fields." })
+  ];
+}
+
+function formatTermDate(value, withWeekday) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value || "");
+  if (!match) return "[date]";
+  const date = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+  return new Intl.DateTimeFormat("en-US", { ...(withWeekday ? { weekday: "long" } : {}), month: "long", day: "numeric", year: "numeric" }).format(date);
+}
+
+// Replace {placeholders} in every text field with the rental term values.
+function applyRentalTerm(form) {
+  const values = {
+    semester: form.semester.trim() || "[semester]",
+    dueDate: formatTermDate(form.dueDate, true),
+    dueDateShort: formatTermDate(form.dueDate, false),
+    lateFeeDate: formatTermDate(form.lateFeeDate, false),
+    lateFee: form.lateFee.trim() || "[late fee]",
+    chargeDate: formatTermDate(form.chargeDate, false)
+  };
+  Object.keys(form).forEach((key) => {
+    if (typeof form[key] === "string") {
+      form[key] = form[key].replace(/\{(semester|dueDate|dueDateShort|lateFeeDate|lateFee|chargeDate)\}/g, (m, name) => values[name]);
+    }
+  });
+  return form;
 }
 
 // Header, title and opening fields every email has.
@@ -694,6 +739,61 @@ const EMAIL_TEMPLATES = [
       itemGroup("Cancelled General Book Items:", "<<<TRADELNITEM>>>"),
       textSection("", form.help)
     ]
+  },
+  {
+    id: "rental-reminder",
+    name: "Rental Reminder (Before Due Date)",
+    title: "Rental Reminder",
+    rentalTerm: true,
+    fields: [
+      ...rentalTermFields(),
+      ...topFields({
+        heroHeadline: "REMINDER: Return Your Rental Books before {dueDateShort}",
+        subhead: "Thank you for renting course materials from the CSU Bookstore!",
+        intro: "Dear <<<CUSTOMERFNAME>>> <<<CUSTOMERLNAME>>> (Student ID #<<<STUNUM>>>),\n\nThank you for renting course materials from the CSU Bookstore. According to our records, you rented the following book(s) for the **{semester}** semester"
+      }),
+      f("details", "Section: “Important Details About Your Rented Course Materials”", "- **REMEMBER THAT IT IS YOUR RESPONSIBILITY TO RETURN YOUR RENTED COURSE MATERIALS BEFORE {dueDate}**: Do not forget to return your rental books by the due date to avoid late fees, or replacement fees as described in your rental agreement.\n- **KEEP YOUR RENTED COURSE MATERIALS AWAY FROM LIQUIDS**: Use caution when studying around beverages. We are unable to accept returns on rental books damaged by liquids. We will refund rental pricing and charge the purchase price of the book in this situation.\n- **YES! YOU CAN WRITE/HIGHLIGHT IN YOUR RENTAL BOOK**: You can write notes in the margin and highlight passages in your rental book.", 8),
+      f("howToReturn", "Section: “How to RETURN Your Rented Books”", "Rental books for {semester} are due back at the CSU Bookstore on or before {dueDate}. Rental books not returned before {lateFeeDate} will be assessed a {lateFee} late fee; books not returned before {chargeDate} will be charged to your student account after this date.\n\n**Please return your rental book before {dueDate} by:**\n- Returning your rental in person at the CSU Bookstore. You can ask any CSU Bookstore employee for assistance locating the rental return location.\n- **Ship your rental return at your expense to:**", 8),
+      f("shipAddress", "Gold box: rental return shipping address", "CSU Bookstore\nATTN: RENTAL RETURNS\n8035 Campus Delivery\nFort Collins, CO 80523\n\n**MAKE SURE YOU INCLUDE YOUR STUDENT ID NUMBER ON THE OUTSIDE OF THE PACKAGE.**", 6),
+      f("purchase", "After the address box", "- **IF YOU WISH TO PURCHASE YOUR RENTAL BOOK**: Reply to this email with your name and student ID number. We will charge your student account the difference between the rental price and the purchase price.", 3),
+      ...footerFields(THANKS_SHOPPING_EXCLAIM, "You are receiving this email because you rented a textbook from the CSU Bookstore in our store or through our website.")
+    ],
+    body: (form) => [
+      intro(form),
+      callout("info", { html: valueText("<<<RENTALNOTICEBOOKS>>><<<RENTALNOTICE-NOFEES>>>", 15) }),
+      alertCallout(form),
+      textSection("Important Details About Your Rented Course Materials", form.details),
+      textSection("How to RETURN Your Rented Books", form.howToReturn),
+      callout("note", { body: form.shipAddress }),
+      has(form.purchase) ? block(rich(form.purchase), 18) : ""
+    ]
+  },
+  {
+    id: "rental-past-due",
+    name: "Rental Past Due",
+    title: "Rental Past Due",
+    rentalTerm: true,
+    fields: [
+      ...rentalTermFields(),
+      ...topFields({
+        heroHeadline: "Your Rental Books are Past Due!",
+        intro: "Dear <<<CUSTOMERFNAME>>> <<<CUSTOMERLNAME>>> (Student ID #<<<STUNUM>>>),\n\nThank you for renting course materials from the CSU Bookstore. According to our records, you rented the following book(s) for the **{semester}** semester. Our records show these books have not been returned and are now past due."
+      }),
+      f("howToReturn", "Section: “How to RETURN Your Rented Books”", "Rental books for {semester} were due back at the CSU Bookstore on or before {dueDate}. Rental books not returned before {lateFeeDate} will be assessed a {lateFee} late fee; books not returned before {chargeDate} will be charged to your student account after this date.\n\n**Please return your rental book by:**\n- **Returning your rental in person at the CSU Bookstore**: Please come to the Textbook Information kiosk located in the lower level of the CSU Bookstore for help returning your course materials.\n- **Ship your rental return at your expense to:**", 8),
+      f("shipAddress", "Gold box: rental return shipping address", "CSU Bookstore\nATTN: RENTAL RETURNS\n8035 Campus Delivery\nFort Collins, CO 80523\n\n**MAKE SURE YOU INCLUDE YOUR STUDENT ID NUMBER ON THE OUTSIDE OF THE PACKAGE.**", 6),
+      f("purchase", "After the address box", "- **IF YOU WISH TO PURCHASE YOUR RENTAL BOOK**: Reply to this email with your name and student ID number. We will charge your student account the difference between the rental price and the purchase price.", 3),
+      f("details", "Section: “Important Details About Your Rented Course Materials”", "- **KEEP YOUR RENTED COURSE MATERIALS AWAY FROM LIQUIDS**: Use caution when studying around beverages. We are unable to accept returns on rental books damaged by liquids. We will refund rental pricing and charge the purchase price of the book in this situation.\n- **YES! YOU CAN WRITE/HIGHLIGHT IN YOUR RENTAL BOOK**: You can write notes in the margin and highlight passages in your rental book.", 6),
+      ...footerFields(THANKS_SHOPPING_EXCLAIM, "You are receiving this email because you rented a textbook from the CSU Bookstore in our store or through our website.")
+    ],
+    body: (form) => [
+      intro(form),
+      callout("info", { html: valueText("<<<RENTALNOTICEBOOKS>>><<<RENTALNOTICE-NOFEES>>>", 15) }),
+      alertCallout(form),
+      textSection("How to RETURN Your Rented Books", form.howToReturn),
+      callout("note", { body: form.shipAddress }),
+      has(form.purchase) ? block(rich(form.purchase), 18) : "",
+      textSection("Important Details About Your Rented Course Materials", form.details)
+    ]
   }
 ];
 
@@ -741,7 +841,7 @@ function readForm(template) {
     const input = document.getElementById(`field-${field.key}`);
     form[field.key] = input ? input.value : field.value;
   });
-  return form;
+  return template.rentalTerm ? applyRentalTerm(form) : form;
 }
 
 function buildEmailHtml() {
@@ -753,7 +853,7 @@ function buildEmailHtml() {
 function renderTemplateFields(template) {
   elements.templateFields.replaceChildren(...template.fields.map((field) => {
     const wrap = document.createElement("div");
-    wrap.className = "col-12";
+    wrap.className = field.half ? "col-md-6" : field.third ? "col-md-4" : "col-12";
     const label = document.createElement("label");
     label.className = "form-label";
     label.htmlFor = `field-${field.key}`;
@@ -762,11 +862,25 @@ function renderTemplateFields(template) {
     input.className = "form-control";
     input.id = `field-${field.key}`;
     if (field.rows > 1) input.rows = field.rows;
-    else input.type = "text";
+    else input.type = field.type || "text";
     input.value = field.value;
     wrap.append(label, input);
-    return wrap;
-  }));
+    const nodes = [];
+    if (field.heading) {
+      const heading = document.createElement("p");
+      heading.className = "col-12 fw-bold mb-0";
+      heading.textContent = field.heading;
+      nodes.push(heading);
+    }
+    nodes.push(wrap);
+    if (field.note) {
+      const note = document.createElement("p");
+      note.className = "col-12 form-text mt-1";
+      note.textContent = field.note;
+      nodes.push(note);
+    }
+    return nodes;
+  }).flat());
 }
 
 function populateTemplateSelect() {
