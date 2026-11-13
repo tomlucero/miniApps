@@ -17,6 +17,10 @@
  * - <<<TOKENS>>> are filled in by the CMS and are never HTML-escaped.
  */
 
+// Store facts (pickup days, hours, contact details) come from ../store-info.js.
+const STORE = window.STORE_INFO;
+if (!STORE) throw new Error("Store facts (store-info.js) are missing.");
+
 const BRAND = {
   logoUrl: "https://www.bookstore.colostate.edu/SiteImages/109-SchoolImages/109-EmailImages/109-Bookstore-WhHoPNGTran200x60@2x.png",
   green: "#1e4d2b",
@@ -109,6 +113,12 @@ function smallText(html, extra = "") {
 
 function link(href, text) {
   return `<a href="${href}" style="color:${BRAND.green}; text-decoration:underline;">${text}</a>`;
+}
+
+// Orders email address from store-info.js, as a mailto link.
+function mailLink() {
+  const email = STORE.contact.ordersEmail;
+  return link(`mailto:${email}`, escapeHtml(email));
 }
 
 // Top of the body: the big headline and the opening message.
@@ -213,7 +223,7 @@ function needHelp(form) {
   return section("Need help?", `
                     ${paragraphs(form.footerContactMessage, "font-size:15px; line-height:23px;")}
                     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;"><tr><td style="padding:10px 0 0 0;">
-                      <p style="margin:0; ${FONT} font-size:15px; line-height:23px; color:${BRAND.text};">Need to cancel your order? Use the cancellation form at ${link("https://www.bookstore.colostate.edu/cancel", "bookstore.colostate.edu/cancel")}.</p>
+                      <p style="margin:0; ${FONT} font-size:15px; line-height:23px; color:${BRAND.text};">Need to cancel your order? Use the cancellation form at ${link(STORE.links.cancelUrl, escapeHtml(STORE.links.cancelText))}.</p>
                     </td></tr></table>`);
 }
 
@@ -316,7 +326,7 @@ const EMAIL_TEMPLATES = [
       { key: "openingMessage", label: "Opening message", rows: 3, value: "We received your order and will begin processing it soon." },
       { key: "pickupNote", label: "Pickup note (green box under the opening)", rows: 2, value: "If you selected in-store pickup, please wait for a pickup notification before coming to the bookstore." },
       { key: "processingMessage", label: "“How long will my order take?” section", rows: 4, value: "Orders received before 2:00 p.m. Mountain Time are processed the same business day. Orders received after 2:00 p.m. Mountain Time are processed the next business day. Orders received after 2:00 p.m. on Fridays are processed the next business day, typically Monday." },
-      { key: "footerContactMessage", label: "“Need help?” section", rows: 2, value: "Have questions about your order? Email BookstoreOrders@colostate.edu or call 970-491-0904 between 8 a.m. and 4 p.m. Mountain Time." }
+      { key: "footerContactMessage", label: "“Need help?” section", rows: 2, value: "Have questions about your order? Email {ordersEmail} or call {phone} between {phoneHours}." }
     ],
     alert: {
       headline: "Processing Delay Notice",
@@ -356,7 +366,7 @@ const EMAIL_TEMPLATES = [
         callout(`
                         ${smallText("<strong>*</strong> Your final total may change after processing due to textbook availability, shipping adjustments, or applicable sales tax. Your final total will appear on the receipt included with your shipment and/or your pickup or shipping confirmation email.", "font-size:12px; line-height:19px;")}
                         ${smallText("<strong>**</strong> Sales tax is calculated when your order is processed. The CSU Bookstore collects applicable sales tax on in-store pickup orders and on orders shipped to destinations where sales tax is required by law.", "font-size:12px; line-height:19px; margin-top:10px;")}
-                        ${smallText(`<strong>Purchasing tax exempt?</strong> Please send a copy of your tax exemption certificate to ${link("mailto:bookstoreorders@colostate.edu", "bookstoreorders@colostate.edu")}.`, "font-size:12px; line-height:19px; margin-top:10px;")}`, "note"),
+                        ${smallText(`<strong>Purchasing tax exempt?</strong> Please send a copy of your tax exemption certificate to ${mailLink()}.`, "font-size:12px; line-height:19px; margin-top:10px;")}`, "note"),
         needHelp(form)
       ];
     }
@@ -372,11 +382,11 @@ const EMAIL_TEMPLATES = [
     fields: [
       { key: "emailHeadline", label: "Email headline", rows: 1, value: "Your order is ready." },
       { key: "openingMessage", label: "Opening message", rows: 4, value: "Thank you for shopping at the CSU Bookstore. Your order is now ready to pick up at the CSU Bookstore. Please bring this email, either on your phone or printed, along with a photo ID." },
-      { key: "pickupMessage", label: "“Where and when can I pick up my order?” section", rows: 3, value: "You can pick up your order from the Order Pickup Counter, located on the lower level of the CSU Bookstore. Pickup hours are Monday through Friday from 8 a.m. to 5 p.m." },
-      { key: "pickupDeadline", label: "Pickup deadline (gold box, bold line)", rows: 1, value: "Please pick up your order within 21 days." },
-      { key: "pickupDeadlineDetail", label: "Pickup deadline (gold box, small print)", rows: 2, value: "Orders not picked up within 21 days will be refunded and restocked." },
+      { key: "pickupMessage", label: "“Where and when can I pick up my order?” section", rows: 3, value: "You can pick up your order from the Order Pickup Counter, located on the lower level of the CSU Bookstore. Pickup hours are {pickupHours}." },
+      { key: "pickupDeadline", label: "Pickup deadline (gold box, bold line)", rows: 1, value: "Please pick up your order within {pickupDays} days." },
+      { key: "pickupDeadlineDetail", label: "Pickup deadline (gold box, small print)", rows: 2, value: "Orders not picked up within {pickupDays} days will be refunded and restocked." },
       { key: "packedOrderNote", label: "Packed order note (green box after order details)", rows: 3, value: "This email is for an in-store pickup order. If any items are not included in this packed order, they will be noted below and handled separately." },
-      { key: "footerContactMessage", label: "“Need help?” section", rows: 2, value: "Need help with pickup? Email BookstoreOrders@colostate.edu or call 970-491-0904 between 8 a.m. and 4 p.m. Mountain Time." }
+      { key: "footerContactMessage", label: "“Need help?” section", rows: 2, value: "Need help with pickup? Email {ordersEmail} or call {phone} between {phoneHours}." }
     ],
     alert: {
       headline: "Pickup Hours Alert",
@@ -388,7 +398,7 @@ const EMAIL_TEMPLATES = [
         headline(form.emailHeadline, form.openingMessage),
         callout(`
                         <p style="margin:0 0 6px 0; ${FONT} font-size:16px; line-height:24px; font-weight:bold; color:${BRAND.darkGreen};">Pickup location</p>
-                        ${smallText("Order Pickup Counter, lower level of the CSU Bookstore.")}`, "info"),
+                        ${smallText(`${safeText(STORE.pickup.location)}.`)}`, "info"),
         alertCallout(form),
         section("Where and when can I pick up my order?", paragraphs(form.pickupMessage)),
         callout(`
@@ -396,7 +406,7 @@ const EMAIL_TEMPLATES = [
                         ${smallText(safeText(form.pickupDeadlineDetail))}`, "note", 18),
         callout(`
                         <p style="margin:0 0 8px 0; ${FONT} font-size:18px; line-height:24px; font-weight:bold; color:${BRAND.darkGreen};">Can someone else pick up my order?</p>
-                        <p style="margin:0; ${FONT} font-size:15px; line-height:23px; color:${BRAND.text};">Yes. Email ${link("mailto:bookstoreorders@colostate.edu", "BookstoreOrders@colostate.edu")} with the name of the person picking up your order so we can make a note on our end.</p>`, "note", 18),
+                        <p style="margin:0; ${FONT} font-size:15px; line-height:23px; color:${BRAND.text};">Yes. Email ${mailLink()} with the name of the person picking up your order so we can make a note on our end.</p>`, "note", 18),
         section("Order Details", details([
           ["Payment Method", valueText("<<<PAYMETHOD>>>")],
           ["Fulfillment Method", valueText("<<<SHIPMETHOD>>>")],
@@ -465,7 +475,7 @@ function readForm(template) {
   };
   template.fields.forEach((field) => {
     const input = document.getElementById(`field-${field.key}`);
-    form[field.key] = input ? input.value : field.value;
+    form[field.key] = input ? input.value : STORE.fill(field.value);
   });
   return form;
 }
@@ -489,7 +499,7 @@ function renderTemplateFields(template) {
     input.id = `field-${field.key}`;
     if (field.rows > 1) input.rows = field.rows;
     else input.type = "text";
-    input.value = field.value;
+    input.value = STORE.fill(field.value);
     wrap.append(label, input);
     return wrap;
   }));
