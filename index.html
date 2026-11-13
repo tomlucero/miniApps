@@ -50,7 +50,7 @@
             <article class="card daily-card">
               <div class="daily-card-kicker"><i class="fa-solid fa-calendar-plus" aria-hidden="true"></i> Restock Date Helper</div>
               <table class="date-helper-table mb-3" aria-label="Calculated restock dates">
-                <thead><tr><th scope="col"><span id="reminderDaysLabel">14</span> Day Reminder Date</th><th scope="col"><span id="restockDaysLabel">21</span> Day Restock Date</th></tr></thead>
+                <thead><tr><th scope="col">14 Day Reminder Date</th><th scope="col">21 Day Restock Date</th></tr></thead>
                 <tbody><tr><td id="restock14">July 1, 2026</td><td id="restock21">July 8, 2026</td></tr></tbody>
               </table>
               <div class="daily-card-kicker"><i class="fa-solid fa-calendar-plus" aria-hidden="true"></i> Payment Error Date Helper</div>
@@ -157,7 +157,6 @@
       </section>
     </div>
   </main>
-  <script src="store-info.js?v=20261113-1"></script>
   <script>
     (() => {
       let triviaItems = [];
@@ -203,12 +202,8 @@
 
         document.getElementById("dailyGreeting").textContent = greeting;
         document.getElementById("todayDate").textContent = `Today is ${fullDateFormatter.format(now)}`;
-        // Pickup policy days come from store-info.js.
-        const pickupPolicy = window.STORE_INFO.pickup;
-        document.getElementById("reminderDaysLabel").textContent = pickupPolicy.reminderDays;
-        document.getElementById("restockDaysLabel").textContent = pickupPolicy.restockDays;
-        document.getElementById("restock14").textContent = helperDateFormatter.format(offsetDate(now, pickupPolicy.reminderDays));
-        document.getElementById("restock21").textContent = helperDateFormatter.format(offsetDate(now, pickupPolicy.restockDays));
+        document.getElementById("restock14").textContent = helperDateFormatter.format(offsetDate(now, 14));
+        document.getElementById("restock21").textContent = helperDateFormatter.format(offsetDate(now, 21));
         document.getElementById("remind14").textContent = helperDateFormatter.format(offsetDate(now, -14));
         document.getElementById("remind26").textContent = helperDateFormatter.format(offsetDate(now, -26));
         document.getElementById("remind28").textContent = helperDateFormatter.format(offsetDate(now, -28));

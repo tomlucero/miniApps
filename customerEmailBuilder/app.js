@@ -3,13 +3,10 @@
 
   const config = window.CUSTOMER_EMAIL_BUILDER_CONFIG;
   if (!config) throw new Error('Customer Email Builder template configuration is missing.');
-  const store = window.STORE_INFO;
-  if (!store) throw new Error('Store facts (store-info.js) are missing.');
 
   const $ = id => document.getElementById(id);
   const form = $('builderForm');
   const templateSelect = $('templateType');
-  if ($('pickupPolicyDays')) $('pickupPolicyDays').textContent = store.pickup.restockDays;
 
   // Build the selector from templates.js so labels and ordering stay editable there.
   Object.entries(config.templates).forEach(([value, template]) => {
@@ -116,12 +113,10 @@
   }
 
   function replaceTokens(text, values) {
-    // A value ending in a period (like "5 p.m.") absorbs the sentence's own period.
-    return String(text).replace(/\{(\w+)\}(\.?)/g, (match, key, dot) => {
-      if (!Object.prototype.hasOwnProperty.call(values, key)) return match;
-      const value = String(values[key]);
-      return value + (dot && !value.endsWith('.') ? '.' : '');
-    });
+    return Object.entries(values).reduce(
+      (result, [key, value]) => result.replaceAll(`{${key}}`, value),
+      text
+    );
   }
 
   function renderTemplate(text, values, note = false) {
@@ -194,7 +189,7 @@
     $('deadlineFields').classList.toggle('d-none', !$('addDeadline').checked);
     $('restockDate').readOnly = Boolean(fields.pickup);
     if (fields.pickup) {
-      $('restockDate').value = offsetDateInputValue($('datePacked').value, store.pickup.restockDays);
+      $('restockDate').value = offsetDateInputValue($('datePacked').value, 21);
     }
   }
 
@@ -241,7 +236,6 @@
     const signature = config.signatures[$('signatureOption').value];
     const signatureName = signature.name || employee;
     const values = {
-      ...store.tokens,
       employee,
       signatureName,
       customer,
@@ -250,7 +244,7 @@
       originalPrice,
       packedDate: formatDate($('datePacked').value),
       firstReminderDate: formatDate($('firstReminderDate').value),
-      restockDate: formatDate(fields.pickup ? offsetDateInputValue($('datePacked').value, store.pickup.restockDays) : $('restockDate').value),
+      restockDate: formatDate(fields.pickup ? offsetDateInputValue($('datePacked').value, 21) : $('restockDate').value),
       expectedRestockDate: formatDate($('expectedRestockDate').value),
       restockResponseDeadline: formatDate($('restockResponseDeadline').value),
       dayOneTitle: clean($('dayOneTitle').value, '[Day One Access title]'),
