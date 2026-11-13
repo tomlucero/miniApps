@@ -208,7 +208,7 @@
   function updateCalculatedDates() {
     const packed = parseLocalDate(packedDate.value);
     document.getElementById("calculatedReminder").textContent = packed ? formatDate(addDays(packed, 14)) : "—";
-    document.getElementById("calculatedRestock").textContent = packed ? formatDate(addDays(packed, 28)) : "—";
+    document.getElementById("calculatedRestock").textContent = packed ? formatDate(addDays(packed, 21)) : "—";
   }
 
   function applyTemplateVariables(sheet, template) {
@@ -302,7 +302,7 @@
       const dates = {
         packed: formatDate(packed),
         reminder: formatDate(addDays(packed, 14)),
-        restock: formatDate(addDays(packed, 28))
+        restock: formatDate(addDays(packed, 21))
       };
 
       screenPreview.replaceChildren();

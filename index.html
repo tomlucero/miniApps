@@ -10,6 +10,12 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://kit.fontawesome.com/b65fbcdd34.js" crossorigin="anonymous"></script>
   <link rel="stylesheet" href="shared-theme.css?v=20260621-1">
+  <style>
+    .tool-group { margin-top: 36px; padding-top: 28px; border-top: 1px solid var(--suite-line, #d9dfd7); }
+    .tool-group-heading { margin: 0; font-size: 1.2rem; font-weight: 800; letter-spacing: -.01em; }
+    .tool-group-heading i { color: var(--suite-accent, #1e4d2b); margin-right: 6px; }
+    .tool-group-lead { margin: 6px 0 18px; color: var(--suite-muted, #5a655f); }
+  </style>
 </head>
 <body>
   <header class="suite-hero">
@@ -65,8 +71,7 @@
               <div class="daily-card-kicker"><i class="fa-solid fa-bell" aria-hidden="true"></i> Reminder Date Helper</div>
               <ul class="reminder-list">
                 <li class="reminder-item"><span class="reminder-label">Remind Orders Packed</span><time class="reminder-value" id="remind14">June 3, 2026</time></li>
-                <li class="reminder-item"><span class="reminder-label">Final Remind Orders Packed</span><time class="reminder-value" id="remind26">May 22, 2026</time></li>
-                <li class="reminder-item"><span class="reminder-label">Restock Orders Packed</span><time class="reminder-value" id="remind28">June 5, 2026</time></li>
+                <li class="reminder-item"><span class="reminder-label">Restock Orders Packed</span><time class="reminder-value" id="remind21">May 29, 2026</time></li>
               </ul>
             </article>
           </div>
@@ -82,28 +87,49 @@
         <div class="row g-4">
           <div class="col-md-6 col-xl-4"><a href="productListingHTMLBuilder/index.html" class="card tool-card"><div class="card-body"><span class="tool-icon"><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i></span><h3>Product Listing Builder</h3><p>Turn product notes into clean, approved description HTML.</p><span class="tool-link">Open tool &rarr;</span></div></a></div>
           <div class="col-md-6 col-xl-4"><a href="TrackingCSV/index.html" class="card tool-card"><div class="card-body"><span class="tool-icon"><i class="fa-solid fa-file-csv" aria-hidden="true"></i></span><h3>Tracking CSV Builder</h3><p>Create consistent tracking rows for shipments and orders.</p><span class="tool-link">Open tool &rarr;</span></div></a></div>
-          <div class="col-md-6 col-xl-4"><a href="bannerAdGen/index.html" class="card tool-card"><div class="card-body"><span class="tool-icon"><i class="fa-solid fa-image" aria-hidden="true"></i></span><h3>Banner Ad Builder</h3><p>Edit, preview, and export structured site banner entries.</p><span class="tool-link">Open tool &rarr;</span></div></a></div>
-          <div class="col-md-6 col-xl-4"><a href="carouselBuilder/index.html" class="card tool-card"><div class="card-body"><span class="tool-icon"><i class="fa-solid fa-images" aria-hidden="true"></i></span><h3>Carousel Builder</h3><p>Build and preview responsive carousel content for site updates.</p><span class="tool-link">Open tool &rarr;</span></div></a></div>
-          <div class="col-md-6 col-xl-4"><a href="homepageMerchandisingBuilder/index.html" class="card tool-card"><div class="card-body"><span class="tool-icon"><i class="fa-solid fa-store" aria-hidden="true"></i></span><h3>Homepage Merchandising Builder</h3><p>Manage Featured Now, Featured Collections, and Featured Items as separate scheduled website modules.</p><span class="tool-link">Open tool &rarr;</span></div></a></div>
-          <div class="col-md-6 col-xl-4"><a href="communicationAlertBuilder/index.html" class="card tool-card"><div class="card-body"><span class="tool-icon"><i class="fa-solid fa-bullhorn" aria-hidden="true"></i></span><h3>Communication Alert Builder</h3><p>Create copy-ready bookstore website alert HTML with live preview, icons, scheduling, and display options.</p><span class="tool-link">Open tool &rarr;</span></div></a></div>
           <div class="col-md-6 col-xl-4"><a href="customerEmailBuilder/index.html" class="card tool-card"><div class="card-body"><span class="tool-icon"><i class="fa-solid fa-envelope" aria-hidden="true"></i></span><h3>Customer Email Builder</h3><p>Draft customer-ready email copy and a matching Insite note.</p><span class="tool-link">Open tool &rarr;</span></div></a></div>
           <div class="col-md-6 col-xl-4"><a href="customerEmailBuilder/template-editor.html" class="card tool-card"><div class="card-body"><span class="tool-icon"><i class="fa-solid fa-pencil" aria-hidden="true"></i></span><h3>Email Builder Template Tool</h3><p>Create the JS files used in the email template builder.</p><span class="tool-link">Open tool &rarr;</span></div></a></div>
-          <div class="col-md-6 col-xl-4"><a href="phoneOrderTaxAllocator/index.html" class="card tool-card"><div class="card-body"><span class="tool-icon"><i class="fa-solid fa-calculator" aria-hidden="true"></i></span><h3>Phone Order Tax Allocator</h3><p>Split phone-order sales tax across item prices with exact rounding and per-item totals.</p><span class="tool-link">Open tool &rarr;</span></div></a></div>
-          <div class="col-md-6 col-xl-4"><a href="orderRangeSignGenerator/index.html" class="card tool-card"><div class="card-body"><span class="tool-icon"><i class="fa-solid fa-sign-hanging" aria-hidden="true"></i></span><h3>Order Range Sign Generator</h3><p>Create printable shelf and rack signs for order-number ranges.</p><span class="tool-link">Open tool &rarr;</span></div></a></div>
-          <div class="col-md-6 col-xl-4"><a href="nonWebOrderPickupTool/index.html" class="card tool-card"><div class="card-body"><span class="tool-icon"><i class="fa-solid fa-clipboard-check" aria-hidden="true"></i></span><h3>Non Web Order Pick Up Tool</h3><p>Create printable pickup paperwork for special orders without an InSite pickup record.</p><span class="tool-link">Open tool &rarr;</span></div></a></div>
-          <div class="col-md-6 col-xl-4"><a href="tempCMShelfTagGen/index.html" class="card tool-card"><div class="card-body"><span class="tool-icon"><i class="fa-solid fa-book-open-reader" aria-hidden="true"></i></span><h3>Temporary Course Materials Shelf Tag Generator</h3><p>Create printable 4-up course-material shelf tags while permanent signage is pending.</p><span class="tool-link">Open tool &rarr;</span></div></a></div>
-          <div class="col-md-6 col-xl-4"><a href="pickupDateLabelGenerator/index.html" class="card tool-card"><div class="card-body"><span class="tool-icon"><i class="fa-solid fa-tags" aria-hidden="true"></i></span><h3>Pickup Date Label Generator</h3><p>Print reminder and restock dates on Avery-style pickup labels.</p><span class="tool-link">Open tool &rarr;</span></div></a></div>
-          <div class="col-md-6 col-xl-4"><a href="pickupShelfScan/index.html" class="card tool-card"><div class="card-body"><span class="tool-icon"><i class="fa-solid fa-barcode" aria-hidden="true"></i></span><h3>Pickup Reminders</h3><p>Turn a phone shelf scan and the Arc file into reminder and restock lists.</p><span class="tool-link">Open tool &rarr;</span></div></a></div>
-          <div class="col-md-6 col-xl-4"><a href="avery5266LabelBuilder/index.html" class="card tool-card"><div class="card-body"><span class="tool-icon"><i class="fa-solid fa-folder-open" aria-hidden="true"></i></span><h3>Avery 5266 Folder Label Builder</h3><p>Create printable folder-label number ranges for Avery 5266 sheets.</p><span class="tool-link">Open tool &rarr;</span></div></a></div>
-          <div class="col-md-6 col-xl-4"><a href="priceTagGenerator/" class="card tool-card"><div class="card-body"><span class="tool-icon"><i class="fa-solid fa-tag" aria-hidden="true"></i></span><h3>Price Tag Generator (Beta)</h3><p>Create professional shelf labels and retail price signs from Excel or manual entry. Supports Avery labels, larger sign formats, optional barcodes, and print-ready layouts.</p><span class="tool-link">Open tool &rarr;</span></div></a></div>
-          <div class="col-md-6 col-xl-4"><a href="dotDateLabelGenerator/index.html" class="card tool-card"><div class="card-body"><span class="tool-icon"><i class="fa-solid fa-circle-dot" aria-hidden="true"></i></span><h3>Dot Date Label Generator</h3><p>Print compact dates on ULINE S-10415 one-inch circle labels.</p><span class="tool-link">Open tool &rarr;</span></div></a></div>
-          <div class="col-md-6 col-xl-4"><a href="iconDotLabelGenerator/index.html" class="card tool-card"><div class="card-body"><span class="tool-icon"><i class="fa-solid fa-icons" aria-hidden="true"></i></span><h3>Icon Dot Label Generator</h3><p>Print Font Awesome icon dots on ULINE S-10415 one-inch circle labels.</p><span class="tool-link">Open tool &rarr;</span></div></a></div>
-          <div class="col-md-6 col-xl-4"><a href="oversizedItemTagGenerator/index.html" class="card tool-card"><div class="card-body"><span class="tool-icon"><i class="fa-solid fa-box-open" aria-hidden="true"></i></span><h3>Oversized/Secure Item Tag Generator</h3><p>Create pick-list reminders and matching tags for oversized or securely stored items.</p><span class="tool-link">Open tool &rarr;</span></div></a></div>
+          <div class="col-md-6 col-xl-4"><a href="storeEmailHtmlBuilder/index.html" class="card tool-card"><div class="card-body"><span class="tool-icon"><i class="fa-solid fa-envelope-open-text" aria-hidden="true"></i></span><h3>Store Email HTML Builder</h3><p>Edit the CMS order, shipping, pickup, refund and rental emails and copy email-safe HTML.</p><span class="tool-link">Open tool &rarr;</span></div></a></div>
            <div class="col-md-6 col-xl-4"><a href="semesterAvailability/index.html" class="card tool-card"><div class="card-body"><span class="tool-icon"><i class="fa-solid fa-calendar-days" aria-hidden="true"></i></span><h3>Semester Availability</h3><p>Collect recurring times staff cannot work for the semester and print a clean sheet for your supervisor.</p><span class="tool-link">Open tool &rarr;</span></div></a></div>
-          <div class="col-md-6 col-xl-4"><a href="menuNavigationBuilder/index.html" class="card tool-card"><div class="card-body"><span class="tool-icon"><i class="fa-solid fa-bars-staggered" aria-hidden="true"></i></span><h3>Menu Navigation Builder</h3><p>Build accessible Bootstrap navigation menus with links, dropdowns, headings, and dividers.</p><span class="tool-link">Open tool &rarr;</span></div></a></div>
-          <div class="col-md-6 col-xl-4"><a href="pagePromoModulesBuilder/index.html" class="card tool-card"><div class="card-body"><span class="tool-icon"><i class="fa-solid fa-panorama" aria-hidden="true"></i></span><h3>Page Promo Modules Builder</h3><p>Create page-specific promo modules with URL and merch-list matching, reusable hero templates, and deploy-ready JavaScript.</p><span class="tool-link">Open tool &rarr;</span></div></a></div>
         </div>
-       
+
+        <div class="tool-group" role="group" aria-labelledby="websiteToolsHeading">
+          <h3 class="tool-group-heading" id="websiteToolsHeading"><i class="fa-solid fa-globe" aria-hidden="true"></i> Website Tools</h3>
+          <p class="tool-group-lead">Build and update content for the bookstore website.</p>
+          <div class="row g-4">
+            <div class="col-md-6 col-xl-4"><a href="bannerAdGen/index.html" class="card tool-card"><div class="card-body"><span class="tool-icon"><i class="fa-solid fa-image" aria-hidden="true"></i></span><h3>Banner Ad Builder</h3><p>Edit, preview, and export structured site banner entries.</p><span class="tool-link">Open tool &rarr;</span></div></a></div>
+            <div class="col-md-6 col-xl-4"><a href="carouselBuilder/index.html" class="card tool-card"><div class="card-body"><span class="tool-icon"><i class="fa-solid fa-images" aria-hidden="true"></i></span><h3>Carousel Builder</h3><p>Build and preview responsive carousel content for site updates.</p><span class="tool-link">Open tool &rarr;</span></div></a></div>
+            <div class="col-md-6 col-xl-4"><a href="homepageMerchandisingBuilder/index.html" class="card tool-card"><div class="card-body"><span class="tool-icon"><i class="fa-solid fa-store" aria-hidden="true"></i></span><h3>Homepage Merchandising Builder</h3><p>Manage Featured Now, Featured Collections, and Featured Items as separate scheduled website modules.</p><span class="tool-link">Open tool &rarr;</span></div></a></div>
+            <div class="col-md-6 col-xl-4"><a href="communicationAlertBuilder/index.html" class="card tool-card"><div class="card-body"><span class="tool-icon"><i class="fa-solid fa-bullhorn" aria-hidden="true"></i></span><h3>Communication Alert Builder</h3><p>Create copy-ready bookstore website alert HTML with live preview, icons, scheduling, and display options.</p><span class="tool-link">Open tool &rarr;</span></div></a></div>
+            <div class="col-md-6 col-xl-4"><a href="menuNavigationBuilder/index.html" class="card tool-card"><div class="card-body"><span class="tool-icon"><i class="fa-solid fa-bars-staggered" aria-hidden="true"></i></span><h3>Menu Navigation Builder</h3><p>Build accessible Bootstrap navigation menus with links, dropdowns, headings, and dividers.</p><span class="tool-link">Open tool &rarr;</span></div></a></div>
+            <div class="col-md-6 col-xl-4"><a href="pagePromoModulesBuilder/index.html" class="card tool-card"><div class="card-body"><span class="tool-icon"><i class="fa-solid fa-panorama" aria-hidden="true"></i></span><h3>Page Promo Modules Builder</h3><p>Create page-specific promo modules with URL and merch-list matching, reusable hero templates, and deploy-ready JavaScript.</p><span class="tool-link">Open tool &rarr;</span></div></a></div>
+          </div>
+        </div>
+
+        <div class="tool-group" role="group" aria-labelledby="fulfillmentToolsHeading">
+          <h3 class="tool-group-heading" id="fulfillmentToolsHeading"><i class="fa-solid fa-truck-fast" aria-hidden="true"></i> Fulfillment Tools</h3>
+          <p class="tool-group-lead">Process, stage and track orders for pickup and shipping.</p>
+          <div class="row g-4">
+            <div class="col-md-6 col-xl-4"><a href="phoneOrderTaxAllocator/index.html" class="card tool-card"><div class="card-body"><span class="tool-icon"><i class="fa-solid fa-calculator" aria-hidden="true"></i></span><h3>Phone Order Tax Allocator</h3><p>Split phone-order sales tax across item prices with exact rounding and per-item totals.</p><span class="tool-link">Open tool &rarr;</span></div></a></div>
+            <div class="col-md-6 col-xl-4"><a href="orderRangeSignGenerator/index.html" class="card tool-card"><div class="card-body"><span class="tool-icon"><i class="fa-solid fa-sign-hanging" aria-hidden="true"></i></span><h3>Order Range Sign Generator</h3><p>Create printable shelf and rack signs for order-number ranges.</p><span class="tool-link">Open tool &rarr;</span></div></a></div>
+            <div class="col-md-6 col-xl-4"><a href="nonWebOrderPickupTool/index.html" class="card tool-card"><div class="card-body"><span class="tool-icon"><i class="fa-solid fa-clipboard-check" aria-hidden="true"></i></span><h3>Non Web Order Pick Up Tool</h3><p>Create printable pickup paperwork for special orders without an InSite pickup record.</p><span class="tool-link">Open tool &rarr;</span></div></a></div>
+            <div class="col-md-6 col-xl-4"><a href="pickupDateLabelGenerator/index.html" class="card tool-card"><div class="card-body"><span class="tool-icon"><i class="fa-solid fa-tags" aria-hidden="true"></i></span><h3>Pickup Date Label Generator</h3><p>Print reminder and restock dates on Avery-style pickup labels.</p><span class="tool-link">Open tool &rarr;</span></div></a></div>
+            <div class="col-md-6 col-xl-4"><a href="pickupShelfScan/index.html" class="card tool-card"><div class="card-body"><span class="tool-icon"><i class="fa-solid fa-barcode" aria-hidden="true"></i></span><h3>Pickup Reminders</h3><p>Turn a phone shelf scan and the Arc file into reminder and restock lists.</p><span class="tool-link">Open tool &rarr;</span></div></a></div>
+            <div class="col-md-6 col-xl-4"><a href="oversizedItemTagGenerator/index.html" class="card tool-card"><div class="card-body"><span class="tool-icon"><i class="fa-solid fa-box-open" aria-hidden="true"></i></span><h3>Oversized/Secure Item Tag Generator</h3><p>Create pick-list reminders and matching tags for oversized or securely stored items.</p><span class="tool-link">Open tool &rarr;</span></div></a></div>
+          </div>
+        </div>
+
+        <div class="tool-group" role="group" aria-labelledby="printToolsHeading">
+          <h3 class="tool-group-heading" id="printToolsHeading"><i class="fa-solid fa-print" aria-hidden="true"></i> Print Tools</h3>
+          <p class="tool-group-lead">Print price tags, dot labels, folder labels and shelf tags.</p>
+          <div class="row g-4">
+            <div class="col-md-6 col-xl-4"><a href="priceTagGenerator/" class="card tool-card"><div class="card-body"><span class="tool-icon"><i class="fa-solid fa-tag" aria-hidden="true"></i></span><h3>Price Tag Generator (Beta)</h3><p>Create professional shelf labels and retail price signs from Excel or manual entry. Supports Avery labels, larger sign formats, optional barcodes, and print-ready layouts.</p><span class="tool-link">Open tool &rarr;</span></div></a></div>
+            <div class="col-md-6 col-xl-4"><a href="dotDateLabelGenerator/index.html" class="card tool-card"><div class="card-body"><span class="tool-icon"><i class="fa-solid fa-circle-dot" aria-hidden="true"></i></span><h3>Dot Date Label Generator</h3><p>Print compact dates on ULINE S-10415 one-inch circle labels.</p><span class="tool-link">Open tool &rarr;</span></div></a></div>
+            <div class="col-md-6 col-xl-4"><a href="iconDotLabelGenerator/index.html" class="card tool-card"><div class="card-body"><span class="tool-icon"><i class="fa-solid fa-icons" aria-hidden="true"></i></span><h3>Icon Dot Label Generator</h3><p>Print Font Awesome icon dots on ULINE S-10415 one-inch circle labels.</p><span class="tool-link">Open tool &rarr;</span></div></a></div>
+            <div class="col-md-6 col-xl-4"><a href="avery5266LabelBuilder/index.html" class="card tool-card"><div class="card-body"><span class="tool-icon"><i class="fa-solid fa-folder-open" aria-hidden="true"></i></span><h3>Avery 5266 Folder Label Builder</h3><p>Create printable folder-label number ranges for Avery 5266 sheets.</p><span class="tool-link">Open tool &rarr;</span></div></a></div>
+            <div class="col-md-6 col-xl-4"><a href="tempCMShelfTagGen/index.html" class="card tool-card"><div class="card-body"><span class="tool-icon"><i class="fa-solid fa-book-open-reader" aria-hidden="true"></i></span><h3>Temporary Course Materials Shelf Tag Generator</h3><p>Create printable 4-up course-material shelf tags while permanent signage is pending.</p><span class="tool-link">Open tool &rarr;</span></div></a></div>
+          </div>
+        </div>
       </section>
 
       <section class="dashboard-section" aria-labelledby="quickLinksHeading">
@@ -205,8 +231,7 @@
         document.getElementById("restock14").textContent = helperDateFormatter.format(offsetDate(now, 14));
         document.getElementById("restock21").textContent = helperDateFormatter.format(offsetDate(now, 21));
         document.getElementById("remind14").textContent = helperDateFormatter.format(offsetDate(now, -14));
-        document.getElementById("remind26").textContent = helperDateFormatter.format(offsetDate(now, -26));
-        document.getElementById("remind28").textContent = helperDateFormatter.format(offsetDate(now, -28));
+        document.getElementById("remind21").textContent = helperDateFormatter.format(offsetDate(now, -21));
         document.getElementById("payment3").textContent = helperDateFormatter.format(offsetBusinessDate(now, 3));
         document.getElementById("payment5").textContent = helperDateFormatter.format(offsetBusinessDate(now, 5));
       }
