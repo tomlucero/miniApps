@@ -524,7 +524,6 @@ const EMAIL_TEMPLATES = [
       itemGroup("General Books Packed", "<<<TRADELNITEM>>>"),
       itemGroup("Items Not Packed", "<<<NOTPACKED>>>", { noteBefore: form.notPackedNote }),
       totals([
-        ["Total Ordered", "<<<DOLLARMER>>>"],
         ["Discounts Applied to Order", "<<<ITEMDISCOUNT>>>", true],
         ["Handling Charges", "<<<HANDLECHARGE>>>"],
         ["Shipping Charges", "<<<SHIPCHARGE>>>"],
