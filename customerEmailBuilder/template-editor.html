@@ -19,16 +19,26 @@
         <a class="suite-back" href="../index.html">&larr; Return to Toolbox</a>
         <p class="suite-eyebrow">Customer communication helper</p>
         <h1>Email Template Editor</h1>
-        <p class="suite-lead">Edit template wording and generate a complete replacement templates.js file.</p>
+        <p class="suite-lead">Edit template wording and save it straight to the live Customer Email Builder.</p>
       </div>
       <img class="suite-logo" src="../productListingHTMLBuilder/images/bookstoreLogo.png" alt="CSU Bookstore logo">
     </div>
   </header>
 
   <main class="container-xl py-4 py-lg-5">
-    <div class="alert alert-warning border-warning mb-4" role="note">
-      <strong>This editor does not update the live app automatically.</strong>
-      It only creates copy/paste-ready JavaScript. After copying, replace <code>templates.js</code> in GitHub or VS Code, then commit and publish through GitHub Pages.
+    <div class="alert alert-info mb-4" role="note">
+      <strong>Save to GitHub updates the live Customer Email Builder</strong>, usually within 1&ndash;2 minutes.
+      Every save is recorded in GitHub history, so any change can be undone.
+    </div>
+
+    <div class="alert alert-warning d-none mb-4" id="staleDraftBanner" role="alert">
+      <strong>You have unsaved edits from an older version of the templates.</strong>
+      <span id="staleDraftDetail"></span>
+      Restoring them would replace the newer wording in those templates.
+      <div class="d-flex flex-wrap gap-2 mt-2">
+        <button class="btn btn-sm btn-outline-dark" id="restoreStaleDraft" type="button">Restore my edits anyway</button>
+        <button class="btn btn-sm btn-dark" id="discardStaleDraft" type="button">Discard them and use the current templates</button>
+      </div>
     </div>
 
     <div class="row g-4 align-items-start">
@@ -39,9 +49,9 @@
               <div>
                 <div class="section-kicker">Draft editor</div>
                 <h2 class="h5 mb-1">Template content</h2>
-                <p class="small text-secondary mb-0">Changes are saved in this browser as you type.</p>
+                <p class="small text-secondary mb-0">Unsaved edits are kept in this browser until you save them to GitHub.</p>
               </div>
-              <button class="btn btn-sm btn-outline-danger" id="resetEditor" type="button">Reset Editor</button>
+              <button class="btn btn-sm btn-outline-danger" id="resetEditor" type="button">Discard Edits</button>
             </div>
 
             <div class="vstack gap-3">
@@ -74,7 +84,7 @@
               <div>
                 <div class="form-label mb-2">Available placeholders</div>
                 <div class="d-flex flex-wrap gap-2" id="placeholderList"></div>
-                <div class="form-text">Keep the braces around placeholders. Conditional language added by the live app is preserved separately in the generated file.</div>
+                <div class="form-text">Keep the braces around placeholders. Conditional language added by the live app is preserved separately in the saved file.</div>
               </div>
 
               <div class="small text-success" id="saveStatus" aria-live="polite"></div>
@@ -103,17 +113,52 @@
       <div class="col-xl-6 sticky-tools">
         <section class="card panel">
           <div class="card-body p-4">
-            <div class="section-kicker">Replacement file</div>
-            <h2 class="h5 mb-1">Generated templates.js</h2>
-            <p class="small text-secondary">This output includes every template and all existing configuration and logic text.</p>
+            <div class="section-kicker">Publish</div>
+            <h2 class="h5 mb-1">Save to GitHub</h2>
+            <p class="small text-secondary mb-3" id="changeSummary">No unsaved changes.</p>
 
-            <div class="d-flex flex-wrap gap-2 mb-3">
-              <button class="btn btn-success" id="generateFile" type="button">Generate templates.js</button>
-              <button class="btn btn-outline-success" id="copyFile" type="button" disabled>Copy Generated templates.js</button>
+            <div id="connectedBlock" class="d-none">
+              <label class="form-label" for="commitNote">What changed? <span class="text-secondary fw-normal">(optional, shown in GitHub history)</span></label>
+              <input class="form-control mb-3" id="commitNote" type="text" placeholder="e.g. Updated pickup hours">
+              <div class="d-flex flex-wrap align-items-center gap-2">
+                <button class="btn btn-primary primary" id="saveToGitHub" type="button" disabled>Save to GitHub</button>
+                <button class="btn btn-sm btn-outline-secondary" id="forgetToken" type="button">Forget token on this computer</button>
+              </div>
             </div>
 
-            <textarea class="form-control code-output" id="generatedOutput" readonly spellcheck="false" aria-label="Generated templates.js code"></textarea>
-            <div class="small mt-2" id="outputStatus" aria-live="polite"></div>
+            <div id="connectBlock">
+              <label class="form-label" for="githubToken">GitHub token</label>
+              <div class="input-group mb-2">
+                <input class="form-control" id="githubToken" type="password" autocomplete="off" spellcheck="false" placeholder="github_pat_...">
+                <button class="btn btn-primary primary" id="connectGitHub" type="button">Connect</button>
+              </div>
+              <details class="small text-secondary">
+                <summary>How to get a token (one time per computer)</summary>
+                <ol class="mt-2 mb-0 ps-3">
+                  <li>On GitHub, go to <strong>Settings &rarr; Developer settings &rarr; Personal access tokens &rarr; Fine-grained tokens</strong> and choose <strong>Generate new token</strong>.</li>
+                  <li>Repository access: <strong>Only select repositories</strong> &rarr; <code>tomlucero/miniApps</code>.</li>
+                  <li>Permissions: <strong>Contents &rarr; Read and write</strong>. Nothing else is needed.</li>
+                  <li>Pick an expiration, generate it, and paste it here. It is stored only in this browser.</li>
+                </ol>
+              </details>
+            </div>
+
+            <div class="small mt-3" id="publishStatus" aria-live="polite"></div>
+          </div>
+        </section>
+
+        <section class="card panel mt-4">
+          <div class="card-body p-4">
+            <details>
+              <summary class="fw-semibold">Manual backup: copy templates.js</summary>
+              <p class="small text-secondary mt-2">Only needed if saving to GitHub isn't available. Paste this over <code>customerEmailBuilder/templates.js</code> in GitHub.</p>
+              <div class="d-flex flex-wrap gap-2 mb-3">
+                <button class="btn btn-outline-success" id="generateFile" type="button">Generate templates.js</button>
+                <button class="btn btn-outline-success" id="copyFile" type="button" disabled>Copy Generated templates.js</button>
+              </div>
+              <textarea class="form-control code-output" id="generatedOutput" readonly spellcheck="false" aria-label="Generated templates.js code"></textarea>
+              <div class="small mt-2" id="outputStatus" aria-live="polite"></div>
+            </details>
           </div>
         </section>
       </div>
@@ -121,17 +166,30 @@
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="templates.js?v=20261113-3"></script>
+  <!-- Always load the newest templates.js (no stale browser or CDN copy). -->
+  <script>document.write('<script src="templates.js?t=' + Date.now() + '"><\/script>');</script>
   <script>
     (() => {
       'use strict';
 
-      const sourceConfig = window.CUSTOMER_EMAIL_BUILDER_CONFIG;
+      const GITHUB = {
+        owner: 'tomlucero',
+        repo: 'miniApps',
+        branch: 'main',
+        path: 'customerEmailBuilder/templates.js'
+      };
+      const FILE_HEADER = '/**\n * Customer Email Builder template configuration.\n * Generated by template-editor.html.\n */\n';
+      const CONFIG_PREFIX = 'window.CUSTOMER_EMAIL_BUILDER_CONFIG = ';
       const storageKey = 'customerEmailBuilder.standaloneTemplateEditorDraft';
+      const tokenKey = 'customerEmailBuilder.githubToken';
       const $ = id => document.getElementById(id);
       const editableFields = ['label', 'subject', 'body', 'note'];
       const clone = value => JSON.parse(JSON.stringify(value));
+
+      // The templates as they are live right now; drafts are compared against this.
+      let sourceConfig = clone(window.CUSTOMER_EMAIL_BUILDER_CONFIG);
       let draftConfig = clone(sourceConfig);
+      let staleDraft = null;
 
       const commonPlaceholders = ['{orderNumber}', '{customer}', '{employee}'];
       const fieldPlaceholders = {
@@ -154,34 +212,106 @@
         couponRedeemedDate: '8/18', couponDeadline: '06/26/2026'
       };
 
-      function restoreSavedDraft() {
-        try {
-          const saved = JSON.parse(localStorage.getItem(storageKey) || 'null');
-          if (!saved?.templates) return;
-          Object.keys(draftConfig.templates).forEach(key => {
-            const savedTemplate = saved.templates[key];
-            if (!savedTemplate) return;
-            editableFields.forEach(field => {
-              if (typeof savedTemplate[field] === 'string') draftConfig.templates[key][field] = savedTemplate[field];
-            });
-          });
-        } catch {
-          $('saveStatus').textContent = 'Saved draft could not be loaded; using templates.js.';
-        }
+      /* ---------- File helpers ---------- */
+
+      function buildFile(config) {
+        return `${FILE_HEADER}${CONFIG_PREFIX}${JSON.stringify(config, null, 2)};\n`;
       }
 
-      function saveDraft() {
+      function parseFile(text) {
+        const start = text.indexOf(CONFIG_PREFIX);
+        if (start < 0) throw new Error('templates.js is not in the expected format.');
+        return JSON.parse(text.slice(start + CONFIG_PREFIX.length).trim().replace(/;\s*$/, ''));
+      }
+
+      // Short fingerprint of the editable wording, used to tell if a draft is out of date.
+      function fingerprint(config) {
+        const text = JSON.stringify(Object.entries(config.templates).map(([key, t]) => [key, ...editableFields.map(f => t[f])]));
+        let hash = 5381;
+        for (let i = 0; i < text.length; i++) hash = ((hash * 33) ^ text.charCodeAt(i)) >>> 0;
+        return hash.toString(36);
+      }
+
+      function changedTemplates(from, to) {
+        return Object.keys(to.templates).filter(key => {
+          const a = from.templates[key] || {};
+          const b = to.templates[key];
+          return editableFields.some(field => a[field] !== b[field]);
+        });
+      }
+
+      function labelsFor(keys, config) {
+        return keys.map(key => (config.templates[key] && config.templates[key].label) || key);
+      }
+
+      function toBase64(text) {
+        const bytes = new TextEncoder().encode(text);
+        let binary = '';
+        bytes.forEach(b => { binary += String.fromCharCode(b); });
+        return btoa(binary);
+      }
+
+      function fromBase64(base64) {
+        const binary = atob(base64.replace(/\s/g, ''));
+        return new TextDecoder().decode(Uint8Array.from(binary, c => c.charCodeAt(0)));
+      }
+
+      /* ---------- Drafts kept in this browser ---------- */
+
+      function draftTemplates() {
         const templates = {};
         Object.entries(draftConfig.templates).forEach(([key, template]) => {
           templates[key] = Object.fromEntries(editableFields.map(field => [field, template[field]]));
         });
+        return templates;
+      }
+
+      function applyDraft(saved) {
+        Object.keys(draftConfig.templates).forEach(key => {
+          const savedTemplate = saved.templates[key];
+          if (!savedTemplate) return;
+          editableFields.forEach(field => {
+            if (typeof savedTemplate[field] === 'string') draftConfig.templates[key][field] = savedTemplate[field];
+          });
+        });
+      }
+
+      function restoreSavedDraft() {
+        let saved = null;
+        try { saved = JSON.parse(localStorage.getItem(storageKey) || 'null'); } catch { saved = null; }
+        if (!saved?.templates) return;
+        if (saved.base === fingerprint(sourceConfig)) {
+          applyDraft(saved);
+          $('saveStatus').textContent = 'Restored your unsaved edits.';
+          return;
+        }
+        // The live templates changed since this draft was started: ask before applying it.
+        const preview = clone(sourceConfig);
+        const keepDraft = draftConfig;
+        draftConfig = preview;
+        applyDraft(saved);
+        const touched = changedTemplates(sourceConfig, draftConfig);
+        draftConfig = keepDraft;
+        if (!touched.length) { clearDraft(); return; }
+        staleDraft = saved;
+        $('staleDraftDetail').textContent = ` It changes: ${labelsFor(touched, sourceConfig).join(', ')}.`;
+        $('staleDraftBanner').classList.remove('d-none');
+      }
+
+      function saveDraft() {
         try {
-          localStorage.setItem(storageKey, JSON.stringify({ templates }));
-          $('saveStatus').textContent = 'Draft saved in this browser.';
+          localStorage.setItem(storageKey, JSON.stringify({ base: fingerprint(sourceConfig), templates: draftTemplates() }));
+          $('saveStatus').textContent = 'Unsaved edits kept in this browser.';
         } catch {
-          $('saveStatus').textContent = 'Draft preview updated, but browser storage is unavailable.';
+          $('saveStatus').textContent = 'Preview updated, but browser storage is unavailable.';
         }
       }
+
+      function clearDraft() {
+        try { localStorage.removeItem(storageKey); } catch {}
+      }
+
+      /* ---------- Editor UI ---------- */
 
       function replaceSampleTokens(text, note = false) {
         const values = { ...sampleValues, item: note ? ` (${sampleValues.item})` : `, ${sampleValues.item},` };
@@ -229,6 +359,14 @@
         updatePreview();
       }
 
+      function updateChangeSummary() {
+        const changed = changedTemplates(sourceConfig, draftConfig);
+        $('changeSummary').textContent = changed.length
+          ? `Unsaved changes in ${changed.length} template${changed.length === 1 ? '' : 's'}: ${labelsFor(changed, draftConfig).join(', ')}.`
+          : 'No unsaved changes.';
+        $('saveToGitHub').disabled = changed.length === 0;
+      }
+
       function updateSelectedTemplate() {
         const template = draftConfig.templates[$('templateSelect').value];
         template.label = $('templateLabel').value;
@@ -238,14 +376,14 @@
         $('templateSelect').selectedOptions[0].textContent = template.label || '(Untitled template)';
         saveDraft();
         updatePreview();
+        updateChangeSummary();
         $('copyFile').disabled = true;
         $('outputStatus').className = 'small mt-2 text-warning-emphasis';
         $('outputStatus').textContent = 'Draft changed. Generate templates.js again before copying.';
       }
 
       function generateFile() {
-        const header = `/**\n * Customer Email Builder template configuration.\n * Generated by template-editor.html.\n */\n`;
-        $('generatedOutput').value = `${header}window.CUSTOMER_EMAIL_BUILDER_CONFIG = ${JSON.stringify(draftConfig, null, 2)};\n`;
+        $('generatedOutput').value = buildFile(draftConfig);
         $('copyFile').disabled = false;
         $('outputStatus').className = 'small mt-2 text-success';
         $('outputStatus').textContent = 'Complete templates.js generated and ready to copy.';
@@ -264,16 +402,23 @@
         }
       }
 
-      function resetEditor() {
-        try { localStorage.removeItem(storageKey); } catch {}
-        draftConfig = clone(sourceConfig);
+      function reloadEditor(message) {
+        const selected = $('templateSelect').value;
         $('templateSelect').replaceChildren();
         populateTemplateSelect();
+        if (draftConfig.templates[selected]) $('templateSelect').value = selected;
         loadSelectedTemplate();
+        updateChangeSummary();
         $('generatedOutput').value = '';
         $('copyFile').disabled = true;
-        $('saveStatus').textContent = 'Editor reset to the current templates.js content.';
         $('outputStatus').textContent = '';
+        if (message) $('saveStatus').textContent = message;
+      }
+
+      function resetEditor() {
+        clearDraft();
+        draftConfig = clone(sourceConfig);
+        reloadEditor('Edits discarded. Showing the current live templates.');
       }
 
       function populateTemplateSelect() {
@@ -285,16 +430,146 @@
         });
       }
 
+      /* ---------- GitHub ---------- */
+
+      function getToken() {
+        try { return localStorage.getItem(tokenKey) || ''; } catch { return ''; }
+      }
+
+      function setPublishStatus(message, tone = 'secondary', html = false) {
+        const el = $('publishStatus');
+        el.className = `small mt-3 text-${tone}`;
+        if (html) el.innerHTML = message; else el.textContent = message;
+      }
+
+      function showConnected(connected) {
+        $('connectedBlock').classList.toggle('d-none', !connected);
+        $('connectBlock').classList.toggle('d-none', connected);
+      }
+
+      async function github(path, token, options = {}) {
+        const response = await fetch(`https://api.github.com/repos/${GITHUB.owner}/${GITHUB.repo}${path}`, {
+          ...options,
+          headers: {
+            Accept: 'application/vnd.github+json',
+            Authorization: `Bearer ${token}`,
+            'X-GitHub-Api-Version': '2022-11-28',
+            ...(options.body ? { 'Content-Type': 'application/json' } : {})
+          }
+        });
+        let data = null;
+        try { data = await response.json(); } catch {}
+        return { ok: response.ok, status: response.status, data };
+      }
+
+      function explainError(status, data) {
+        if (status === 401) return 'GitHub did not accept the token. It may have expired. Forget it and connect a new one.';
+        if (status === 403) return 'The token is not allowed to change this repository. It needs Contents: Read and write on tomlucero/miniApps.';
+        if (status === 404) return 'GitHub could not find the repository or file with this token. Check that the token includes tomlucero/miniApps.';
+        if (status === 409 || status === 422) return 'Someone else saved the templates at the same moment. Reload the page to get the latest, then save again.';
+        return `GitHub returned an error (${status}${data?.message ? `: ${data.message}` : ''}).`;
+      }
+
+      async function connectGitHub() {
+        const token = $('githubToken').value.trim();
+        if (!token) { setPublishStatus('Paste a token first.', 'danger'); return; }
+        setPublishStatus('Checking the token…');
+        try {
+          const { ok, status, data } = await github('', token);
+          if (!ok) { setPublishStatus(explainError(status, data), 'danger'); return; }
+          if (!data?.permissions?.push) { setPublishStatus(explainError(403), 'danger'); return; }
+          try { localStorage.setItem(tokenKey, token); } catch {}
+          $('githubToken').value = '';
+          showConnected(true);
+          setPublishStatus('Connected. Saves will update the live Customer Email Builder.', 'success');
+        } catch {
+          setPublishStatus('Could not reach GitHub. Check the internet connection and try again.', 'danger');
+        }
+      }
+
+      function forgetToken() {
+        try { localStorage.removeItem(tokenKey); } catch {}
+        showConnected(false);
+        setPublishStatus('Token removed from this computer.');
+      }
+
+      async function saveToGitHub() {
+        const token = getToken();
+        if (!token) { showConnected(false); setPublishStatus('Connect a GitHub token first.', 'danger'); return; }
+        const changed = changedTemplates(sourceConfig, draftConfig);
+        if (!changed.length) { setPublishStatus('Nothing to save.'); return; }
+
+        $('saveToGitHub').disabled = true;
+        setPublishStatus('Saving…');
+        try {
+          const path = `/contents/${GITHUB.path}`;
+          const current = await github(`${path}?ref=${GITHUB.branch}`, token);
+          if (!current.ok) { setPublishStatus(explainError(current.status, current.data), 'danger'); return; }
+
+          // Stop if someone changed the templates on GitHub after this page loaded.
+          const liveConfig = parseFile(fromBase64(current.data.content));
+          const changedRemotely = changedTemplates(sourceConfig, liveConfig);
+          if (changedRemotely.length || JSON.stringify(liveConfig) !== JSON.stringify(sourceConfig)) {
+            const names = changedRemotely.length ? ` (${labelsFor(changedRemotely, liveConfig).join(', ')})` : '';
+            setPublishStatus(`Not saved: the templates were changed on GitHub after you opened this page${names}. Your edits are still here. Reload the page in a minute to get the latest, then choose whether to restore your edits.`, 'danger');
+            return;
+          }
+
+          const names = labelsFor(changed, draftConfig);
+          const note = $('commitNote').value.trim();
+          const message = `Update email templates: ${names.join(', ')}${note ? `\n\n${note}` : ''}\n\nSaved from the Email Template Editor.`;
+          const saved = await github(path, token, {
+            method: 'PUT',
+            body: JSON.stringify({ message, content: toBase64(buildFile(draftConfig)), sha: current.data.sha, branch: GITHUB.branch })
+          });
+          if (!saved.ok) { setPublishStatus(explainError(saved.status, saved.data), 'danger'); return; }
+
+          sourceConfig = clone(draftConfig);
+          clearDraft();
+          $('commitNote').value = '';
+          updateChangeSummary();
+          const link = saved.data?.commit?.html_url;
+          setPublishStatus(`Saved ${names.join(', ')}. The live Customer Email Builder updates in about 1–2 minutes.${link ? ` <a href="${link}" target="_blank" rel="noopener">View this change on GitHub</a>.` : ''}`, 'success', true);
+          $('saveStatus').textContent = '';
+        } catch (error) {
+          setPublishStatus(error instanceof SyntaxError || /format/.test(error.message)
+            ? 'Not saved: templates.js on GitHub is not in the format this editor writes. Ask for help before saving.'
+            : 'Could not reach GitHub. Your edits are still here; try again.', 'danger');
+        } finally {
+          updateChangeSummary();
+        }
+      }
+
+      /* ---------- Start ---------- */
+
       restoreSavedDraft();
       populateTemplateSelect();
       loadSelectedTemplate();
+      updateChangeSummary();
+      showConnected(Boolean(getToken()));
       ['templateLabel', 'subjectTemplate', 'bodyTemplate', 'noteTemplate']
         .forEach(id => $(id).addEventListener('input', updateSelectedTemplate));
       $('templateSelect').addEventListener('change', loadSelectedTemplate);
       $('generateFile').addEventListener('click', generateFile);
       $('copyFile').addEventListener('click', copyGeneratedFile);
       $('resetEditor').addEventListener('click', resetEditor);
-      generateFile();
+      $('connectGitHub').addEventListener('click', connectGitHub);
+      $('githubToken').addEventListener('keydown', event => { if (event.key === 'Enter') connectGitHub(); });
+      $('forgetToken').addEventListener('click', forgetToken);
+      $('saveToGitHub').addEventListener('click', saveToGitHub);
+      $('restoreStaleDraft').addEventListener('click', () => {
+        applyDraft(staleDraft);
+        staleDraft = null;
+        saveDraft();
+        $('staleDraftBanner').classList.add('d-none');
+        reloadEditor('Your older edits were restored. Check them before saving.');
+      });
+      $('discardStaleDraft').addEventListener('click', () => {
+        staleDraft = null;
+        clearDraft();
+        $('staleDraftBanner').classList.add('d-none');
+        $('saveStatus').textContent = 'Old edits discarded. Showing the current live templates.';
+      });
     })();
   </script>
 </body>
