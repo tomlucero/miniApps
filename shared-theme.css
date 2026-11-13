@@ -60,7 +60,7 @@ button, input, textarea, select { font: inherit; }
 
 .suite-hero-image {
   min-height: clamp(130px, 20vw, 230px);
-  background: url("https://www.bookstore.colostate.edu/SiteImages/109-SchoolImages/109-upstairs-store-1920x500.jpg") top center / cover;
+  background: url("https://www.bookstore.colostate.edu/SiteImages/109-SchoolImages/109-admin-hero-large-1920x750.jpg") top center / cover;
 }
 
 .suite-hero-inner {
