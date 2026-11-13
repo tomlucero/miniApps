@@ -1,3 +1,307 @@
+/*
+ * Store Email HTML Builder
+ *
+ * Every email shares ONE layout (emailShell) and ONE set of building blocks
+ * (headline, section, callout, details, itemGroup, totals). Templates only
+ * supply wording and choose which blocks to use, so all emails keep the same
+ * format. To add an email, copy a template below and change its content;
+ * do not add new styling inside a template.
+ *
+ * Email-client notes (why the markup looks old-fashioned):
+ * - Layout is tables only, with inline styles, so Gmail, Outlook and Apple Mail
+ *   render it the same way even when <style> is stripped.
+ * - Outlook for Windows ignores max-width, so the 600px column is wrapped in an
+ *   Outlook-only fixed-width table (<!--[if mso]>).
+ * - Spacing uses table-cell padding, not <div> heights, which Outlook ignores.
+ * - The font is set on every text cell because Outlook does not inherit it.
+ * - <<<TOKENS>>> are filled in by the CMS and are never HTML-escaped.
+ */
+
+const BRAND = {
+  logoUrl: "https://www.bookstore.colostate.edu/SiteImages/109-SchoolImages/109-EmailImages/109-Bookstore-WhHoPNGTran200x60@2x.png",
+  green: "#1e4d2b",
+  darkGreen: "#163c21",
+  gold: "#c8c372",
+  cream: "#fcfbf7",
+  page: "#e6ebe6",
+  ink: "#1d2722",
+  text: "#2f3a34",
+  muted: "#5a655f",
+  label: "#617068",
+  line: "#d9dfd7"
+};
+
+const FONT = "font-family:Arial, Helvetica, sans-serif;";
+
+// Callout colors. Every box in every email uses one of these.
+const TONES = {
+  info: { accent: BRAND.green, background: "#f1f5f1", border: "#d9dfd7" },
+  note: { accent: BRAND.gold, background: "#faf7e8", border: "#e4ddb1" },
+  alert: { accent: "#d9782d", background: "#fff4e8", border: "#efc6a1" }
+};
+
+/* ---------- Text helpers ---------- */
+
+function escapeHtml(value = "") {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+// Escape typed text but keep CMS tokens such as <<<ORDERNUM>>> intact.
+function safeText(value = "") {
+  return escapeHtml(value).replace(/&lt;&lt;&lt;([A-Za-z0-9_-]+)&gt;&gt;&gt;/g, "<<<$1>>>");
+}
+
+// Blank line = new paragraph, single line break = <br>.
+function paragraphs(value = "", style = "") {
+  const parts = String(value).trim().split(/\n\s*\n/).filter((part) => part.trim());
+  return parts
+    .map((part, index) => {
+      const margin = index === parts.length - 1 ? "0" : "0 0 12px 0";
+      return `<p style="margin:${margin}; ${FONT} font-size:16px; line-height:24px; color:${BRAND.text}; ${style}">${safeText(part.trim()).replace(/\n/g, "<br>")}</p>`;
+    })
+    .join("\n");
+}
+
+/* ---------- Building blocks (the only place email styling lives) ---------- */
+
+// One full-width row of the email body, with consistent top spacing.
+function block(inner, paddingTop = 24) {
+  return `
+              <tr>
+                <td style="padding:${paddingTop}px 0 0 0;">
+${inner}
+                </td>
+              </tr>`;
+}
+
+function divider() {
+  return `
+              <tr>
+                <td style="padding:24px 0 0 0;">
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+                    <tr><td height="1" style="height:1px; font-size:1px; line-height:1px; background-color:${BRAND.line};" bgcolor="${BRAND.line}">&nbsp;</td></tr>
+                  </table>
+                </td>
+              </tr>`;
+}
+
+function heading(text, size = 20) {
+  const lineHeight = Math.round(size * 1.3);
+  return `<h3 style="margin:0; ${FONT} font-size:${size}px; line-height:${lineHeight}px; color:${BRAND.darkGreen}; font-weight:bold; mso-line-height-rule:exactly;">${safeText(text)}</h3>`;
+}
+
+function smallLabel(text) {
+  return `<p style="margin:0 0 6px 0; ${FONT} font-size:12px; line-height:18px; letter-spacing:.6px; text-transform:uppercase; color:${BRAND.label}; font-weight:bold;">${safeText(text)}</p>`;
+}
+
+function valueText(html, size = 16) {
+  return `<p style="margin:0; ${FONT} font-size:${size}px; line-height:${Math.round(size * 1.5)}px; color:${BRAND.ink};">${html}</p>`;
+}
+
+function smallText(html, extra = "") {
+  return `<p style="margin:0; ${FONT} font-size:14px; line-height:21px; color:${BRAND.muted}; ${extra}">${html}</p>`;
+}
+
+function link(href, text) {
+  return `<a href="${href}" style="color:${BRAND.green}; text-decoration:underline;">${text}</a>`;
+}
+
+// Top of the body: the big headline and the opening message.
+function headline(title, message) {
+  return block(`
+                  <h2 style="margin:0; ${FONT} font-size:28px; line-height:34px; color:${BRAND.darkGreen}; font-weight:bold; mso-line-height-rule:exactly;">${safeText(title)}</h2>
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+                    <tr><td style="padding:14px 0 0 0;">${paragraphs(message)}</td></tr>
+                  </table>`, 0);
+}
+
+// A divider, a heading, then content. Used for every titled section.
+function section(title, contentHtml) {
+  return `${divider()}${block(`
+                  ${heading(title)}
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+                    <tr><td style="padding:12px 0 0 0;">${contentHtml}</td></tr>
+                  </table>`)}`;
+}
+
+// A colored box with a left accent bar.
+function callout(contentHtml, tone = "info", paddingTop = 24) {
+  const t = TONES[tone];
+  return block(`
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="${t.background}" style="border-collapse:collapse; background-color:${t.background};">
+                    <tr>
+                      <td style="padding:16px 18px; background-color:${t.background}; border:1px solid ${t.border}; border-left:6px solid ${t.accent};">
+                        ${contentHtml}
+                      </td>
+                    </tr>
+                  </table>`, paddingTop);
+}
+
+// Label/value pairs, two per row. Columns stack on phones.
+function details(pairs) {
+  const rows = [];
+  for (let i = 0; i < pairs.length; i += 2) {
+    const cell = (pair, side) => {
+      if (!pair) return `<td class="stack" width="50%" valign="top" style="width:50%;">&nbsp;</td>`;
+      const padding = side === "left" ? "0 12px 0 0" : "0 0 0 12px";
+      return `<td class="stack" width="50%" valign="top" style="width:50%; padding:${padding};">${smallLabel(pair[0])}${pair[1]}</td>`;
+    };
+    rows.push(`
+                    <tr>
+                      ${cell(pairs[i], "left")}
+                      ${cell(pairs[i + 1], "right")}
+                    </tr>${i + 2 < pairs.length ? `
+                    <tr><td colspan="2" height="20" style="height:20px; font-size:1px; line-height:1px;">&nbsp;</td></tr>` : ""}`);
+  }
+  return `
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">${rows.join("")}
+                  </table>`;
+}
+
+// Promo code with order notes underneath, shared by both templates.
+function promoAndNotes() {
+  return `${valueText("<<<PROMOCODE>>>")}
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;"><tr><td style="padding:16px 0 0 0;">${smallLabel("Order Notes")}${valueText("<<<CUSTORDNOTES>>>")}</td></tr></table>`;
+}
+
+// A list of items from the CMS with a right-aligned total line.
+function itemGroup(title, itemsToken, totalLabel, totalToken) {
+  return section(title, `
+                    ${valueText(itemsToken, 15)}
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+                      <tr><td align="right" style="padding:10px 0 0 0;">${smallText(`${totalLabel}: ${totalToken}`, "font-weight:bold; text-align:right;")}</td></tr>
+                    </table>`);
+}
+
+function totals(rows, finalLabel, finalToken) {
+  const lineRows = rows.map(([label, token]) => `
+                      <tr>
+                        <td style="padding:6px 10px 6px 0; ${FONT} font-size:16px; line-height:24px; color:${BRAND.text}; font-weight:bold;">${label}</td>
+                        <td align="right" style="padding:6px 0; ${FONT} font-size:16px; line-height:24px; color:${BRAND.ink}; text-align:right;">${token}</td>
+                      </tr>`).join("");
+  return section("Order Total", `
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">${lineRows}
+                      <tr>
+                        <td style="padding:12px 10px 0 0; ${FONT} font-size:22px; line-height:28px; color:${BRAND.darkGreen}; font-weight:bold;">${finalLabel}</td>
+                        <td align="right" style="padding:12px 0 0 0; ${FONT} font-size:22px; line-height:28px; color:${BRAND.darkGreen}; font-weight:bold; text-align:right;">${finalToken}</td>
+                      </tr>
+                    </table>`);
+}
+
+// Optional closing/delay alert from the form.
+function alertCallout(form) {
+  if (!form.includeAlert) return "";
+  const title = form.alertHeadline.trim() || "Closing / Delay Alert";
+  const message = form.alertMessage.trim() || "Please note this temporary update before visiting or placing an order.";
+  const start = prettyDateTime(form.alertStart);
+  const end = prettyDateTime(form.alertEnd);
+  const timing = start || end
+    ? `<p style="margin:8px 0 0 0; ${FONT} font-size:13px; line-height:20px; color:#8c4b14;"><strong>Timing:</strong> ${escapeHtml(start || "Now")}${end ? ` through ${escapeHtml(end)}` : ""}</p>`
+    : "";
+  return callout(`
+                        <p style="margin:0 0 6px 0; ${FONT} font-size:16px; line-height:22px; font-weight:bold; color:#8c4b14;">${safeText(title)}</p>
+                        ${paragraphs(message, "font-size:15px; line-height:23px;")}
+                        ${timing}`, "alert");
+}
+
+function needHelp(form) {
+  return section("Need help?", `
+                    ${paragraphs(form.footerContactMessage, "font-size:15px; line-height:23px;")}
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;"><tr><td style="padding:10px 0 0 0;">
+                      <p style="margin:0; ${FONT} font-size:15px; line-height:23px; color:${BRAND.text};">Need to cancel your order? Use the cancellation form at ${link("https://www.bookstore.colostate.edu/cancel", "bookstore.colostate.edu/cancel")}.</p>
+                    </td></tr></table>`);
+}
+
+function prettyDateTime(value) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return new Intl.DateTimeFormat("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit"
+  }).format(date);
+}
+
+/* ---------- The one shared layout ---------- */
+
+function emailShell(template, bodyRows) {
+  const preheaderFill = "&#847;&zwnj;&nbsp;".repeat(40);
+  return `<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="format-detection" content="telephone=no, date=no, address=no, email=no">
+  <meta name="x-apple-disable-message-reformatting">
+  <meta name="color-scheme" content="light">
+  <meta name="supported-color-schemes" content="light">
+  <title>${safeText(template.title)}</title>
+  <!--[if mso]>
+  <noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript>
+  <![endif]-->
+  <style>
+    body, table, td, p, a { -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; }
+    table, td { mso-table-lspace:0pt; mso-table-rspace:0pt; }
+    img { -ms-interpolation-mode:bicubic; }
+    @media only screen and (max-width:620px) {
+      .email-pad { padding-left:20px !important; padding-right:20px !important; }
+      .stack { display:block !important; width:100% !important; padding:0 0 16px 0 !important; }
+    }
+  </style>
+</head>
+<body style="margin:0; padding:0; width:100%; background-color:${BRAND.page};">
+  <div style="display:none; font-size:1px; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden; mso-hide:all;">${safeText(template.preheader)}${preheaderFill}</div>
+
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="${BRAND.page}" style="width:100%; border-collapse:collapse; background-color:${BRAND.page};">
+    <tr>
+      <td align="center" style="padding:24px 12px;">
+        <!--[if mso]><table role="presentation" width="600" align="center" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%; max-width:600px; border-collapse:collapse;">
+          <tr>
+            <td class="email-pad" bgcolor="${BRAND.green}" style="padding:32px; background-color:${BRAND.green};">
+              <img src="${BRAND.logoUrl}" alt="CSU Bookstore" width="200" style="display:block; width:200px; max-width:100%; height:auto; border:0; outline:none; text-decoration:none; ${FONT} font-size:20px; font-weight:bold; color:#ffffff;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+                <tr><td style="padding:18px 0 0 0;">
+                  ${template.eyebrow ? `<p style="margin:0 0 10px 0; ${FONT} font-size:12px; line-height:18px; letter-spacing:1px; text-transform:uppercase; color:${BRAND.gold}; font-weight:bold;">${safeText(template.eyebrow)}</p>` : ""}
+                  <h1 style="margin:0; ${FONT} font-size:30px; line-height:36px; color:#ffffff; font-weight:bold; mso-line-height-rule:exactly;">${safeText(template.heroHeadline)}</h1>
+                  <p style="margin:10px 0 0 0; ${FONT} font-size:15px; line-height:22px; color:#dce7dc;">${safeText(template.subhead)}</p>
+                </td></tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td class="email-pad" bgcolor="${BRAND.cream}" style="padding:32px; background-color:${BRAND.cream}; border-left:1px solid ${BRAND.line}; border-right:1px solid ${BRAND.line};">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">${bodyRows.join("")}
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td class="email-pad" bgcolor="${BRAND.green}" style="padding:24px 32px; background-color:${BRAND.green};">
+              <p style="margin:0; ${FONT} font-size:13px; line-height:20px; color:#f2f6f3;">CSU Bookstore &bull; Colorado State University</p>
+              <p style="margin:0; ${FONT} font-size:13px; line-height:20px; color:#f2f6f3;">Official store of the CSU Rams</p>
+            </td>
+          </tr>
+        </table>
+        <!--[if mso]></td></tr></table><![endif]-->
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+}
+
+/* ---------- Templates: wording and which blocks to use ---------- */
+
 const EMAIL_TEMPLATES = [
   {
     id: "order-confirmation",
@@ -5,22 +309,57 @@ const EMAIL_TEMPLATES = [
     title: "CSU Bookstore Order Confirmation",
     preheader: "We received your CSU Bookstore order #<<<ORDERNUM>>>. We’ll begin processing it soon and send another update before it ships or is ready for pickup.",
     eyebrow: "",
-    subhead: "Thank you for your order from the CSU Bookstore.",
     heroHeadline: "Order <<<ORDERNUM>>> Received",
-    defaults: {
-      emailHeadline: "Thank you for your order.",
-      openingMessage: "We received your order and will begin processing it soon.",
-      standardShippingMessage: "Orders received before 2:00 p.m. Mountain Time are processed the same business day. Orders received after 2:00 p.m. Mountain Time are processed the next business day. Orders received after 2:00 p.m. on Fridays are processed the next business day, typically Monday.",
-      pickupMessage: "If you selected in-store pickup, please wait for a pickup notification before coming to the bookstore.",
-      footerContactMessage: "Have questions about your order? Email BookstoreOrders@colostate.edu or call 970-491-0904 between 8 a.m. and 4 p.m. Mountain Time."
-    },
-    defaultAlert: {
+    subhead: "Thank you for your order from the CSU Bookstore.",
+    fields: [
+      { key: "emailHeadline", label: "Email headline", rows: 1, value: "Thank you for your order." },
+      { key: "openingMessage", label: "Opening message", rows: 3, value: "We received your order and will begin processing it soon." },
+      { key: "pickupNote", label: "Pickup note (green box under the opening)", rows: 2, value: "If you selected in-store pickup, please wait for a pickup notification before coming to the bookstore." },
+      { key: "processingMessage", label: "“How long will my order take?” section", rows: 4, value: "Orders received before 2:00 p.m. Mountain Time are processed the same business day. Orders received after 2:00 p.m. Mountain Time are processed the next business day. Orders received after 2:00 p.m. on Fridays are processed the next business day, typically Monday." },
+      { key: "footerContactMessage", label: "“Need help?” section", rows: 2, value: "Have questions about your order? Email BookstoreOrders@colostate.edu or call 970-491-0904 between 8 a.m. and 4 p.m. Mountain Time." }
+    ],
+    alert: {
       headline: "Processing Delay Notice",
       message: "The CSU Bookstore may have adjusted hours or processing delays. Orders will be processed as quickly as possible, and we appreciate your understanding."
     },
-    includeRequestedPickupDefault: true,
-    supportsRequestedPickup: true,
-    sections: "confirmation"
+    requestedPickup: { supported: true, defaultOn: true },
+    body(form) {
+      const requestedPickup = form.includeRequestedPickup
+        ? section("Pickup Details", details([
+            ["Requested Pickup Date", `${valueText("<<<PICKUPDATE>>>")}<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;"><tr><td style="padding:6px 0 0 0;">${smallText("When applicable. Pickup orders are completed by or before 3:00 p.m. on the requested date and may be ready sooner.", "font-size:12px; line-height:18px;")}</td></tr></table>`],
+            ["Promo Code", promoAndNotes()]
+          ]))
+        : "";
+      return [
+        headline(form.emailHeadline, form.openingMessage),
+        callout(paragraphs(form.pickupNote, `font-weight:bold; color:${BRAND.darkGreen};`), "info"),
+        alertCallout(form),
+        section("How long will my order take?", paragraphs(form.processingMessage)),
+        section("Order Details", details([
+          ["Payment Method", valueText("<<<PAYMETHOD>>>")],
+          ["Fulfillment Method", valueText("<<<SHIPMETHOD>>>")],
+          ["Shipping Address", valueText("<<<SHIPADDRESS>>>")],
+          ["Billing Address", valueText("<<<BILLADDRESS>>>")]
+        ])),
+        requestedPickup,
+        itemGroup("Course Materials Ordered", "<<<CRSBK-NOUPDATE>>><<<CRSBK-NOINSTR>>><<<CSBKLNITEM>>>", "Total Course Materials Ordered*", "<<<DOLLARBOOKS>>>"),
+        itemGroup("Merchandise Ordered", "<<<MERLNITEM>>>", "Total Merchandise Ordered*", "<<<DOLLARMER>>>"),
+        itemGroup("General Books Ordered", "<<<TRADELNITEM>>>", "Total General Books Ordered*", "<<<DOLLARTRADE>>>"),
+        totals([
+          ["Order Discounts Applied", "<<<ORDERDISCOUNT>>>"],
+          ["Item Discounts Applied", "<<<ITEMDISCOUNT>>>"],
+          ["Shipping Charges", "<<<SHIPCHARGE>>>"],
+          ["Shipping Discounts Applied", "<<<SHIPDISCOUNT>>>"],
+          ["Subtotal", "<<<SUBTOTAL>>>"],
+          ["Tax**", "<<<TAX>>>"]
+        ], "Total", "<<<GRANDTOTAL>>>"),
+        callout(`
+                        ${smallText("<strong>*</strong> Your final total may change after processing due to textbook availability, shipping adjustments, or applicable sales tax. Your final total will appear on the receipt included with your shipment and/or your pickup or shipping confirmation email.", "font-size:12px; line-height:19px;")}
+                        ${smallText("<strong>**</strong> Sales tax is calculated when your order is processed. The CSU Bookstore collects applicable sales tax on in-store pickup orders and on orders shipped to destinations where sales tax is required by law.", "font-size:12px; line-height:19px; margin-top:10px;")}
+                        ${smallText(`<strong>Purchasing tax exempt?</strong> Please send a copy of your tax exemption certificate to ${link("mailto:bookstoreorders@colostate.edu", "bookstoreorders@colostate.edu")}.`, "font-size:12px; line-height:19px; margin-top:10px;")}`, "note"),
+        needHelp(form)
+      ];
+    }
   },
   {
     id: "pickup-confirmation",
@@ -28,44 +367,71 @@ const EMAIL_TEMPLATES = [
     title: "CSU Bookstore Pickup Confirmation",
     preheader: "Order <<<ORDERNUM>>> is ready to pick up at the CSU Bookstore. Open this email for pickup details, hours, and a summary of your packed items.",
     eyebrow: "CSU Bookstore",
-    subhead: "Your order is packed and waiting at the official store of the CSU Rams.",
     heroHeadline: "Order <<<ORDERNUM>>> Is Ready for Pickup",
-    defaults: {
-      emailHeadline: "Your order is ready.",
-      openingMessage: "Thank you for shopping at the CSU Bookstore. Your order is now ready to pick up at the CSU Bookstore. Please bring this email, either on your phone or printed, along with a photo ID.",
-      standardShippingMessage: "This email is for an in-store pickup order. If any items are not included in this packed order, they will be noted below and handled separately.",
-      pickupMessage: "You can pick up your order from the Order Pickup Counter, located on the lower level of the CSU Bookstore. Pickup hours are Monday through Friday from 8 a.m. to 5 p.m.",
-      footerContactMessage: "Need help with pickup? Email BookstoreOrders@colostate.edu or call 970-491-0904 between 8 a.m. and 4 p.m. Mountain Time."
-    },
-    defaultAlert: {
+    subhead: "Your order is packed and waiting at the official store of the CSU Rams.",
+    fields: [
+      { key: "emailHeadline", label: "Email headline", rows: 1, value: "Your order is ready." },
+      { key: "openingMessage", label: "Opening message", rows: 4, value: "Thank you for shopping at the CSU Bookstore. Your order is now ready to pick up at the CSU Bookstore. Please bring this email, either on your phone or printed, along with a photo ID." },
+      { key: "pickupMessage", label: "“Where and when can I pick up my order?” section", rows: 3, value: "You can pick up your order from the Order Pickup Counter, located on the lower level of the CSU Bookstore. Pickup hours are Monday through Friday from 8 a.m. to 5 p.m." },
+      { key: "pickupDeadline", label: "Pickup deadline (gold box, bold line)", rows: 1, value: "Please pick up your order within 21 days." },
+      { key: "pickupDeadlineDetail", label: "Pickup deadline (gold box, small print)", rows: 2, value: "Orders not picked up within 21 days will be refunded and restocked." },
+      { key: "packedOrderNote", label: "Packed order note (green box after order details)", rows: 3, value: "This email is for an in-store pickup order. If any items are not included in this packed order, they will be noted below and handled separately." },
+      { key: "footerContactMessage", label: "“Need help?” section", rows: 2, value: "Need help with pickup? Email BookstoreOrders@colostate.edu or call 970-491-0904 between 8 a.m. and 4 p.m. Mountain Time." }
+    ],
+    alert: {
       headline: "Pickup Hours Alert",
       message: "The CSU Bookstore may have holiday closures or adjusted pickup hours. Please review current store hours before coming to campus."
     },
-    includeRequestedPickupDefault: false,
-    supportsRequestedPickup: false,
-    sections: "pickup"
+    requestedPickup: { supported: false, defaultOn: false },
+    body(form) {
+      return [
+        headline(form.emailHeadline, form.openingMessage),
+        callout(`
+                        <p style="margin:0 0 6px 0; ${FONT} font-size:16px; line-height:24px; font-weight:bold; color:${BRAND.darkGreen};">Pickup location</p>
+                        ${smallText("Order Pickup Counter, lower level of the CSU Bookstore.")}`, "info"),
+        alertCallout(form),
+        section("Where and when can I pick up my order?", paragraphs(form.pickupMessage)),
+        callout(`
+                        <p style="margin:0 0 6px 0; ${FONT} font-size:16px; line-height:24px; font-weight:bold; color:${BRAND.darkGreen};">${safeText(form.pickupDeadline)}</p>
+                        ${smallText(safeText(form.pickupDeadlineDetail))}`, "note", 18),
+        callout(`
+                        <p style="margin:0 0 8px 0; ${FONT} font-size:18px; line-height:24px; font-weight:bold; color:${BRAND.darkGreen};">Can someone else pick up my order?</p>
+                        <p style="margin:0; ${FONT} font-size:15px; line-height:23px; color:${BRAND.text};">Yes. Email ${link("mailto:bookstoreorders@colostate.edu", "BookstoreOrders@colostate.edu")} with the name of the person picking up your order so we can make a note on our end.</p>`, "note", 18),
+        section("Order Details", details([
+          ["Payment Method", valueText("<<<PAYMETHOD>>>")],
+          ["Fulfillment Method", valueText("<<<SHIPMETHOD>>>")],
+          ["Pickup Location", valueText("Pick up at the CSU Bookstore")],
+          ["Billing Address", valueText("<<<BILLADDRESS>>>")],
+          ["Date Order Packed", valueText("<<<DATEPACKSHIP>>>")],
+          ["Promo Code", promoAndNotes()]
+        ])),
+        callout(paragraphs(form.packedOrderNote, "font-size:15px; line-height:23px;"), "info"),
+        itemGroup("Course Materials Packed", "<<<CRSBK-NOUPDATE>>><<<CRSBK-NOINSTR>>><<<CSBKLNITEM>>>", "Total Course Materials Charged to <<<PAYMETHOD>>>", "<<<DOLLARBOOKS>>>"),
+        itemGroup("Merchandise Packed", "<<<MERLNITEM>>>", "Total Merchandise Charged to <<<PAYMETHOD>>>", "<<<DOLLARMER>>>"),
+        itemGroup("General Books Packed", "<<<TRADELNITEM>>>", "Total General Books Charged to <<<PAYMETHOD>>>", "<<<DOLLARTRADE>>>"),
+        section("Items Not Packed", `
+                    ${valueText("<<<NOTPACKED>>>", 15)}
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;"><tr><td style="padding:10px 0 0 0;">
+                      ${smallText("The item or items listed above were not packed in this portion of your order. <strong>Your <<<PAYMETHOD>>> was not charged for items that were not packed.</strong>")}
+                    </td></tr></table>`),
+        totals([
+          ["Item Discounts Applied", "<<<ITEMDISCOUNT>>>"],
+          ["Order Discounts Applied", "<<<ORDERDISCOUNT>>>"],
+          ["Subtotal", "<<<SUBTOTAL>>>"],
+          ["Tax", "<<<TAX>>>"]
+        ], "Total Charged to <<<PAYMETHOD>>>", "<<<GRANDTOTAL>>>"),
+        needHelp(form)
+      ];
+    }
   }
 ];
 
-const BRAND = {
-  logoUrl: "https://www.bookstore.colostate.edu/SiteImages/109-SchoolImages/109-EmailImages/109-Bookstore-WhHoPNGTran200x60@2x.png",
-  green: "#1e4d2b",
-  gold: "#c8c372",
-  cream: "#fcfbf7",
-  page: "#e6ebe6",
-  ink: "#1d2722",
-  muted: "#5a655f",
-  line: "#d9dfd7"
-};
+/* ---------- Page wiring ---------- */
 
 const elements = {
   form: document.getElementById("emailForm"),
   templateType: document.getElementById("templateType"),
-  emailHeadline: document.getElementById("emailHeadline"),
-  openingMessage: document.getElementById("openingMessage"),
-  standardShippingMessage: document.getElementById("standardShippingMessage"),
-  pickupMessage: document.getElementById("pickupMessage"),
-  footerContactMessage: document.getElementById("footerContactMessage"),
+  templateFields: document.getElementById("templateFields"),
   includeAlert: document.getElementById("includeAlert"),
   alertFields: document.getElementById("alertFields"),
   alertHeadline: document.getElementById("alertHeadline"),
@@ -88,364 +454,77 @@ function currentTemplate() {
   return EMAIL_TEMPLATES.find((template) => template.id === elements.templateType.value) || EMAIL_TEMPLATES[0];
 }
 
-function escapeHtml(value = "") {
-  return String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
-
-function richText(value = "") {
-  return escapeHtml(value)
-    .split(/\n{2,}/)
-    .map((paragraph) => paragraph.replace(/\n/g, "<br>"))
-    .filter(Boolean)
-    .join('<div style="height:10px; line-height:10px;">&nbsp;</div>');
-}
-
-function prettyDateTime(value) {
-  if (!value) return "";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "";
-  return new Intl.DateTimeFormat(undefined, {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-    hour: "numeric",
-    minute: "2-digit"
-  }).format(date);
-}
-
-function spacer(height) {
-  return `<div style="height:${height}px; line-height:${height}px;">&nbsp;</div>`;
-}
-
-function sectionRule() {
-  return `${spacer(22)}<div style="border-top:1px solid ${BRAND.line};">&nbsp;</div>`;
-}
-
-function twoColumn(leftLabel, leftValue, rightLabel, rightValue) {
-  return `
-                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-spacing:0; border-collapse:collapse;">
-                  <tr>
-                    <td width="50%" valign="top" style="padding-right:12px;">
-                      <div style="font-size:12px; line-height:18px; letter-spacing:.6px; text-transform:uppercase; color:#617068; font-weight:bold;">${leftLabel}</div>
-                      ${spacer(6)}
-                      <div style="font-size:17px; line-height:25px; color:${BRAND.ink};">${leftValue}</div>
-                    </td>
-                    <td width="50%" valign="top" style="padding-left:12px;">
-                      <div style="font-size:12px; line-height:18px; letter-spacing:.6px; text-transform:uppercase; color:#617068; font-weight:bold;">${rightLabel}</div>
-                      ${spacer(6)}
-                      <div style="font-size:17px; line-height:25px; color:${BRAND.ink};">${rightValue}</div>
-                    </td>
-                  </tr>
-                </table>`;
-}
-
-function infoBox(content, accent = BRAND.green, background = "#f1f5f1", border = "transparent") {
-  return `
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="${background}" style="border-spacing:0; border-collapse:collapse; background-color:${background}; border:1px solid ${border}; border-left:6px solid ${accent};">
-                <tr>
-                  <td style="padding:16px 18px;">
-                    ${content}
-                  </td>
-                </tr>
-              </table>`;
-}
-
-function alertBlock() {
-  if (!elements.includeAlert.checked) return "";
-
-  const headline = elements.alertHeadline.value.trim() || "Closing / Delay Alert";
-  const message = elements.alertMessage.value.trim() || "Please note this temporary update before visiting or placing an order.";
-  const start = prettyDateTime(elements.alertStart.value);
-  const end = prettyDateTime(elements.alertEnd.value);
-  const dateLine = start || end
-    ? `${spacer(8)}<div style="font-size:13px; line-height:20px; color:#8c4b14;"><strong>Timing:</strong> ${escapeHtml(start || "Now")}${end ? ` through ${escapeHtml(end)}` : ""}</div>`
-    : "";
-
-  return `
-              ${infoBox(`
-                    <div style="font-size:16px; line-height:22px; font-weight:bold; color:#8c4b14;">${escapeHtml(headline)}</div>
-                    ${spacer(6)}
-                    <div style="font-size:15px; line-height:23px; color:#2f3a34;">${richText(message)}</div>
-                    ${dateLine}
-              `, "#d9782d", "#fff4e8", "#efc6a1")}
-              ${spacer(18)}`;
-}
-
-function requestedPickupSection() {
-  if (!elements.includeRequestedPickup.checked) return "";
-  return `
-              ${sectionRule()}
-              <div style="padding-top:22px;">
-                ${twoColumn(
-                  "Requested Pickup Date",
-                  `<<<PICKUPDATE>>>${spacer(6)}<div style="font-size:12px; line-height:18px; color:${BRAND.muted};">When applicable. Pickup orders are completed by or before 3:00 p.m. on the requested date and may be ready sooner.</div>`,
-                  "Promo Code",
-                  `<<<PROMOCODE>>>${spacer(16)}<div style="font-size:12px; line-height:18px; letter-spacing:.6px; text-transform:uppercase; color:#617068; font-weight:bold;">Order Notes</div>${spacer(6)}<div style="font-size:16px; line-height:24px; color:${BRAND.ink};"><<<CUSTORDNOTES>>></div>`
-                )}
-              </div>`;
-}
-
-function itemSections(mode) {
-  const packedWord = mode === "pickup" ? "Packed" : "Ordered";
-  const chargedText = mode === "pickup" ? "Charged to <<<PAYMETHOD>>>" : "Ordered*";
-  const notPacked = mode === "pickup" ? `
-              ${sectionRule()}
-              <div style="padding-top:24px;">
-                <h3 style="font-size:20px; line-height:26px; color:#163c21; font-weight:bold; margin:0;">Items Not Packed</h3>
-                ${spacer(10)}
-                <div style="font-size:15px; line-height:24px; color:#2f3a34;"><<<NOTPACKED>>></div>
-                ${spacer(10)}
-                <div style="font-size:14px; line-height:21px; color:${BRAND.muted};">The item or items listed above were not packed in this portion of your order. <strong>Your <<<PAYMETHOD>>> was not charged for items that were not packed.</strong></div>
-              </div>` : "";
-
-  return `
-              ${sectionRule()}
-              <div style="padding-top:24px;">
-                <h3 style="font-size:20px; line-height:26px; color:#163c21; font-weight:bold; margin:0;">Course Materials ${packedWord}</h3>
-                ${spacer(10)}
-                <div style="font-size:15px; line-height:24px; color:#2f3a34;"><<<CRSBK-NOUPDATE>>><<<CRSBK-NOINSTR>>><<<CSBKLNITEM>>></div>
-                ${spacer(10)}
-                <div style="font-size:14px; line-height:21px; color:${BRAND.muted}; font-weight:bold; text-align:right;">Total Course Materials ${chargedText}: <<<DOLLARBOOKS>>></div>
-              </div>
-              ${sectionRule()}
-              <div style="padding-top:24px;">
-                <h3 style="font-size:20px; line-height:26px; color:#163c21; font-weight:bold; margin:0;">Merchandise ${packedWord}</h3>
-                ${spacer(10)}
-                <div style="font-size:15px; line-height:24px; color:#2f3a34;"><<<MERLNITEM>>></div>
-                ${spacer(10)}
-                <div style="font-size:14px; line-height:21px; color:${BRAND.muted}; font-weight:bold; text-align:right;">Total Merchandise ${chargedText}: <<<DOLLARMER>>></div>
-              </div>
-              ${sectionRule()}
-              <div style="padding-top:24px;">
-                <h3 style="font-size:20px; line-height:26px; color:#163c21; font-weight:bold; margin:0;">General Books ${packedWord}</h3>
-                ${spacer(10)}
-                <div style="font-size:15px; line-height:24px; color:#2f3a34;"><<<TRADELNITEM>>></div>
-                ${spacer(10)}
-                <div style="font-size:14px; line-height:21px; color:${BRAND.muted}; font-weight:bold; text-align:right;">Total General Books ${chargedText}: <<<DOLLARTRADE>>></div>
-              </div>
-              ${notPacked}`;
-}
-
-function totalsSection(mode) {
-  const isPickup = mode === "pickup";
-  const rows = isPickup
-    ? [
-        ["Item Discounts Applied", "<<<ITEMDISCOUNT>>>"],
-        ["Order Discounts Applied", "<<<ORDERDISCOUNT>>>"],
-        ["Subtotal", "<<<SUBTOTAL>>>"],
-        ["Tax", "<<<TAX>>>"]
-      ]
-    : [
-        ["Order Discounts Applied", "<<<ORDERDISCOUNT>>>"],
-        ["Item Discounts Applied", "<<<ITEMDISCOUNT>>>"],
-        ["Shipping Charges", "<<<SHIPCHARGE>>>"],
-        ["Shipping Discounts Applied", "<<<SHIPDISCOUNT>>>"],
-        ["Subtotal", "<<<SUBTOTAL>>>"],
-        ["Tax**", "<<<TAX>>>"]
-      ];
-
-  return `
-              ${sectionRule()}
-              <div style="padding-top:24px;">
-                <h3 style="font-size:20px; line-height:26px; color:#163c21; font-weight:bold; margin:0;">Order Total</h3>
-                ${spacer(14)}
-                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-spacing:0; border-collapse:collapse;">
-                  ${rows.map(([label, value]) => `
-                  <tr>
-                    <td style="padding:6px 10px 6px 0; font-size:16px; line-height:24px; color:#2f3a34; font-weight:bold;">${label}</td>
-                    <td style="padding:6px 0; font-size:16px; line-height:24px; color:${BRAND.ink}; text-align:right;">${value}</td>
-                  </tr>`).join("")}
-                  <tr>
-                    <td style="padding:12px 10px 0 0; font-size:24px; line-height:30px; color:#163c21; font-weight:bold;">${isPickup ? "Total Charged to <<<PAYMETHOD>>>" : "Total"}</td>
-                    <td style="padding:12px 0 0; font-size:24px; line-height:30px; color:#163c21; font-weight:bold; text-align:right;"><<<GRANDTOTAL>>></td>
-                  </tr>
-                </table>
-              </div>`;
-}
-
-function confirmationSpecificSections() {
-  return `
-              <div style="padding-top:28px;">
-                <h3 style="font-size:20px; line-height:26px; color:#163c21; font-weight:bold; margin:0;">How long will my order take?</h3>
-                ${spacer(12)}
-                <div style="font-size:16px; line-height:24px; color:#2f3a34;">${richText(elements.standardShippingMessage.value)}</div>
-              </div>
-              <div style="padding-top:28px;">
-                ${twoColumn("Payment Method", "<<<PAYMETHOD>>>", "Fulfillment Method", "<<<SHIPMETHOD>>>")}
-              </div>
-              ${sectionRule()}
-              <div style="padding-top:22px;">
-                ${twoColumn("Shipping Address", "<<<SHIPADDRESS>>>", "Billing Address", "<<<BILLADDRESS>>>")}
-              </div>
-              ${requestedPickupSection()}`;
-}
-
-function pickupSpecificSections() {
-  return `
-              <div style="padding-top:24px;">
-                <h3 style="font-size:20px; line-height:26px; color:#163c21; font-weight:bold; margin:0;">Where and when can I pick up my order?</h3>
-                ${spacer(12)}
-                <div style="font-size:16px; line-height:24px; color:#2f3a34;">${richText(elements.pickupMessage.value)}</div>
-              </div>
-              ${spacer(18)}
-              ${infoBox(`
-                    <div style="font-size:16px; line-height:24px; color:#163c21; font-weight:bold;">Please pick up your order within 21 days.</div>
-                    ${spacer(6)}
-                    <div style="font-size:14px; line-height:21px; color:${BRAND.muted};">Orders not picked up within 21 days will be refunded and restocked.</div>
-              `, BRAND.gold, "#f5f7e8", "#dde3b1")}
-              ${spacer(24)}
-              ${infoBox(`
-                    <div style="font-size:20px; line-height:26px; font-weight:bold; color:#163c21;">Can someone else pick up my order?</div>
-                    ${spacer(8)}
-                    <div style="font-size:15px; line-height:23px; color:#2f3a34;">Yes. Email <a href="mailto:bookstoreorders@colostate.edu" style="color:${BRAND.green};">BookstoreOrders@colostate.edu</a> with the name of the person picking up your order so we can make a note on our end.</div>
-              `, BRAND.gold, "#faf7e8", "#e4ddb1")}
-              ${sectionRule()}
-              <div style="padding-top:24px;">
-                ${twoColumn("Payment Method", "<<<PAYMETHOD>>>", "Fulfillment Method", "<<<SHIPMETHOD>>>")}
-              </div>
-              ${sectionRule()}
-              <div style="padding-top:22px;">
-                ${twoColumn("Pickup Location", "Pick up at the CSU Bookstore", "Billing Address", "<<<BILLADDRESS>>>")}
-              </div>
-              ${sectionRule()}
-              <div style="padding-top:22px;">
-                ${twoColumn(
-                  "Date Order Packed",
-                  "<<<DATEPACKSHIP>>>",
-                  "Promo Code",
-                  `<<<PROMOCODE>>>${spacer(16)}<div style="font-size:12px; line-height:18px; letter-spacing:.6px; text-transform:uppercase; color:#617068; font-weight:bold;">Order Notes</div>${spacer(6)}<div style="font-size:16px; line-height:24px; color:${BRAND.ink};"><<<CUSTORDNOTES>>></div>`
-                )}
-              </div>
-              ${spacer(18)}
-              ${infoBox(`<div style="font-size:15px; line-height:23px; color:#2f3a34;">${richText(elements.standardShippingMessage.value)}</div>`, BRAND.green, "#f1f5f1", "#d9dfd7")}`;
-}
-
-function taxNoteSection(mode) {
-  if (mode === "pickup") return "";
-  return `
-              ${spacer(20)}
-              ${infoBox(`
-                    <div style="font-size:12px; line-height:19px; color:${BRAND.muted};"><strong>*</strong> Your final total may change after processing due to textbook availability, shipping adjustments, or applicable sales tax. Your final total will appear on the receipt included with your shipment and/or your pickup or shipping confirmation email.</div>
-                    ${spacer(10)}
-                    <div style="font-size:12px; line-height:19px; color:${BRAND.muted};"><strong>**</strong> Sales tax is calculated when your order is processed. The CSU Bookstore collects applicable sales tax on in-store pickup orders and on orders shipped to destinations where sales tax is required by law.</div>
-                    ${spacer(10)}
-                    <div style="font-size:12px; line-height:19px; color:${BRAND.muted};"><strong>Purchasing tax exempt?</strong> Please send a copy of your tax exemption certificate to <a href="mailto:bookstoreorders@colostate.edu" style="color:${BRAND.green};">bookstoreorders@colostate.edu</a>.</div>
-              `, BRAND.gold, "#faf7e8", "#e4ddb1")}`;
+function readForm(template) {
+  const form = {
+    includeAlert: elements.includeAlert.checked,
+    alertHeadline: elements.alertHeadline.value,
+    alertMessage: elements.alertMessage.value,
+    alertStart: elements.alertStart.value,
+    alertEnd: elements.alertEnd.value,
+    includeRequestedPickup: template.requestedPickup.supported && elements.includeRequestedPickup.checked
+  };
+  template.fields.forEach((field) => {
+    const input = document.getElementById(`field-${field.key}`);
+    form[field.key] = input ? input.value : field.value;
+  });
+  return form;
 }
 
 function buildEmailHtml() {
   const template = currentTemplate();
-  const mode = template.sections === "pickup" ? "pickup" : "confirmation";
-  const headline = elements.emailHeadline.value.trim();
-  const opening = elements.openingMessage.value.trim();
-  const pickup = elements.pickupMessage.value.trim();
-  const footer = elements.footerContactMessage.value.trim();
+  const rows = template.body(readForm(template)).filter(Boolean);
+  return emailShell(template, rows);
+}
 
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="format-detection" content="telephone=no, date=no, address=no, email=no">
-  <meta name="x-apple-disable-message-reformatting">
-  <title>${escapeHtml(template.title)}</title>
-</head>
-<body style="margin:0; padding:0; width:100%; min-width:100%; background-color:${BRAND.page}; font-family:Arial, Helvetica, sans-serif; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%;">
-  <div style="display:none !important; visibility:hidden; opacity:0; color:transparent; height:0; width:0; overflow:hidden; mso-hide:all;">${escapeHtml(template.preheader)}</div>
-
-  <table role="presentation" width="100%" bgcolor="${BRAND.page}" cellpadding="0" cellspacing="0" style="width:100%; border-spacing:0; border-collapse:collapse; background-color:${BRAND.page};">
-    <tr>
-      <td align="center" style="padding:24px 12px;">
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%; max-width:600px; border-spacing:0; border-collapse:collapse;">
-          <tr>
-            <td bgcolor="${BRAND.green}" style="padding:32px; background-color:${BRAND.green};">
-              <img src="${BRAND.logoUrl}" alt="CSU Bookstore" width="200" style="display:block; width:200px; max-width:100%; height:auto; border:0; line-height:100%;">
-              ${spacer(18)}
-              ${template.eyebrow ? `<div style="font-size:12px; line-height:18px; letter-spacing:1px; text-transform:uppercase; color:${BRAND.gold}; font-weight:bold;">${escapeHtml(template.eyebrow)}</div>${spacer(10)}` : ""}
-              <h1 style="font-size:32px; line-height:38px; color:#ffffff; font-weight:bold; margin:0;">${escapeHtml(template.heroHeadline)}</h1>
-              ${spacer(10)}
-              <div style="font-size:15px; line-height:22px; color:#dce7dc;">${escapeHtml(template.subhead)}</div>
-            </td>
-          </tr>
-
-          <tr>
-            <td bgcolor="${BRAND.cream}" style="padding:32px; background-color:${BRAND.cream}; border:1px solid ${BRAND.line};">
-              <h2 style="font-size:28px; line-height:34px; color:#163c21; font-weight:bold; margin:0;">${escapeHtml(headline)}</h2>
-              ${spacer(14)}
-              <div style="font-size:16px; line-height:24px; color:#2f3a34;">${richText(opening)}</div>
-              ${spacer(18)}
-              ${mode === "confirmation"
-                ? infoBox(`<div style="font-size:16px; line-height:24px; font-weight:bold; color:#163c21;">${richText(pickup)}</div>`, BRAND.green, "#f1f5f1", "#d9dfd7")
-                : infoBox(`<div style="font-size:16px; line-height:24px; font-weight:bold; color:#163c21;">Pickup location</div>${spacer(6)}<div style="font-size:14px; line-height:21px; color:${BRAND.muted};">Order Pickup Counter, lower level of the CSU Bookstore.</div>`, BRAND.green, "#f1f5f1", "#d9dfd7")
-              }
-              ${spacer(18)}
-              ${alertBlock()}
-              ${mode === "confirmation" ? confirmationSpecificSections() : pickupSpecificSections()}
-              ${itemSections(mode)}
-              ${totalsSection(mode)}
-              ${taxNoteSection(mode)}
-              ${sectionRule()}
-              <div style="padding-top:24px;">
-                <h3 style="font-size:20px; line-height:26px; color:#163c21; font-weight:bold; margin:0;">Need help?</h3>
-                ${spacer(10)}
-                <div style="font-size:15px; line-height:23px; color:#2f3a34;">${richText(footer)}</div>
-                ${spacer(10)}
-                <div style="font-size:15px; line-height:23px; color:#2f3a34;">Need to cancel your order? Use the cancellation form at <a href="https://www.bookstore.colostate.edu/cancel" style="color:${BRAND.green};">bookstore.colostate.edu/cancel</a>.</div>
-              </div>
-            </td>
-          </tr>
-
-          <tr>
-            <td bgcolor="${BRAND.green}" style="padding:24px 32px; background-color:${BRAND.green};">
-              <div style="font-size:13px; line-height:20px; color:#f2f6f3;">CSU Bookstore &bull; Colorado State University</div>
-              <div style="font-size:13px; line-height:20px; color:#f2f6f3;">Official store of the CSU Rams</div>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>`;
+function renderTemplateFields(template) {
+  elements.templateFields.replaceChildren(...template.fields.map((field) => {
+    const wrap = document.createElement("div");
+    wrap.className = "col-12";
+    const label = document.createElement("label");
+    label.className = "form-label";
+    label.htmlFor = `field-${field.key}`;
+    label.textContent = field.label;
+    const input = document.createElement(field.rows > 1 ? "textarea" : "input");
+    input.className = "form-control";
+    input.id = `field-${field.key}`;
+    if (field.rows > 1) input.rows = field.rows;
+    else input.type = "text";
+    input.value = field.value;
+    wrap.append(label, input);
+    return wrap;
+  }));
 }
 
 function populateTemplateSelect() {
-  elements.templateType.innerHTML = EMAIL_TEMPLATES
-    .map((template) => `<option value="${template.id}">${template.name}</option>`)
-    .join("");
+  elements.templateType.replaceChildren(...EMAIL_TEMPLATES.map((template) => {
+    const option = document.createElement("option");
+    option.value = template.id;
+    option.textContent = template.name;
+    return option;
+  }));
 }
 
 function loadTemplateDefaults() {
   const template = currentTemplate();
-  elements.emailHeadline.value = template.defaults.emailHeadline;
-  elements.openingMessage.value = template.defaults.openingMessage;
-  elements.standardShippingMessage.value = template.defaults.standardShippingMessage;
-  elements.pickupMessage.value = template.defaults.pickupMessage;
-  elements.footerContactMessage.value = template.defaults.footerContactMessage;
-  elements.alertHeadline.value = template.defaultAlert.headline;
-  elements.alertMessage.value = template.defaultAlert.message;
+  renderTemplateFields(template);
+  elements.alertHeadline.value = template.alert.headline;
+  elements.alertMessage.value = template.alert.message;
   elements.alertStart.value = "";
   elements.alertEnd.value = "";
   elements.includeAlert.checked = false;
   elements.alertFields.classList.add("d-none");
-  elements.includeRequestedPickup.checked = Boolean(template.includeRequestedPickupDefault);
-  elements.requestedPickupBlockControl.classList.toggle("d-none", !template.supportsRequestedPickup);
+  elements.includeRequestedPickup.checked = template.requestedPickup.defaultOn;
+  elements.requestedPickupBlockControl.classList.toggle("d-none", !template.requestedPickup.supported);
   updateOutput();
 }
 
 function updateOutput() {
-  const template = currentTemplate();
   const html = buildEmailHtml();
   elements.htmlOutput.value = html;
-  elements.emailPreview.srcdoc = html;
-  elements.templateBadge.textContent = template.name;
+  // Preview only: show CMS codes as readable text. The copied HTML is unchanged.
+  elements.emailPreview.srcdoc = html.replace(/<<<([A-Za-z0-9_-]+)>>>/g,
+    '<span style="background:#fff3bf; color:#6b5300; font-family:monospace; font-size:12px;">&lt;&lt;&lt;$1&gt;&gt;&gt;</span>');
+  elements.templateBadge.textContent = currentTemplate().name;
 }
 
 async function copyHtml() {
@@ -462,12 +541,11 @@ async function copyHtml() {
 
 function downloadHtml() {
   updateOutput();
-  const template = currentTemplate();
   const blob = new Blob([elements.htmlOutput.value], { type: "text/html" });
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement("a");
   anchor.href = url;
-  anchor.download = `${template.id}.html`;
+  anchor.download = `${currentTemplate().id}.html`;
   document.body.append(anchor);
   anchor.click();
   anchor.remove();

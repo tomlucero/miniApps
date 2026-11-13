@@ -189,7 +189,7 @@
     $('deadlineFields').classList.toggle('d-none', !$('addDeadline').checked);
     $('restockDate').readOnly = Boolean(fields.pickup);
     if (fields.pickup) {
-      $('restockDate').value = offsetDateInputValue($('datePacked').value, 28);
+      $('restockDate').value = offsetDateInputValue($('datePacked').value, 21);
     }
   }
 
@@ -244,7 +244,7 @@
       originalPrice,
       packedDate: formatDate($('datePacked').value),
       firstReminderDate: formatDate($('firstReminderDate').value),
-      restockDate: formatDate(fields.pickup ? offsetDateInputValue($('datePacked').value, 28) : $('restockDate').value),
+      restockDate: formatDate(fields.pickup ? offsetDateInputValue($('datePacked').value, 21) : $('restockDate').value),
       expectedRestockDate: formatDate($('expectedRestockDate').value),
       restockResponseDeadline: formatDate($('restockResponseDeadline').value),
       dayOneTitle: clean($('dayOneTitle').value, '[Day One Access title]'),
