@@ -404,7 +404,7 @@ const EMAIL_TEMPLATES = [
       f("pickupNote", "Green box: in-store pickup note", "**If you selected in-store pickup, please wait for a pickup notification before coming to the bookstore.**", 2),
       f("processing", "Section: “How long will my order take?”", "- Orders received **before 2:00 p.m. Mountain Time** are processed the same business day and are typically available for pickup by **3:00 p.m.**\n- Orders received **after 2:00 p.m. Mountain Time** are processed the next business day and are typically available for pickup by **3:00 p.m.**\n- Orders received **after 2:00 p.m. on Fridays** are processed the next business day, typically Monday.", 6),
       f("pickupDateNote", "Requested Pickup Date: small print", "When applicable. Pickup orders are completed by or before 3:00 p.m. on the requested date and may be ready sooner.", 2),
-      f("footnotes", "Small print under the totals", "* Your final total may change after processing due to course material availability, shipping adjustments, or applicable sales tax. Your final total will appear on the receipt included with your shipment and/or your pickup or shipping confirmation email.\n\n** Sales tax is calculated when your order is processed. The CSU Bookstore collects applicable sales tax on in-store pickup orders and on orders shipped to destinations where sales tax is required by law.\n\n**Purchasing tax exempt?** Please send a copy of your tax exemption certificate to bookstoreorders@colostate.edu.", 8),
+      f("footnotes", "Small print under the totals", "* Your final total may change after processing due to course material availability, shipping adjustments, or applicable sales tax. Your final total will appear on the receipt included with your shipment and/or your pickup or shipping confirmation email.\n\n** Sales tax is calculated when your order is processed. The CSU Bookstore collects applicable sales tax on in-store pickup orders and on orders shipped to destinations where sales tax is required by law.\n\n**Purchasing tax exempt?** Please send a copy of your tax exemption certificate to BookstoreOrders@colostate.edu.", 8),
       f("help", "Section: “Need help?”", `Have questions about your order? Email BookstoreOrders@colostate.edu or call 970-491-0904 between 8 a.m. and 4 p.m. Mountain Time.\n\nNeed to cancel your order? Use the cancellation form at ${CANCEL_LINK}.`, 4),
       ...footerFields(THANKS_SHOPPING, "You are receiving this email because you made a purchase from the CSU Bookstore. This transactional email confirms that the CSU Bookstore received your order.")
     ],
@@ -442,7 +442,7 @@ const EMAIL_TEMPLATES = [
       }),
       f("importantTitle", "Orange box: title", "IMPORTANT", 1),
       f("important", "Orange box: message", "**There is no problem with your credit card. You do not need to change your payment method or cancel your order.**\n\n**FOR YOUR SAFETY, DO NOT SEND CREDIT CARD INFORMATION OVER EMAIL.**", 4),
-      f("nextSteps", "Section: “Next Steps”", "- Reply to this email with updated or confirmed billing address information (the address your bank has on file). Residence hall addresses are typically not valid billing addresses.\n- **Attention Students:** Your residence hall address is not your permanent billing address. Please provide the permanent billing address associated with your bank.\n- **International / non-U.S. cards:** Some international credit or debit cards do not support Address Verification (AVS) and may require manual review. If your card was issued outside the United States, please reply to this email so we can review your order.\n- **Do NOT send credit card information over email. Credit card information sent over email is not secure.**\n- Your order will move out of Pending status once the information is approved and you receive a confirmation email from the CSU Bookstore.\n\n**Unresolved Pending orders may be canceled 72 hours after initial notification.**", 10),
+      f("nextSteps", "Section: “Next Steps”", "- Reply to this email with updated or confirmed billing address information (the address your bank has on file). Residence hall addresses are typically not valid billing addresses.\n- **Attention Students:** Your residence hall address is not your permanent billing address. Please provide the permanent billing address associated with your bank.\n- **International / non-U.S. cards:** Some international credit or debit cards do not support Address Verification (AVS) and may require manual review. If your card was issued outside the United States, please reply to this email so we can review your order.\n- **Do NOT send credit card information over email. Credit card information sent over email is not secure.**\n- Your order will move out of Pending status once the information is approved and you receive a confirmation email from the CSU Bookstore.\n\n**Unresolved Pending orders may be cancelled 72 hours after initial notification.**", 10),
       f("why", "Section: “Why Orders May Be Placed in Pending Status”", "Orders may be placed in **Pending** status for several common reasons, including:\n- The billing address entered at checkout did not match the address on file with your credit or debit card's issuing bank.\n- If you moved recently, your bank may still have a former address on file.\n- Address numbers or ZIP codes may contain a transposed digit.\n- Some banks—particularly outside the United States—do not use Address Verification (AVS) or ZIP code verification systems.\n\nThe following message from our credit card processor explains why your order was placed in Pending status: **<<<AVSRESPONSE>>>**\n\nFor reference, the billing address you provided at checkout was:\n<<<BILLADDRESS>>>", 10),
       f("pickupDateNote", "Requested Pick Up Date: small print", "Orders in pending status may require an additional day from the requested pickup date.", 2),
       ...footerFields("The CSU Bookstore is owned and operated by Colorado State University, and returns all revenues to the University to fund student programs and services.")
@@ -475,7 +475,7 @@ const EMAIL_TEMPLATES = [
       f("notCharged", "Text under the backordered items", "You have not been charged for the item(s) listed above.", 1),
       f("nextSteps", "Section: “What Happens Next?”", "- **Please do not place another order** for the item(s). When stock arrives, you will receive the item(s), and we will charge it to your **<<<PAYMETHOD>>>**.\n- We are receiving more stock to fulfill your order. The Special Order we submitted reserves the item(s) for you.\n- You will receive an email when the item(s) are ready to pick up. If we ship your order, you will get an email before it ships.\n\nMost special orders are fulfilled within 5-7 business days, and many arrive much sooner. Fulfillment times may vary in some cases due to factors beyond our control.", 8),
       f("cancelTitle", "Green box: title", "If you Wish to Cancel Your Order", 1),
-      f("cancel", "Green box: message", `If you wish to cancel all or part of this order, please complete our cancelation form at ${CANCEL_LINK}`, 3),
+      f("cancel", "Green box: message", `If you wish to cancel all or part of this order, please complete our cancellation form at ${CANCEL_LINK}`, 3),
       ...footerFields(THANKS_SHOPPING_EXCLAIM, NOTICE_RECEIVED)
     ],
     body: (form) => [
@@ -486,9 +486,9 @@ const EMAIL_TEMPLATES = [
       textSection("What Happens Next?", form.nextSteps),
       callout("info", { title: form.cancelTitle, body: form.cancel }),
       section(ORDER_DETAILS_HEADING, ""),
-      itemGroup("Course Materials Ordered", "<<<CRSBK-NOUPDATE>>><<<CRSBK-NOINSTR>>><<<CSBKLNITEM>>>", { total: "Total Course Materials Ordered*: <<<DOLLARBOOKS>>>" }),
-      itemGroup("Merchandise or Supplies Ordered", "<<<MERLNITEM>>>", { total: "Total Merchandise or Supplies Ordered*: <<<DOLLARMER>>>" }),
-      itemGroup("General Books Ordered", "<<<TRADELNITEM>>>", { total: "Total General Books Ordered*: <<<DOLLARTRADE>>>" })
+      itemGroup("Course Materials Ordered", "<<<CRSBK-NOUPDATE>>><<<CRSBK-NOINSTR>>><<<CSBKLNITEM>>>", { total: "Total Course Materials Ordered: <<<DOLLARBOOKS>>>" }),
+      itemGroup("Merchandise or Supplies Ordered", "<<<MERLNITEM>>>", { total: "Total Merchandise or Supplies Ordered: <<<DOLLARMER>>>" }),
+      itemGroup("General Books Ordered", "<<<TRADELNITEM>>>", { total: "Total General Books Ordered: <<<DOLLARTRADE>>>" })
     ]
   },
   {
@@ -508,7 +508,7 @@ const EMAIL_TEMPLATES = [
       f("satisfaction", "Green box: message", "Your order was double-checked for accuracy and packed carefully to avoid damage to your merchandise or course materials. If your shipment arrives and we did not meet your expectations, please email BookstoreOrders@colostate.edu or call 970-491-0904 for assistance.", 4),
       f("returnsTitle", "Gold box: title", "Returns and Exchanges", 1),
       f("returns", "Gold box: message", `If you need to return or exchange any items on your order, please visit ${RETURNS_LINK}. Please note that shipping charges are non-refundable.`, 3),
-      f("notPackedNote", "Items Not Packed: note above the list", "Any items listed below were not packed with this order. They may be on back order or may have been removed from your order. Please email bookstoreorders@colostate.edu for assistance.", 3),
+      f("notPackedNote", "Items Not Packed: note above the list", "Any items listed below were not packed with this order. They may be on back order or may have been removed from your order. Please email BookstoreOrders@colostate.edu for assistance.", 3),
       f("footnotes", "Small print under the totals", "* Sales tax in some jurisdictions may change over time, so the tax amount assessed may differ from your original order depending on when the order is processed.", 3),
       ...footerFields(THANKS_SHOPPING, "You are receiving this email because you made a purchase from the CSU Bookstore. This transactional email alerts you that the order you placed has been processed for fulfillment.")
     ],
@@ -550,7 +550,7 @@ const EMAIL_TEMPLATES = [
       }),
       f("trackingNote", "Tracking box: note", "If the tracking page is not yet updated, please allow time for the shipment to scan into their system.", 2),
       f("satisfactionTitle", "Green box: title", "Your satisfaction is our priority.", 1),
-      f("satisfaction", "Green box: message", "Your order was double-checked for accuracy and packed carefully to help prevent damage to your merchandise or course materials.\n\nIf your shipment arrives and we did not meet your expectations, please email bookstoreorders@colostate.edu or call 970-491-0904 for assistance.", 4),
+      f("satisfaction", "Green box: message", "Your order was double-checked for accuracy and packed carefully to help prevent damage to your merchandise or course materials.\n\nIf your shipment arrives and we did not meet your expectations, please email BookstoreOrders@colostate.edu or call 970-491-0904 for assistance.", 4),
       f("returnsTitle", "Orange box: title", "Returns and Exchanges", 1),
       f("returns", "Orange box: message", `If you need to return or exchange any items on your order, please visit ${RETURNS_LINK}. Please note that shipping charges are non-refundable.`, 3),
       f("notPackedNote", "Items Not Packed: note under the list", "The item or items listed above were not packed in this portion of your order. The reason is provided. You will receive another email when your backordered items are ready to ship. **Your <<<PAYMETHOD>>> was not charged for items that were not packed.**", 4),
@@ -599,10 +599,10 @@ const EMAIL_TEMPLATES = [
       f("deadline", "Gold box: pickup deadline", "**Please pick up your order within 21 days. Orders not picked up within 21 days will be refunded and restocked.**", 2),
       f("someoneElseTitle", "Gold box: title", "Can Someone Else Pick Up My Order?", 1),
       f("someoneElse", "Gold box: message", "Yes! Send an email to BookstoreOrders@colostate.edu with the name of the person picking up your order so we can make a note on our end. Please share your order number and pick up details they will need to pick up your order.", 4),
-      f("help", "Help and cancellation (no heading)", `Have questions about your order? Email BookstoreOrders@colostate.edu or call 970-491-0904 between 8 a.m. and 4 p.m. Mountain Time for assistance.\n\nChanged your mind and need to cancel your order? Use our cancelation form at ${CANCEL_LINK}`, 4),
+      f("help", "Help and cancellation (no heading)", `Have questions about your order? Email BookstoreOrders@colostate.edu or call 970-491-0904 between 8 a.m. and 4 p.m. Mountain Time for assistance.\n\nChanged your mind and need to cancel your order? Use our cancellation form at ${CANCEL_LINK}`, 4),
       f("notPackedNote", "Items Not Packed: note under the list", "The item(s) listed above were not packed in this portion of your order. The reason it was not packed is provided. You will receive another email when your backordered items are ready to pick up. **Your <<<PAYMETHOD>>> was not charged for the items we did not pack.**", 4),
       f("footnotes", "Small print under the totals", "* Your final total may have changed after processing due to adjustments in course material availability (new/used) or sales tax.", 3),
-      ...footerFields(THANKS_SHOPPING_EXCLAIM, NOTICE_RECEIVED)
+      ...footerFields(THANKS_SHOPPING_EXCLAIM, "You are receiving this email because you made a purchase from the CSU Bookstore. This transactional email confirms your order is ready to pick up.")
     ],
     body: (form) => [
       intro(form),
@@ -642,7 +642,7 @@ const EMAIL_TEMPLATES = [
       }),
       f("codeNote", "Access code box: note", "Use the code above to access your eBook at [bookshelf.vitalsource.com](https://bookshelf.vitalsource.com). You can only redeem this code once.", 2),
       f("redeem", "Section: “How to Redeem Your eBook”", "- Go to VitalSource Bookshelf: [bookshelf.vitalsource.com](https://bookshelf.vitalsource.com/)\n- Sign in or create an account with your **CSU email address**\n- Select **Tools → Redeem Code**\n- Enter your access code\n- Your eBook will appear in your library\n\nNeed more help? View detailed redemption instructions at [VitalSource Support](https://storesupport.vitalsource.com/hc/en-us/articles/32269498278551-How-To-Redeem-A-VitalSource-Access-Code-purchased-at-a-Bookstore-Point-of-Sale-POS).", 8),
-      f("refund", "Section: “eTextbook Refund Information”", `eBooks purchased from the CSU Bookstore may be eligible for refund within 14 days of purchase if all of the following conditions are met:\n- The request is made within 14 days of the **purchase** date\n- No more than 20% of the eTextbook has been viewed or printed\n- Any included access codes for online resources have not been used\n\nRefund requests should be submitted through the **CSU Bookstore Order Cancellation Form** at ${CANCEL_LINK} or by sending your request to bookstoreorders@colostate.edu.`, 8),
+      f("refund", "Section: “eBook Refund Information”", `eBooks purchased from the CSU Bookstore may be eligible for refund within 14 days of purchase if all of the following conditions are met:\n- The request is made within 14 days of the **purchase** date\n- No more than 20% of the eTextbook has been viewed or printed\n- Any included access codes for online resources have not been used\n\nRefund requests should be submitted through the **CSU Bookstore Order Cancellation Form** at ${CANCEL_LINK} or by sending your request to BookstoreOrders@colostate.edu.`, 8),
       f("help", "Section: “Need Help Accessing Your eBook?”", `For assistance redeeming or accessing your eBook, visit VitalSource Support: [support.vitalsource.com](https://support.vitalsource.com/hc/en-us)\n\nFor eBook help, please use our eBook Support Form: https://col.st/ydp83.\n\nChanged your mind and need to cancel your order? Use our cancellation form at ${CANCEL_LINK}`, 6),
       ...footerFields(THANKS_SHOPPING_EXCLAIM, "You are receiving this email because you purchased an eBook from the CSU Bookstore website. This transactional email provides the customer information about the eBook purchase and activation instructions.")
     ],
@@ -651,7 +651,7 @@ const EMAIL_TEMPLATES = [
       valueBox("Your eBook Access Information", "<<<EBOOKINFO>>>", form.codeNote),
       alertCallout(form),
       textSection("How to Redeem Your eBook", form.redeem),
-      textSection("eTextbook Refund Information", form.refund),
+      textSection("eBook Refund Information", form.refund),
       textSection("Need Help Accessing Your eBook?", form.help)
     ]
   },
@@ -665,7 +665,7 @@ const EMAIL_TEMPLATES = [
         intro: "Hello <<<CUSTOMERNAME>>>,\n\nWe processed a refund for the items listed below from CSU Bookstore **Order Number <<<ORDERNUM>>>** on **<<<REFUNDDATE>>>** to your **<<<PAYMETHOD>>>** in the amount of **<<<REFUNDAMT>>>**."
       }),
       f("refundNote", "Refunded Items: note under the list", "If you do not see any items listed above, we may have refunded shipping or handling fees.", 2),
-      f("help", "Closing message (no heading)", "Please allow 24-72 hours for the refund to appear on your credit/debit card account. Please allow more time for refunds to appear on your CSU Student Account. If you have any questions about this refund, please email BookstoreOrders@Colostate.edu or call 970-491-0904.", 4),
+      f("help", "Closing message (no heading)", "Please allow 24-72 hours for the refund to appear on your credit/debit card account. Please allow more time for refunds to appear on your CSU Student Account. If you have any questions about this refund, please email BookstoreOrders@colostate.edu or call 970-491-0904.", 4),
       ...footerFields(THANKS_CHOOSING)
     ],
     body: (form) => [
@@ -676,15 +676,15 @@ const EMAIL_TEMPLATES = [
     ]
   },
   {
-    id: "order-canceled",
-    name: "Order Canceled",
+    id: "order-cancelled",
+    name: "Order Cancelled",
     title: "Order Cancellation Email",
     fields: [
       ...topFields({
         heroHeadline: "CSU Bookstore Order #<<<ORDERNUM>>> Cancellation Confirmation",
         intro: "Hello <<<CUSTOMERNAME>>>,\n\nWe are writing to let you know that CSU Bookstore **Order Number <<<ORDERNUM>>>** has been cancelled.\n\nBecause we charge your payment method when we ship or prepare your order for pickup, your <<<PAYMETHOD>>> has not been charged."
       }),
-      f("help", "Closing message (no heading)", "If you have any questions about this cancellation, please email BookstoreOrders@Colostate.edu or call 970-491-0904.", 2),
+      f("help", "Closing message (no heading)", "If you have any questions about this cancellation, please email BookstoreOrders@colostate.edu or call 970-491-0904.", 2),
       ...footerFields(THANKS_CHOOSING)
     ],
     body: (form) => [
