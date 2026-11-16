@@ -42,29 +42,37 @@
         <div class="panel-body import-tools">
           <label for="sourceCode">Paste carousel code here <span>Existing `bk-carousel` markup will be converted into editable slides.</span></label>
           <textarea id="sourceCode" spellcheck="false"></textarea>
-          <div class="settings-grid settings-grid--two">
-            <label for="carouselId">Carousel ID
-              <input id="carouselId" value="bkHomeHeroOverlayCarousel">
-            </label>
-            <label for="commentDisabled">Disabled slides
-              <select id="commentDisabled">
-                <option value="comments">Keep as comments</option>
-                <option value="omit">Leave out</option>
-              </select>
-            </label>
-          </div>
-          <div class="settings-grid settings-grid--two">
-            <label for="startDate">Start date
-              <input id="startDate" type="date">
-            </label>
-            <label for="endDate">End date
-              <input id="endDate" type="date">
-            </label>
-          </div>
+          <div class="row-actions" id="blockPicker" style="display:none" role="group" aria-label="Carousels found in pasted code"></div>
           <label for="evergreen">
             <input id="evergreen" type="checkbox">
-            Evergreen fallback (no dates; shows only when no dated carousel is live)
+            Evergreen (the pool of slides shown when no dated carousel is live)
           </label>
+          <div id="datedFields">
+            <div class="settings-grid settings-grid--two">
+              <label for="carouselId">Carousel ID
+                <input id="carouselId" value="bkHomeHeroOverlayCarousel">
+              </label>
+              <label for="commentDisabled">Disabled slides
+                <select id="commentDisabled">
+                  <option value="comments">Keep as comments</option>
+                  <option value="omit">Leave out</option>
+                </select>
+              </label>
+            </div>
+            <div class="settings-grid settings-grid--two">
+              <label for="startDate">Start date
+                <input id="startDate" type="date">
+              </label>
+              <label for="endDate">End date
+                <input id="endDate" type="date">
+              </label>
+            </div>
+          </div>
+          <div id="evergreenFields" hidden>
+            <label for="evergreenShow">Slides shown per page load
+              <input id="evergreenShow" type="number" min="1" max="12" value="4">
+            </label>
+          </div>
           <div id="slideList" class="slide-list"></div>
         </div>
       </section>
@@ -89,9 +97,10 @@
           <div class="row-actions">
             <button class="btn primary" id="copyCode" type="button">Copy Generated Code</button>
             <button class="btn" id="selectCode" type="button">Select Code</button>
+            <button class="btn" id="downloadCode" type="button">Download File</button>
             <span class="status" id="status"></span>
           </div>
-          <label for="outputCode">Generated carousel code <span>Copy this into your site where the carousel HTML goes.</span></label>
+          <label for="outputCode">Generated code <span id="outputLabel">Copy this into your site where the carousel HTML goes.</span></label>
           <textarea id="outputCode" spellcheck="false"></textarea>
         </div>
       </section>
@@ -202,7 +211,8 @@
     const state = {
       slides: [],
       previewIndex: 0,
-      idEditedByHand: false
+      idEditedByHand: false,
+      blocks: []
     };
 
     const DEFAULT_CAROUSEL_ID = "bkHomeHeroOverlayCarousel";
@@ -231,6 +241,11 @@
       startDate: document.querySelector("#startDate"),
       endDate: document.querySelector("#endDate"),
       evergreen: document.querySelector("#evergreen"),
+      datedFields: document.querySelector("#datedFields"),
+      evergreenFields: document.querySelector("#evergreenFields"),
+      outputLabel: document.querySelector("#outputLabel"),
+      downloadCode: document.querySelector("#downloadCode"),
+      evergreenShow: document.querySelector("#evergreenShow"),
       commentDisabled: document.querySelector("#commentDisabled"),
       previewStage: document.querySelector("#previewStage"),
       previewDots: document.querySelector("#previewDots"),
@@ -322,7 +337,87 @@
       state.slides = slides.length ? slides : [makeSlide()];
       state.previewIndex = 0;
       render();
-      setStatus(`Imported ${state.slides.length} slide${state.slides.length === 1 ? "" : "s"}.`);
+      if (block && block.hasAttribute("data-evergreen") && !activeSlides.length && !commentSlides.length) {
+        setStatus("That is the evergreen placeholder. It has no slides of its own. Paste bk-evergreen-slides.js to edit the evergreen pool.");
+        return;
+      }
+      if (els.evergreen.checked) {
+        setStatus(`Old-style evergreen block: loaded ${state.slides.length} slide${state.slides.length === 1 ? "" : "s"} into the evergreen pool.`);
+        return;
+      }
+      const kind = (els.startDate.value || els.endDate.value)
+        ? `dated ${els.startDate.value || "..."} to ${els.endDate.value || "..."}`
+        : "no dates";
+      setStatus(`Imported ${state.slides.length} slide${state.slides.length === 1 ? "" : "s"} (${kind}).`);
+    }
+
+    // Splits pasted code into one piece per carousel block, so copying a whole
+    // box (dated block + evergreen block) does not merge into one big carousel.
+    function splitCarouselBlocks(code) {
+      const text = String(code);
+      // Hide comment contents so a commented-out <section> is not counted.
+      const masked = text.replace(/<!--[\s\S]*?-->/g, comment => " ".repeat(comment.length));
+      const starts = [];
+      const pattern = /<section\b[^>]*\bbk-carousel-block\b[^>]*>/g;
+      let match;
+      while ((match = pattern.exec(masked))) starts.push(match.index);
+      if (starts.length < 2) return [text];
+      return starts.map((start, index) => text.slice(start, index + 1 < starts.length ? starts[index + 1] : text.length));
+    }
+
+    function describeBlock(blockCode) {
+      const doc = new DOMParser().parseFromString(`<div>${blockCode}</div>`, "text/html");
+      const section = doc.querySelector(".bk-carousel-block");
+      const title = doc.querySelector(".bk-carousel__title");
+      const slideCount = doc.querySelectorAll(".carousel-item").length;
+      let kind = "No dates";
+      if (section && section.hasAttribute("data-evergreen")) {
+        kind = "Evergreen placeholder (slides come from the pool file)";
+      } else if (section && section.hasAttribute("data-fallback")) {
+        kind = "Old-style evergreen";
+      } else if (section && (section.getAttribute("data-start") || section.getAttribute("data-end"))) {
+        kind = `${section.getAttribute("data-start") || "..."} to ${section.getAttribute("data-end") || "..."}`;
+      }
+      let headline = title ? cleanText(title.textContent) : "";
+      if (headline.length > 40) headline = `${headline.slice(0, 37)}...`;
+      return `${kind}${headline ? `: ${headline}` : ""} (${slideCount} slide${slideCount === 1 ? "" : "s"})`;
+    }
+
+    function renderBlockPicker(selectedIndex) {
+      const picker = document.querySelector("#blockPicker");
+      picker.innerHTML = "";
+      if (state.blocks.length < 2) {
+        picker.style.display = "none";
+        return;
+      }
+      picker.style.display = "";
+      const intro = document.createElement("span");
+      intro.className = "status";
+      intro.textContent = `Your paste has ${state.blocks.length} carousels. Pick one to edit:`;
+      picker.appendChild(intro);
+      state.blocks.forEach((blockCode, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = `btn small${index === selectedIndex ? " dark" : ""}`;
+        button.textContent = describeBlock(blockCode);
+        if (index === selectedIndex) button.setAttribute("aria-pressed", "true");
+        button.addEventListener("click", () => loadBlock(index));
+        picker.appendChild(button);
+      });
+    }
+
+    function loadBlock(index) {
+      renderBlockPicker(index);
+      parseSlidesFromCode(state.blocks[index]);
+    }
+
+    function importPastedCode(code) {
+      if (/BKEvergreenSlides/.test(code)) {
+        importEvergreenFile(code);
+        return;
+      }
+      state.blocks = splitCarouselBlocks(code);
+      loadBlock(0);
     }
 
     function slideFromElement(item, enabled) {
@@ -367,7 +462,23 @@
       refreshPreviewAndCode();
     }
 
+    // The Evergreen checkbox picks the output: carousel HTML (dated) or the
+    // evergreen slide file. Only show the fields that apply to that output.
+    function updateModeUI() {
+      const evergreen = els.evergreen.checked;
+      els.datedFields.hidden = evergreen;
+      els.evergreenFields.hidden = !evergreen;
+      els.downloadCode.textContent = evergreen ? "Download bk-evergreen-slides.js" : "Download File";
+      els.downloadCode.classList.toggle("primary", evergreen);
+      if (els.outputLabel) {
+        els.outputLabel.textContent = evergreen
+          ? "Click Download, then upload the file to the File Manager over the old one."
+          : "Copy this into your site where the carousel HTML goes.";
+      }
+    }
+
     function refreshPreviewAndCode() {
+      updateModeUI();
       normalizePreviewIndex();
       renderPreview();
       els.outputCode.value = generateCode();
@@ -549,7 +660,101 @@
       });
     }
 
+    // ---- Evergreen slide file (bk-evergreen-slides.js) ----
+    // The file is plain data. Keys are quoted, so it is valid JSON inside the
+    // assignment, which lets the builder read it back safely with JSON.parse.
+    function evergreenHeadline(slide) {
+      const headline = cleanText(slide.headline);
+      const highlight = cleanText(slide.highlight);
+      const index = highlight ? headline.toLowerCase().indexOf(highlight.toLowerCase()) : -1;
+      if (index === -1) return headline;
+      return `${headline.slice(0, index)}[${headline.slice(index, index + highlight.length)}]${headline.slice(index + highlight.length)}`;
+    }
+
+    function evergreenId(slide, index, used) {
+      let base = (slide.evergreen && slide.evergreen.id) ||
+        cleanText(slide.headline).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 30) ||
+        `slide-${index + 1}`;
+      let id = base;
+      let n = 2;
+      while (used.has(id)) id = `${base}-${n++}`;
+      used.add(id);
+      return id;
+    }
+
+    function generateEvergreenFile() {
+      const used = new Set();
+      const show = Math.max(1, Math.min(12, parseInt(els.evergreenShow.value, 10) || 4));
+      const slides = state.slides
+        .filter(slide => cleanText(slide.headline) && slide.desktopImage)
+        .map((slide, index) => {
+          const extra = slide.evergreen || {};
+          const out = { id: evergreenId(slide, index, used) };
+          if (!slide.enabled) out.disabled = true;
+          if (extra.pin) out.pin = true;
+          if (extra.endDate) out.endDate = extra.endDate;
+          out.desktopImage = slide.desktopImage;
+          out.mobileImage = slide.mobileImage || slide.desktopImage;
+          out.alt = slide.alt;
+          out.eyebrow = slide.eyebrow;
+          out.headline = evergreenHeadline(slide);
+          out.text = slide.description;
+          out.primaryText = slide.primaryText;
+          out.primaryLink = slide.primaryLink;
+          return out;
+        });
+      const body = JSON.stringify({ show, slides }, null, 2);
+      return `/*
+  CSU Bookstore Evergreen Slides (the pool)
+  File: bk-evergreen-slides.js
+  Made by the carousel builder (Output: Evergreen slide file).
+  bk-evergreen.js picks "show" slides from this list at random on each page load.
+  Per slide: pin true = always included, disabled true = skipped,
+  endDate "YYYY-MM-DD" = skipped after that day, [word] = highlighted word.
+*/
+window.BKEvergreenSlides = ${body};
+`;
+    }
+
+    function importEvergreenFile(code) {
+      const start = code.indexOf("{", code.indexOf("BKEvergreenSlides"));
+      const end = code.lastIndexOf("}");
+      let data;
+      try {
+        data = JSON.parse(code.slice(start, end + 1));
+      } catch (error) {
+        setStatus("Could not read that file. Paste a file made by this builder.");
+        return;
+      }
+      const list = Array.isArray(data.slides) ? data.slides : [];
+      state.slides = list.map(item => {
+        const match = String(item.headline || "").match(/\[([^\]]+)\]/);
+        const slide = makeSlide({
+          enabled: !item.disabled,
+          desktopImage: item.desktopImage || "",
+          mobileImage: item.mobileImage || "",
+          alt: item.alt || "",
+          eyebrow: item.eyebrow || "",
+          headline: String(item.headline || "").replace(/\[([^\]]+)\]/g, "$1"),
+          highlight: match ? match[1] : "",
+          description: item.text || "",
+          primaryLink: item.primaryLink || "",
+          primaryText: item.primaryText || ""
+        });
+        slide.evergreen = { id: item.id, pin: Boolean(item.pin), endDate: item.endDate || "" };
+        return slide;
+      });
+      if (!state.slides.length) state.slides = [makeSlide()];
+      els.evergreenShow.value = data.show || 4;
+      els.evergreen.checked = true;
+      state.blocks = [];
+      state.previewIndex = 0;
+      render();
+      setStatus(`Imported ${list.length} evergreen slide${list.length === 1 ? "" : "s"}.`);
+    }
+
     function generateCode() {
+      if (els.evergreen.checked) return generateEvergreenFile();
       if (!state.idEditedByHand) els.carouselId.value = suggestedId();
       const id =(els.carouselId.value || "bkHomeHeroOverlayCarousel").trim();
       const included = state.slides.filter(slide => slide.enabled);
@@ -671,6 +876,27 @@ ${slide.description ? `<p class="bk-carousel__text">${escapeHtml(slide.descripti
       }, 2500);
     }
 
+    // Saves the generated code as a file, with no server involved.
+    // The evergreen file is named 109-bk-evergreen-slides.js because the File
+    // Manager adds its own 109- when uploading, which gives 109-109-bk-evergreen-slides.js.
+    function downloadCode() {
+      const evergreen = els.evergreen.checked;
+      const text = generateCode();
+      const name = evergreen
+        ? "109-bk-evergreen-slides.js"
+        : `carousel-${(els.carouselId.value || "block").trim()}.html`;
+      const type = evergreen ? "text/javascript" : "text/html";
+      const url = URL.createObjectURL(new Blob([text], { type: `${type};charset=utf-8` }));
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = name;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      setStatus(`Downloaded ${name}.`);
+    }
+
     async function copyCode() {
       els.outputCode.value = generateCode();
       try {
@@ -692,15 +918,16 @@ ${slide.description ? `<p class="bk-carousel__text">${escapeHtml(slide.descripti
 
     document.querySelector("#loadSample").addEventListener("click", () => {
       els.sourceCode.value = sampleCode;
-      parseSlidesFromCode(sampleCode);
+      importPastedCode(sampleCode);
     });
-    document.querySelector("#importBtn").addEventListener("click", () => parseSlidesFromCode(els.sourceCode.value));
+    document.querySelector("#importBtn").addEventListener("click", () => importPastedCode(els.sourceCode.value));
     document.querySelector("#addTop").addEventListener("click", () => {
       state.slides.push(makeSlide());
       render();
     });
     document.querySelector("#copyTop").addEventListener("click", copyCode);
     document.querySelector("#copyCode").addEventListener("click", copyCode);
+    els.downloadCode.addEventListener("click", downloadCode);
     document.querySelector("#selectCode").addEventListener("click", () => {
       els.outputCode.focus();
       els.outputCode.select();
@@ -711,13 +938,13 @@ ${slide.description ? `<p class="bk-carousel__text">${escapeHtml(slide.descripti
     document.querySelector("#previewPrev").addEventListener("click", () => goPreview(-1));
     document.querySelector("#previewNext").addEventListener("click", () => goPreview(1));
     els.carouselId.addEventListener("input", () => { state.idEditedByHand = true; });
-    [els.carouselId, els.commentDisabled, els.startDate, els.endDate, els.evergreen].forEach(input => {
+    [els.carouselId, els.commentDisabled, els.startDate, els.endDate, els.evergreen, els.evergreenShow].forEach(input => {
       input.addEventListener("input", render);
       input.addEventListener("change", render);
     });
 
     els.sourceCode.value = sampleCode;
-    parseSlidesFromCode(sampleCode);
+    importPastedCode(sampleCode);
   </script>
 </body>
 </html>
