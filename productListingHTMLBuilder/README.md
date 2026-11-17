@@ -2,7 +2,7 @@
 
 A simple local web app for student employees who need to turn product listing notes into clean HTML for MBS/Insite product descriptions.
 
-**Current version:** 1.3.0
+**Current version:** 1.3.1
 
 ## Files
 
@@ -97,6 +97,8 @@ Suggested Metadata includes:
 - SEO Title, copied directly from Product Name with a 60-character live counter
 - Meta Description, limited to 155 characters with a live counter
 - Search Keywords, generated as up to 20 comma-separated shopper-style search phrases
+
+When a **SKU** is entered, it is listed under Product Specifications (`<li><strong>SKU:</strong> 123456</li>`) and always included in the Search Keywords.
 
 Metadata generation is category-aware:
 
