@@ -41,6 +41,7 @@ const fields = {
   studentAccountEligible: document.querySelector("#studentAccountEligible"),
   productName: document.querySelector("#productName"),
   brand: document.querySelector("#brand"),
+  sku: document.querySelector("#sku"),
   productType: document.querySelector("#productType"),
   color: document.querySelector("#color"),
   material: document.querySelector("#material"),
@@ -515,6 +516,14 @@ function buildFeatures(data) {
     })
     .filter(Boolean);
 
+  if (data.sku) {
+    automaticItems.push({
+      label: "SKU",
+      value: data.sku,
+      type: "attribute",
+    });
+  }
+
   if (data.studentAccountEligible) {
     automaticItems.push({
       label: "Student Account Eligible",
@@ -946,7 +955,15 @@ function buildSearchKeywords(data) {
   // 4. A couple of broad school terms to round it out.
   add(`Colorado State University ${coreTerm}`, "CSU Rams");
 
-  return uniqueList(terms).slice(0, 20).join(", ");
+  // 5. The SKU is always kept, so it is never trimmed by the 20-term limit.
+  const sku = cleanValue(data.sku || "");
+  const keywords = uniqueList(terms.filter((term) => term.toLowerCase() !== sku.toLowerCase())).slice(0, sku ? 19 : 20);
+
+  if (sku) {
+    keywords.push(sku);
+  }
+
+  return keywords.join(", ");
 }
 
 function buildMetadata(data) {
