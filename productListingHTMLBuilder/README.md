@@ -98,7 +98,7 @@ Suggested Metadata includes:
 - Meta Description, limited to 155 characters with a live counter
 - Search Keywords, generated as up to 20 comma-separated shopper-style search phrases
 
-When a **SKU** is entered, it is listed under Product Specifications (`<li><strong>SKU:</strong> 123456</li>`) and always included in the Search Keywords.
+When a **SKU** is entered, it is listed under Product Specifications (`<li><strong>SKU:</strong> 2021234</li>`) and always included in the Search Keywords. For clothing items, use the Mother SKU.
 
 Metadata generation is category-aware:
 
