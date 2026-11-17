@@ -101,6 +101,7 @@
             <span class="status" id="status"></span>
           </div>
           <label for="outputCode">Generated code <span id="outputLabel">Copy this into your site where the carousel HTML goes.</span></label>
+          <p class="status" id="outputNote" style="margin:0 0 8px;font-size:0.9em"></p>
           <textarea id="outputCode" spellcheck="false"></textarea>
         </div>
       </section>
@@ -212,7 +213,8 @@
       slides: [],
       previewIndex: 0,
       idEditedByHand: false,
-      blocks: []
+      blocks: [],
+      placeholder: ""
     };
 
     const DEFAULT_CAROUSEL_ID = "bkHomeHeroOverlayCarousel";
@@ -244,6 +246,7 @@
       datedFields: document.querySelector("#datedFields"),
       evergreenFields: document.querySelector("#evergreenFields"),
       outputLabel: document.querySelector("#outputLabel"),
+      outputNote: document.querySelector("#outputNote"),
       downloadCode: document.querySelector("#downloadCode"),
       evergreenShow: document.querySelector("#evergreenShow"),
       commentDisabled: document.querySelector("#commentDisabled"),
@@ -416,8 +419,21 @@
         importEvergreenFile(code);
         return;
       }
-      state.blocks = splitCarouselBlocks(code);
+      // The one-line evergreen placeholder has no slides to edit, so it is not
+      // offered as a block. It is remembered and added back to the output, so
+      // pasting the output over the module does not delete the fallback.
+      const parts = splitCarouselBlocks(code);
+      const placeholders = parts.filter(isEvergreenPlaceholder);
+      const real = parts.filter(part => !isEvergreenPlaceholder(part));
+      state.placeholder = placeholders.length ? placeholders[0].trim() : "";
+      state.blocks = real.length ? real : [code];
       loadBlock(0);
+    }
+
+    function isEvergreenPlaceholder(blockCode) {
+      const doc = new DOMParser().parseFromString(`<div>${blockCode}</div>`, "text/html");
+      const section = doc.querySelector(".bk-carousel-block");
+      return Boolean(section && section.hasAttribute("data-evergreen") && !doc.querySelector(".carousel-item"));
     }
 
     function slideFromElement(item, enabled) {
@@ -470,6 +486,13 @@
       els.evergreenFields.hidden = !evergreen;
       els.downloadCode.textContent = evergreen ? "Download bk-evergreen-slides.js" : "Download File";
       els.downloadCode.classList.toggle("primary", evergreen);
+      if (els.outputNote) {
+        els.outputNote.textContent = evergreen
+          ? ""
+          : state.placeholder
+            ? "This output ends with the evergreen placeholder, so the fallback stays in the module."
+            : "No evergreen fallback in this output. That is fine only if the module already has one below the carousel.";
+      }
       if (els.outputLabel) {
         els.outputLabel.textContent = evergreen
           ? "Click Download, then upload the file to the File Manager over the old one."
@@ -748,6 +771,7 @@ window.BKEvergreenSlides = ${body};
       els.evergreenShow.value = data.show || 4;
       els.evergreen.checked = true;
       state.blocks = [];
+      state.placeholder = "";
       state.previewIndex = 0;
       render();
       setStatus(`Imported ${list.length} evergreen slide${list.length === 1 ? "" : "s"}.`);
@@ -813,7 +837,7 @@ ${slideLines.join("\n")}
 <span class="visually-hidden">Next campaign</span>
 </button>
 </div>
-</section>`;
+</section>${state.placeholder ? `\n\n${state.placeholder}` : ""}`;
     }
 
     function buildSlideMarkup(slide, active, isFirst) {
