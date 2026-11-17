@@ -101,7 +101,7 @@
             <span class="status" id="status"></span>
           </div>
           <label for="outputCode">Generated code <span id="outputLabel">Copy this into your site where the carousel HTML goes.</span></label>
-          <p class="status" id="outputNote" style="margin:0 0 8px;font-size:0.9em"></p>
+          <p class="status" id="outputNote" style="margin:0 0 8px;font-size:0.9em;word-break:break-word"></p>
           <textarea id="outputCode" spellcheck="false"></textarea>
         </div>
       </section>
@@ -217,6 +217,7 @@
       placeholder: ""
     };
 
+    const PLACEHOLDER_LINE = '<section class="bk-carousel-block" data-schedule-group="home-hero" data-fallback data-evergreen></section>';
     const DEFAULT_CAROUSEL_ID = "bkHomeHeroOverlayCarousel";
     const SCHEDULE_GROUP = "home-hero";
 
@@ -487,11 +488,17 @@
       els.downloadCode.textContent = evergreen ? "Download bk-evergreen-slides.js" : "Download File";
       els.downloadCode.classList.toggle("primary", evergreen);
       if (els.outputNote) {
-        els.outputNote.textContent = evergreen
-          ? ""
-          : state.placeholder
-            ? "This output ends with the evergreen placeholder, so the fallback stays in the module."
-            : "No evergreen fallback in this output. That is fine only if the module already has one below the carousel.";
+        // Green (status) when the fallback is included, red (field-warning) when it is missing.
+        const missing = !evergreen && !state.placeholder;
+        els.outputNote.className = missing ? "field-warning" : "status";
+        els.outputNote.textContent = "";
+        if (missing) {
+          const code = document.createElement("code");
+          code.textContent = PLACEHOLDER_LINE;
+          els.outputNote.append("No evergreen fallback in this output. Please make sure ", code, " is at the bottom of the module when publishing to the site.");
+        } else if (!evergreen) {
+          els.outputNote.textContent = "This output ends with the evergreen placeholder, so the fallback stays in the module.";
+        }
       }
       if (els.outputLabel) {
         els.outputLabel.textContent = evergreen
