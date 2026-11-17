@@ -2,7 +2,7 @@
 
 A simple local web app for student employees who need to turn product listing notes into clean HTML for MBS/Insite product descriptions.
 
-**Current version:** 1.3.0
+**Current version:** 1.3.1
 
 ## Files
 

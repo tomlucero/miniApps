@@ -24,7 +24,7 @@ let descriptionEditor = null;
 const productNameLimit = 60;
 const seoTitleLimit = 60;
 const metaDescriptionLimit = 155;
-const appVersion = "1.3.0";
+const appVersion = "1.3.1";
 const metadataDirty = {
   seoTitle: false,
   metaDescription: false,
