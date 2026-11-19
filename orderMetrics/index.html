@@ -128,7 +128,7 @@
     </form>
   </div>
 
-  <script src="config.js?v=20261119-3"></script>
+  <script src="config.js?v=20261119-4"></script>
   <script>
   const $ = id => document.getElementById(id);
   const AUTO_REFRESH_MS = 2 * 60 * 1000;     // only while showing today
@@ -157,9 +157,6 @@
     });
     groups.push({ title: 'Customer contacts', icon: 'fa-headset',
       tiles: TT_CHANNELS.map(c => ({ label: c.label + 's', v: sumKeys(counts, TT_SUBJECTS.map(s => c.key + '.' + s.key)) })) });
-    const old = TT_LEGACY.filter(i => counts[i.key]);
-    if (old.length) groups.push({ title: 'Before the Course Materials / Merch split', icon: 'fa-clock-rotate-left',
-      tiles: old.map(i => ({ label: i.long, v: counts[i.key] })) });
     return groups.map(g => '<div class="tile-group"><h3><i class="fa-solid ' + g.icon + '" aria-hidden="true"></i>' + esc(g.title) + '</h3><div class="tiles">' +
       g.tiles.map(t => '<div class="tile' + (t.v ? '' : ' zero') + (t.total ? ' total' : '') + '"><div class="v">' + fmt(t.v) + '</div><div class="l">' + esc(t.label) + '</div></div>').join('') +
       '</div></div>').join('');
@@ -180,11 +177,6 @@
       g.items.forEach(i => { h += row(i.label, [i.key]); });
       if (g.total) h += row('Total', g.items.map(i => i.key)).replace('<tr>', '<tr class="fw-semibold">');
     });
-    const old = TT_LEGACY.filter(i => d.week[i.key]);
-    if (old.length) {
-      h += '<tr class="grp"><td colspan="9">Before the Course Materials / Merch split</td></tr>';
-      old.forEach(i => { h += row(i.long, [i.key]); });
-    }
     h += '<tr class="grp"><td colspan="9">Customer contacts</td></tr>';
     TT_CHANNELS.forEach(c => { h += row(c.label + 's', TT_SUBJECTS.map(s => c.key + '.' + s.key)); });
     return h + '</tbody>';

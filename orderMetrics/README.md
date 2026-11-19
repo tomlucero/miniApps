@@ -79,9 +79,7 @@ Buttons are listed in two places that must match:
 - `Code.gs`: `ITEMS`, `CHANNELS`, `SUBJECTS`. This is what the sheet accepts and the column names it writes.
 
 Rules:
-- **Retiring a button:** remove it from `TT_GROUPS`, move it to `TT_LEGACY` in `config.js`, and move it from
-  `ITEMS` to `LEGACY_ITEMS` in `Code.gs`. Old rows keep counting on the dashboard under "Before the split" for the weeks that have them.
-  (The original Printed / Shipped / Packed / Picked up buttons were retired this way on 2026-11-19.)
+- **Removing a button:** take it out of both files. Rows already in the Log keep their old name, but the dashboard stops showing them.
 - **Renaming a label** is safe any time. Old rows keep the old name in the Log, so the totals tabs would show two columns for a while.
 - **Never change a key** (the short `snake_case` id). The dashboard counts by key.
 - **Adding a button:** add it to both files with a new key, then redeploy the script (new version).

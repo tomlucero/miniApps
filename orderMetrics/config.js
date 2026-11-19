@@ -24,14 +24,6 @@ const TT_GROUPS = [
     { key: 'pending', label: 'Pending order',        long: 'Pending orders' }
   ]}
 ];
-// Buttons that were retired. Old rows keep these keys; the dashboard shows them only when a period has some.
-const TT_LEGACY = [
-  { key: 'ship_printed',   long: 'Shipping orders printed' },
-  { key: 'shipped',        long: 'Shipping orders shipped' },
-  { key: 'pickup_printed', long: 'Pickup orders printed' },
-  { key: 'pickup_packed',  long: 'Pickup orders packed' },
-  { key: 'picked_up',      long: 'Pickup orders picked up' }
-];
 const TT_CHANNELS = [
   { key: 'call',      label: 'Phone call', icon: 'fa-phone' },
   { key: 'voicemail', label: 'Voicemail',  icon: 'fa-voicemail' },
@@ -51,7 +43,6 @@ const TT_PIN_KEY = 'teamTracking.pin';
 
 function ttLabel(key) {
   for (const g of TT_GROUPS) for (const i of g.items) if (i.key === key) return i.long;
-  const old = TT_LEGACY.find(x => x.key === key); if (old) return old.long;
   const [c, s] = String(key).split('.');
   const ch = TT_CHANNELS.find(x => x.key === c), su = TT_SUBJECTS.find(x => x.key === s);
   return ch && su ? ch.label + ' · ' + su.label : key;
