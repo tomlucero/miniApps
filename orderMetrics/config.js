@@ -9,20 +9,28 @@ const TT_SHEET_URL = '';
 
 // What the buttons count. Keep the keys in sync with ITEMS / CHANNELS / SUBJECTS in Code.gs.
 // Changing a label is safe any time. Changing a key starts a new column in the sheet.
+// total: true adds a "Total" tile for that group on the dashboard. note: a hint shown under the buttons.
 const TT_GROUPS = [
-  { title: 'Shipping', icon: 'fa-truck-fast', items: [
-    { key: 'ship_printed', label: 'Printed', long: 'Shipping orders printed' },
-    { key: 'shipped',      label: 'Shipped', long: 'Shipping orders shipped' }
+  { title: 'Shipping', icon: 'fa-truck-fast', total: true, note: 'Mixed order? Count it as Course Materials.', items: [
+    { key: 'ship_cm',    label: 'Course Materials', long: 'Shipping · Course Materials', icon: 'fa-book' },
+    { key: 'ship_merch', label: 'Merchandise',      long: 'Shipping · Merchandise',      icon: 'fa-shirt' }
   ]},
-  { title: 'Pickup', icon: 'fa-bag-shopping', items: [
-    { key: 'pickup_printed', label: 'Printed',   long: 'Pickup orders printed' },
-    { key: 'pickup_packed',  label: 'Packed',    long: 'Pickup orders packed' },
-    { key: 'picked_up',      label: 'Picked up', long: 'Pickup orders picked up' }
+  { title: 'Pick up at store', icon: 'fa-store', total: true, note: 'Mixed order? Count it as Course Materials.', items: [
+    { key: 'pickup_cm',    label: 'Course Materials', long: 'Pick up at store · Course Materials', icon: 'fa-book' },
+    { key: 'pickup_merch', label: 'Merchandise',      long: 'Pick up at store · Merchandise',      icon: 'fa-shirt' }
   ]},
   { title: 'Requests', icon: 'fa-inbox', items: [
     { key: 'cancel',  label: 'Cancellation request', long: 'Cancellation requests' },
     { key: 'pending', label: 'Pending order',        long: 'Pending orders' }
   ]}
+];
+// Buttons that were retired. Old rows keep these keys; the dashboard shows them only when a period has some.
+const TT_LEGACY = [
+  { key: 'ship_printed',   long: 'Shipping orders printed' },
+  { key: 'shipped',        long: 'Shipping orders shipped' },
+  { key: 'pickup_printed', long: 'Pickup orders printed' },
+  { key: 'pickup_packed',  long: 'Pickup orders packed' },
+  { key: 'picked_up',      long: 'Pickup orders picked up' }
 ];
 const TT_CHANNELS = [
   { key: 'call',      label: 'Phone call', icon: 'fa-phone' },
@@ -43,6 +51,7 @@ const TT_PIN_KEY = 'teamTracking.pin';
 
 function ttLabel(key) {
   for (const g of TT_GROUPS) for (const i of g.items) if (i.key === key) return i.long;
+  const old = TT_LEGACY.find(x => x.key === key); if (old) return old.long;
   const [c, s] = String(key).split('.');
   const ch = TT_CHANNELS.find(x => x.key === c), su = TT_SUBJECTS.find(x => x.key === s);
   return ch && su ? ch.label + ' · ' + su.label : key;

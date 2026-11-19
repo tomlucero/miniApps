@@ -52,6 +52,7 @@
          background:var(--accent); color:var(--on-accent); font-weight:700; font-size:17px; line-height:1.15;
          box-shadow:0 2px 0 var(--accent-dark); transition:transform .06s; }
   .tap:active { transform:translateY(2px); box-shadow:none; }
+  .note { margin:8px 2px 0; font-size:12px; color:var(--muted); }
   .tap.alt { background:var(--card); color:var(--accent-dark); border:2px solid var(--accent); box-shadow:none; }
   .tap i { display:block; font-size:20px; margin-bottom:5px; }
   .tap .n { position:absolute; top:6px; right:8px; font-size:11px; font-weight:600; opacity:.85; }
@@ -161,7 +162,7 @@
 
 <div id="toast" aria-live="polite"></div>
 
-<script src="config.js?v=20261119-2"></script>
+<script src="config.js?v=20261119-3"></script>
 <script>
 const QUEUE_KEY = 'teamTracking.queue.v1';   // taps not yet saved to the sheet
 const UNDO_KEY  = 'teamTracking.undo.v1';    // recent taps from this device, newest last
@@ -208,11 +209,17 @@ TT_GROUPS.forEach(g => {
   const grid = sec.querySelector('.grid');
   if (g.items.length === 3) grid.classList.add('three');
   g.items.forEach(i => {
-    const b = tapButton(i.key, i.label);
+    const b = tapButton(i.key, i.label, i.icon);
     b.setAttribute('aria-label', '+ ' + i.long);
     b.addEventListener('click', () => record(i.key, b));
     grid.appendChild(b);
   });
+  if (g.note) {
+    const n = document.createElement('p');
+    n.className = 'note';
+    n.textContent = g.note;
+    sec.appendChild(n);
+  }
   $('groups').appendChild(sec);
 });
 

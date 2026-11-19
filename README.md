@@ -24,7 +24,7 @@ Many of the tools replace tasks that were previously completed using handwritten
 * **Phone Order Tax Allocator** – Splits phone-order sales tax across items proportionally while preserving exact rounding totals.
 * **Order Range Sign Generator** – Produces professional shelf and rack signs for order retrieval areas.
 * **Non Web Order Pick Up Tool** – Creates printable pickup paperwork for special orders without an InSite pickup record.
-* **Team Tracking** – One-tap tallies of printed, shipped and pickup orders, cancellation requests, pending orders, and calls/voicemails/emails by subject, with a today and week-to-date dashboard. Phone page: `orderMetrics/log.html`.
+* **Team Tracking** – One-tap tallies of shipping and pickup orders (Course Materials and Merchandise), cancellation requests, pending orders, and calls/voicemails/emails by subject, with a today and week-to-date dashboard. Phone page: `orderMetrics/log.html`.
 * **Pickup Date Label Generator** – Creates reminder and restock labels for pickup orders.
 * **Oversized / Secure Item Tag Generator** – Produces retrieval tags and documentation for oversized or secured merchandise.
 * **Dot Date Label Generator** – Creates printable date labels for operational workflows.

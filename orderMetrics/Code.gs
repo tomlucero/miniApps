@@ -30,13 +30,21 @@ const HEADER = ['timestamp', 'date', 'week_of', 'item', 'qty', 'key', 'entry_id'
 
 // Keep in sync with orderMetrics/config.js. The key is what the pages send; the label is what the sheet shows.
 const ITEMS = {
+  ship_cm:        'Shipping · Course Materials',
+  ship_merch:     'Shipping · Merchandise',
+  pickup_cm:      'Pick up at store · Course Materials',
+  pickup_merch:   'Pick up at store · Merchandise',
+  cancel:         'Cancellation requests',
+  pending:        'Pending orders'
+};
+// Retired buttons (before the Course Materials / Merchandise split). Still accepted so taps
+// that were waiting on a phone when the change went out are not lost.
+const LEGACY_ITEMS = {
   ship_printed:   'Shipping orders printed',
   shipped:        'Shipping orders shipped',
   pickup_printed: 'Pickup orders printed',
   pickup_packed:  'Pickup orders packed',
-  picked_up:      'Pickup orders picked up',
-  cancel:         'Cancellation requests',
-  pending:        'Pending orders'
+  picked_up:      'Pickup orders picked up'
 };
 const CHANNELS = { call: 'Phone call', voicemail: 'Voicemail', email: 'Email' };
 const SUBJECTS = {
@@ -46,6 +54,7 @@ const SUBJECTS = {
 
 function labelFor_(key) {
   if (ITEMS[key]) return ITEMS[key];
+  if (LEGACY_ITEMS[key]) return LEGACY_ITEMS[key];
   const p = String(key).split('.');
   if (p.length === 2 && CHANNELS[p[0]] && SUBJECTS[p[1]]) return CHANNELS[p[0]] + ' · ' + SUBJECTS[p[1]];
   return null;
