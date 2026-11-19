@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Team Tracking | CSU Bookstore</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/b65fbcdd34.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="../shared-theme.css?v=20260621-1">
+  <style>
+    .toolbar { display:flex; flex-wrap:wrap; align-items:center; gap:10px; }
+    .toolbar input.form-control { width:170px !important; flex:0 0 auto; }
+    .toolbar .updated { color:var(--suite-muted); font-size:.9rem; margin-left:auto; }
+    .dash-section { margin-top:28px; }
+    .dash-section > h2 { font-size:1.25rem; font-weight:750; margin:0 0 4px; }
+    .dash-section > .sub { color:var(--suite-muted); margin:0 0 14px; font-size:.92rem; }
+    .tile-groups { display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:16px; }
+    .tile-group { background:var(--suite-paper); border:1px solid var(--suite-line); border-radius:var(--suite-radius);
+                  box-shadow:var(--suite-shadow); padding:16px 18px; }
+    .tile-group h3 { font-size:.8rem; text-transform:uppercase; letter-spacing:.07em; color:var(--suite-muted);
+                     font-weight:700; margin:0 0 10px; display:flex; gap:8px; align-items:center; }
+    .tiles { display:flex; flex-wrap:wrap; gap:10px 22px; }
+    .tile { min-width:84px; }
+    .tile .v { font-size:2.1rem; font-weight:800; line-height:1.05; font-variant-numeric:tabular-nums; color:var(--suite-ink); }
+    .tile .l { font-size:.85rem; color:var(--suite-muted); }
+    .tile.zero .v { color:var(--suite-line); }
+    .table-card { background:var(--suite-paper); border:1px solid var(--suite-line); border-radius:var(--suite-radius);
+                  box-shadow:var(--suite-shadow); overflow-x:auto; }
+    .table-card table { margin:0; font-variant-numeric:tabular-nums; }
+    .table-card th, .table-card td { padding:.5rem .8rem; white-space:nowrap; }
+    .table-card thead th { font-size:.78rem; text-transform:uppercase; letter-spacing:.05em; color:var(--suite-muted); font-weight:700; }
+    .table-card td.num, .table-card th.num { text-align:right; }
+    .table-card tr.grp td { background:var(--suite-soft); font-weight:700; font-size:.8rem; text-transform:uppercase; letter-spacing:.05em; color:var(--suite-muted); }
+    .table-card tr.total td { font-weight:750; border-top:2px solid var(--suite-line); }
+    .table-card td.z { color:#b8c4d0; }
+    .table-card .future { color:#c3cdd8; }
+    .cap { font-size:.85rem; color:var(--suite-muted); margin:8px 2px 0; }
+
+    /* hours chart: one series, accent bars */
+    .hours { display:flex; align-items:flex-end; gap:4px; height:160px; padding:18px 4px 0; }
+    .hours .col { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; position:relative; }
+    .hours .bar { width:100%; max-width:34px; background:var(--suite-accent); border-radius:4px 4px 0 0; min-height:0; }
+    .hours .col:hover .bar { background:var(--suite-accent-dark); }
+    .hours .val { font-size:.75rem; color:var(--suite-muted); margin-bottom:3px; font-variant-numeric:tabular-nums; }
+    .hours .hr { font-size:.72rem; color:var(--suite-muted); margin-top:4px; border-top:1px solid var(--suite-line); width:100%; text-align:center; padding-top:3px; }
+    .chart-card { background:var(--suite-paper); border:1px solid var(--suite-line); border-radius:var(--suite-radius); box-shadow:var(--suite-shadow); padding:12px 16px 14px; }
+
+    #pinGate { position:fixed; inset:0; background:var(--suite-wash); z-index:50; display:flex; align-items:center; justify-content:center; padding:16px; }
+    #pinGate[hidden] { display:none; }
+    #pinGate form { width:100%; max-width:360px; padding:24px; text-align:center; background:var(--suite-paper);
+                    border:1px solid var(--suite-line); border-radius:var(--suite-radius); box-shadow:var(--suite-shadow); }
+    #pinInput { font-size:1.6rem; letter-spacing:.3em; text-align:center; margin:12px 0; }
+    #pinMsg { min-height:22px; margin-top:10px; color:var(--suite-danger); font-size:.9rem; }
+    #loadMsg:empty { display:none; }
+  </style>
+</head>
+<body>
+  <header class="suite-hero">
+    <div class="suite-hero-image" role="img" aria-label="Colorado State University Lory Student Center"></div>
+    <div class="suite-hero-inner">
+      <div>
+        <a class="suite-back" href="../index.html">&larr; Return to Toolbox</a>
+        <p class="suite-eyebrow">Fulfillment metrics</p>
+        <h1>Team Tracking</h1>
+        <p class="suite-lead">Today's and this week's order, request and customer-contact counts, logged by the team from <a href="log.html">the tally page</a>.</p>
+      </div>
+      <img class="suite-logo" src="../productListingHTMLBuilder/images/bookstoreLogo.png" alt="CSU Bookstore logo">
+    </div>
+  </header>
+
+  <main class="workspace-band">
+    <div class="container pb-5">
+      <div class="toolbar">
+        <label for="dayPick" class="fw-semibold">Show</label>
+        <input type="date" id="dayPick" class="form-control form-control-sm">
+        <button class="btn btn-sm btn-outline-secondary" id="todayBtn" type="button">Today</button>
+        <button class="btn btn-sm btn-primary" id="refreshBtn" type="button"><i class="fa-solid fa-rotate" aria-hidden="true"></i> Refresh</button>
+        <a class="btn btn-sm btn-outline-secondary" href="log.html"><i class="fa-solid fa-hand-pointer" aria-hidden="true"></i> Tally page</a>
+        <a class="btn btn-sm btn-outline-secondary" id="sheetLink" target="_blank" rel="noopener" hidden><i class="fa-solid fa-table" aria-hidden="true"></i> Open sheet</a>
+        <span class="updated" id="updated" role="status"></span>
+      </div>
+      <div class="alert alert-warning mt-3" id="loadMsg" role="alert"></div>
+
+      <section class="dash-section" aria-labelledby="dayHeading">
+        <h2 id="dayHeading">Today</h2>
+        <p class="sub" id="daySub"></p>
+        <div class="tile-groups" id="dayTiles"></div>
+      </section>
+
+      <section class="dash-section" aria-labelledby="weekHeading">
+        <h2 id="weekHeading">Week to date</h2>
+        <p class="sub" id="weekSub"></p>
+        <div class="tile-groups" id="weekTiles"></div>
+        <div class="table-card mt-3"><table class="table table-sm" id="weekTable"></table></div>
+      </section>
+
+      <section class="dash-section" aria-labelledby="contactsHeading">
+        <h2 id="contactsHeading">Customer contacts by subject</h2>
+        <p class="sub">Phone calls, voicemails and emails, for the day shown and for the week to date.</p>
+        <div class="row g-3">
+          <div class="col-lg-6"><div class="table-card"><table class="table table-sm" id="contactsDay"></table></div></div>
+          <div class="col-lg-6"><div class="table-card"><table class="table table-sm" id="contactsWeek"></table></div></div>
+        </div>
+      </section>
+
+      <section class="dash-section" aria-labelledby="hoursHeading">
+        <h2 id="hoursHeading">Activity by hour</h2>
+        <p class="sub" id="hoursSub">Everything logged on the day shown, by the hour it was tapped. Useful for planning shifts.</p>
+        <div class="chart-card"><div class="hours" id="hours" role="img"></div></div>
+      </section>
+
+      <p class="cap mt-4"><button class="btn btn-link btn-sm p-0" id="lockBtn" type="button">Change PIN on this computer</button></p>
+    </div>
+  </main>
+
+  <div id="pinGate" hidden>
+    <form id="pinForm" autocomplete="off">
+      <h2 class="h5 fw-bold"><i class="fa-solid fa-lock" aria-hidden="true"></i> Team Tracking</h2>
+      <label for="pinInput" class="text-muted">Enter the team PIN</label>
+      <input id="pinInput" class="form-control" type="password" inputmode="numeric" maxlength="12" autocomplete="off">
+      <button class="btn btn-primary w-100" type="submit">Unlock</button>
+      <div id="pinMsg" role="alert"></div>
+    </form>
+  </div>
+
+  <script src="config.js?v=20261119-2"></script>
+  <script>
+  const $ = id => document.getElementById(id);
+  const AUTO_REFRESH_MS = 2 * 60 * 1000;     // only while showing today
+  const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const fmt = n => (n || 0).toLocaleString();
+  const parseYmd = s => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
+  const toYmd = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  const niceDate = s => parseYmd(s).toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
+  const shortDate = s => parseYmd(s).toLocaleDateString([], { month: 'short', day: 'numeric' });
+  const contactKeys = () => TT_CHANNELS.flatMap(c => TT_SUBJECTS.map(s => c.key + '.' + s.key));
+  const sumKeys = (obj, keys) => keys.reduce((a, k) => a + (obj[k] || 0), 0);
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  if (typeof TT_SHEET_URL === 'string' && /^https:\/\//.test(TT_SHEET_URL)) { $('sheetLink').href = TT_SHEET_URL; $('sheetLink').hidden = false; }
+
+  let data = null;
+  let timer = null;
+  let followToday = true;   // when true, always ask for 'today' so the page rolls over at midnight
+
+  /* ---------- tiles ---------- */
+  function tilesHtml(counts) {
+    const groups = TT_GROUPS.map(g => ({ title: g.title, icon: g.icon,
+      tiles: g.items.map(i => ({ label: i.label, v: counts[i.key] || 0 })) }));
+    groups.push({ title: 'Customer contacts', icon: 'fa-headset',
+      tiles: TT_CHANNELS.map(c => ({ label: c.label + 's', v: sumKeys(counts, TT_SUBJECTS.map(s => c.key + '.' + s.key)) })) });
+    return groups.map(g => '<div class="tile-group"><h3><i class="fa-solid ' + g.icon + '" aria-hidden="true"></i>' + esc(g.title) + '</h3><div class="tiles">' +
+      g.tiles.map(t => '<div class="tile' + (t.v ? '' : ' zero') + '"><div class="v">' + fmt(t.v) + '</div><div class="l">' + esc(t.label) + '</div></div>').join('') +
+      '</div></div>').join('');
+  }
+
+  /* ---------- week table: one row per item, one column per day ---------- */
+  function weekTable(d) {
+    const mon = parseYmd(d.weekOf);
+    const days = DAYS.map((name, i) => { const x = new Date(mon); x.setDate(mon.getDate() + i); return { name, ymd: toYmd(x) }; });
+    const cell = (v, future) => future ? '<td class="num future">–</td>' : '<td class="num' + (v ? '' : ' z') + '">' + fmt(v) + '</td>';
+    let h = '<thead><tr><th>Item</th>' + days.map(x => '<th class="num">' + x.name + '<br><span class="fw-normal text-lowercase">' + shortDate(x.ymd) + '</span></th>').join('') +
+            '<th class="num">Week</th></tr></thead><tbody>';
+    const row = (label, keys) => '<tr><td>' + esc(label) + '</td>' +
+      days.map(x => cell(sumKeys(d.byDay[x.ymd] || {}, keys), x.ymd > d.date)).join('') +
+      '<td class="num fw-bold">' + fmt(sumKeys(d.week, keys)) + '</td></tr>';
+    TT_GROUPS.forEach(g => {
+      h += '<tr class="grp"><td colspan="9">' + esc(g.title) + '</td></tr>';
+      g.items.forEach(i => { h += row(i.label, [i.key]); });
+    });
+    h += '<tr class="grp"><td colspan="9">Customer contacts</td></tr>';
+    TT_CHANNELS.forEach(c => { h += row(c.label + 's', TT_SUBJECTS.map(s => c.key + '.' + s.key)); });
+    return h + '</tbody>';
+  }
+
+  /* ---------- contacts: subject rows × channel columns ---------- */
+  function contactsTable(counts, title) {
+    let h = '<thead><tr><th>' + esc(title) + '</th>' + TT_CHANNELS.map(c => '<th class="num">' + esc(c.label) + '</th>').join('') + '<th class="num">Total</th></tr></thead><tbody>';
+    TT_SUBJECTS.forEach(s => {
+      const vals = TT_CHANNELS.map(c => counts[c.key + '.' + s.key] || 0);
+      h += '<tr><td>' + esc(s.label) + '</td>' + vals.map(v => '<td class="num' + (v ? '' : ' z') + '">' + fmt(v) + '</td>').join('') +
+           '<td class="num fw-bold">' + fmt(vals.reduce((a, b) => a + b, 0)) + '</td></tr>';
+    });
+    const tots = TT_CHANNELS.map(c => sumKeys(counts, TT_SUBJECTS.map(s => c.key + '.' + s.key)));
+    h += '<tr class="total"><td>Total</td>' + tots.map(v => '<td class="num">' + fmt(v) + '</td>').join('') +
+         '<td class="num">' + fmt(tots.reduce((a, b) => a + b, 0)) + '</td></tr>';
+    return h + '</tbody>';
+  }
+
+  /* ---------- hours chart ---------- */
+  function hoursChart(byHour) {
+    const hrs = Object.keys(byHour).map(Number);
+    const lo = Math.min(8, ...hrs), hi = Math.max(17, ...hrs);   // always show at least 8am to 5pm
+    const max = Math.max(1, ...Object.values(byHour));
+    const label = h => (h % 12 || 12) + (h < 12 ? 'a' : 'p');
+    let html = '', desc = [];
+    for (let h = lo; h <= hi; h++) {
+      const v = byHour[h] || 0;
+      const range = label(h) + '–' + label((h + 1) % 24);
+      if (v) desc.push(range + ': ' + v);
+      html += '<div class="col" title="' + range + ': ' + fmt(v) + ' logged">' +
+              '<span class="val">' + (v ? fmt(v) : '') + '</span>' +
+              '<div class="bar" style="height:' + (v / max * 100) + '%"></div><span class="hr">' + label(h) + '</span></div>';
+    }
+    $('hours').innerHTML = html;
+    $('hours').setAttribute('aria-label', 'Items logged by hour. ' + (desc.join(', ') || 'Nothing logged.'));
+  }
+
+  function render() {
+    const d = data;
+    const isToday = d.date === d.today;
+    $('dayHeading').textContent = isToday ? 'Today' : niceDate(d.date);
+    $('daySub').textContent = (isToday ? niceDate(d.date) + '. ' : '') + 'Everything the team logged on this day.';
+    $('dayTiles').innerHTML = tilesHtml(d.day);
+    const last = DAYS[(parseYmd(d.date).getDay() + 6) % 7];
+    $('weekHeading').textContent = isToday ? 'Week to date' : 'Week of ' + shortDate(d.weekOf);
+    $('weekSub').textContent = 'Monday ' + shortDate(d.weekOf) + ' through ' + last + ' ' + shortDate(d.date) + '. Restarts every Monday.';
+    $('weekTiles').innerHTML = tilesHtml(d.week);
+    $('weekTable').innerHTML = weekTable(d);
+    $('contactsDay').innerHTML = contactsTable(d.day, isToday ? 'Today' : shortDate(d.date));
+    $('contactsWeek').innerHTML = contactsTable(d.week, isToday ? 'Week to date' : 'Week of ' + shortDate(d.weekOf));
+    hoursChart(d.byHour || {});
+    $('updated').textContent = 'Updated ' + new Date(d.updatedAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) +
+                               (isToday ? ' · refreshes every 2 min' : '');
+  }
+
+  async function refresh() {
+    clearTimeout(timer);
+    $('refreshBtn').disabled = true;
+    try {
+      const d = await ttPost({ action: 'summary', date: followToday ? '' : $('dayPick').value });
+      if (d.ok) {
+        data = d; $('loadMsg').textContent = '';
+        if (followToday) $('dayPick').value = d.date;
+        $('dayPick').max = d.today;
+        render();
+      } else if (d.error === 'bad pin' || d.error === 'locked') {
+        gate.show(d.error === 'locked' ? 'Too many wrong tries. Wait 10 minutes.' : 'The PIN changed. Enter the new one.');
+      } else {
+        $('loadMsg').textContent = 'The sheet returned an error: ' + d.error;
+      }
+    } catch (e) {
+      $('loadMsg').textContent = 'Could not reach the sheet. Check the connection; this page will try again.';
+    } finally {
+      $('refreshBtn').disabled = false;
+      if (followToday && !document.hidden) timer = setTimeout(refresh, AUTO_REFRESH_MS);
+    }
+  }
+
+  $('refreshBtn').addEventListener('click', refresh);
+  $('todayBtn').addEventListener('click', () => { followToday = true; refresh(); });
+  $('dayPick').addEventListener('change', () => { followToday = !$('dayPick').value || (data && $('dayPick').value === data.today); refresh(); });
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && followToday) refresh(); });
+  const gate = ttPinGate(refresh);
+  $('lockBtn').addEventListener('click', () => gate.show());
+  </script>
+</body>
+</html>
