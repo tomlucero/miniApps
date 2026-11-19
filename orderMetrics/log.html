@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#126a64">
+<title>Team Tracking | Log</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://kit.fontawesome.com/b65fbcdd34.js" crossorigin="anonymous"></script>
+<style>
+  :root { --bg:#f5f7fb; --card:#fff; --text:#1f2933; --muted:#64748b; --line:#d9e2ec;
+          --accent:#126a64; --accent-dark:#0c514d; --accent-soft:#e7f2f1; --on-accent:#fff;
+          --err:#b42318; --errbg:#fff1f0; --warn:#9a5b00; --warnbg:#fff6e5; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#14161a; --card:#1e2127; --text:#eceef1; --muted:#9aa3b0; --line:#2d323a;
+            --accent:#4cb7a8; --accent-dark:#7fd0c4; --accent-soft:#173330; --on-accent:#0b1f1d;
+            --err:#f2877f; --errbg:#3a1f1d; --warn:#f0b75a; --warnbg:#3a2c14; }
+  }
+  * { box-sizing:border-box; }
+  html { -webkit-text-size-adjust:100%; }
+  body { margin:0; background:var(--bg); color:var(--text);
+         font:15px/1.4 "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+         padding:12px 12px calc(96px + env(safe-area-inset-bottom)); }
+  .wrap { max-width:520px; margin:0 auto; }
+  button { font:inherit; touch-action:manipulation; -webkit-tap-highlight-color:transparent; cursor:pointer; }
+
+  header { display:flex; align-items:center; justify-content:space-between; gap:8px; margin:2px 2px 10px; }
+  h1 { font-size:19px; margin:0; font-weight:700; }
+  .pill { font-size:12px; font-weight:600; padding:5px 10px; border-radius:999px; white-space:nowrap;
+          background:var(--accent-soft); color:var(--accent-dark); }
+  .pill.wait { background:var(--warnbg); color:var(--warn); }
+  .pill.err  { background:var(--errbg); color:var(--err); }
+
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px; margin-bottom:10px; }
+  .card h2 { font-size:13px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin:0 0 8px;
+             display:flex; align-items:center; gap:6px; font-weight:700; }
+
+  /* "Next tap counts as" */
+  .qtyrow { display:flex; gap:6px; align-items:center; }
+  .qtyrow .lbl { font-size:13px; color:var(--muted); margin-right:2px; line-height:1.15; }
+  .qty { flex:1; min-width:0; padding:10px 0; border-radius:10px; border:2px solid var(--line); background:transparent;
+         color:var(--text); font-weight:700; font-size:16px; }
+  .qty[aria-pressed=true] { border-color:var(--accent); background:var(--accent); color:var(--on-accent); }
+  #qtyHint { font-size:12px; color:var(--muted); margin-top:6px; min-height:16px; }
+  #qtyHint.armed { color:var(--accent-dark); font-weight:600; }
+
+  .grid { display:grid; grid-template-columns:repeat(2, 1fr); gap:8px; }
+  .grid.three { grid-template-columns:repeat(3, 1fr); }
+  .tap { position:relative; min-height:72px; padding:10px 8px; border-radius:12px; border:0;
+         background:var(--accent); color:var(--on-accent); font-weight:700; font-size:17px; line-height:1.15;
+         box-shadow:0 2px 0 var(--accent-dark); transition:transform .06s; }
+  .tap:active { transform:translateY(2px); box-shadow:none; }
+  .tap.alt { background:var(--card); color:var(--accent-dark); border:2px solid var(--accent); box-shadow:none; }
+  .tap i { display:block; font-size:20px; margin-bottom:5px; }
+  .tap .n { position:absolute; top:6px; right:8px; font-size:11px; font-weight:600; opacity:.85; }
+  .tap.hit { animation:hit .35s; }
+  @keyframes hit { 0% { filter:brightness(1.35); } 100% { filter:none; } }
+
+  /* bottom undo bar */
+  #undoBar { position:fixed; left:0; right:0; bottom:0; padding:10px 12px calc(10px + env(safe-area-inset-bottom));
+             background:var(--card); border-top:1px solid var(--line); }
+  #undoBar .in { max-width:520px; margin:0 auto; display:flex; gap:10px; align-items:center; }
+  #undoBtn { flex:1; min-height:52px; border-radius:12px; border:2px solid var(--err); background:transparent; color:var(--err);
+             font-weight:700; font-size:15px; text-align:left; padding:6px 12px; display:flex; align-items:center; gap:10px; }
+  #undoBtn:disabled { border-color:var(--line); color:var(--muted); }
+  #undoBtn small { display:block; font-weight:500; font-size:12px; opacity:.9; }
+
+  /* toast */
+  #toast { position:fixed; left:50%; top:12px; transform:translate(-50%, -140%); transition:transform .2s;
+           background:var(--text); color:var(--bg); padding:10px 16px; border-radius:999px; font-weight:600;
+           max-width:calc(100% - 32px); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; z-index:30; }
+  #toast.show { transform:translate(-50%, 0); }
+
+  /* subject picker (bottom sheet) */
+  #sheet { position:fixed; inset:0; background:rgba(0,0,0,.45); display:flex; align-items:flex-end; z-index:20; }
+  #sheet[hidden] { display:none; }
+  #sheet .panel { width:100%; max-width:520px; margin:0 auto; background:var(--card); border-radius:16px 16px 0 0;
+                  padding:14px 12px calc(14px + env(safe-area-inset-bottom)); }
+  #sheet h3 { margin:0 0 10px; font-size:17px; }
+  #sheet .grid { margin-bottom:10px; }
+  .cancel { width:100%; min-height:48px; border-radius:12px; border:2px solid var(--line); background:transparent;
+            color:var(--text); font-weight:600; }
+
+  /* PIN gate */
+  #pinGate { position:fixed; inset:0; background:var(--bg); z-index:40; display:flex; align-items:center; justify-content:center; padding:16px; }
+  #pinGate[hidden] { display:none; }
+  #pinGate .card { width:100%; max-width:360px; padding:20px; text-align:center; }
+  #pinInput { width:100%; font-size:28px; letter-spacing:.3em; text-align:center; padding:12px; margin:12px 0;
+              border:2px solid var(--line); border-radius:12px; background:var(--bg); color:var(--text); }
+  #pinInput:focus { outline:none; border-color:var(--accent); }
+  #pinGate button { width:100%; min-height:52px; border:0; border-radius:12px; background:var(--accent); color:var(--on-accent);
+                    font-weight:700; font-size:17px; }
+  #pinGate button:disabled { opacity:.5; }
+  #pinMsg { min-height:20px; margin-top:10px; color:var(--err); font-size:14px; }
+
+  .foot { display:flex; justify-content:space-between; gap:10px; font-size:13px; color:var(--muted); margin:6px 2px; }
+  .foot a, .foot button { color:var(--accent-dark); background:none; border:0; padding:0; font-size:13px; text-decoration:underline; }
+  @media (max-width:360px) { .tap { font-size:15px; min-height:64px; } .qtyrow .lbl { display:none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><i class="fa-solid fa-clipboard-list" aria-hidden="true"></i> Team Tracking</h1>
+    <span class="pill" id="status" role="status" aria-live="polite">Ready</span>
+  </header>
+
+  <section class="card" aria-label="How many the next tap counts">
+    <div class="qtyrow" role="group" aria-label="Next tap counts as">
+      <span class="lbl">Next tap<br>counts as</span>
+      <button class="qty" data-q="1"  type="button" aria-pressed="true">1</button>
+      <button class="qty" data-q="5"  type="button" aria-pressed="false">5</button>
+      <button class="qty" data-q="10" type="button" aria-pressed="false">10</button>
+      <button class="qty" data-q="25" type="button" aria-pressed="false">25</button>
+      <button class="qty" data-q="custom" type="button" aria-pressed="false" id="customQty">#</button>
+    </div>
+    <div id="qtyHint">Each tap counts 1. For a stack, pick a number first.</div>
+  </section>
+
+  <div id="groups"></div>
+
+  <section class="card" aria-labelledby="contactsHeading">
+    <h2 id="contactsHeading"><i class="fa-solid fa-headset" aria-hidden="true"></i> Customer contacts</h2>
+    <div class="grid three" id="channels"></div>
+  </section>
+
+  <div class="foot">
+    <span id="todayCount"></span>
+    <span><a href="index.html">Dashboard</a> · <button type="button" id="lockBtn">Change PIN</button></span>
+  </div>
+</div>
+
+<div id="undoBar">
+  <div class="in">
+    <button id="undoBtn" type="button" disabled>
+      <i class="fa-solid fa-rotate-left" aria-hidden="true"></i>
+      <span id="undoText">Nothing to undo</span>
+    </button>
+  </div>
+</div>
+
+<div id="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+  <div class="panel">
+    <h3 id="sheetTitle">What was it about?</h3>
+    <div class="grid" id="subjects"></div>
+    <button class="cancel" type="button" id="sheetCancel">Cancel</button>
+  </div>
+</div>
+
+<div id="pinGate" hidden>
+  <form class="card" id="pinForm" autocomplete="off">
+    <h1 style="font-size:20px"><i class="fa-solid fa-lock" aria-hidden="true"></i> Team Tracking</h1>
+    <label for="pinInput" style="display:block;color:var(--muted);margin-top:6px">Enter the team PIN</label>
+    <input id="pinInput" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="12" autocomplete="off">
+    <button type="submit">Unlock</button>
+    <div id="pinMsg" role="alert"></div>
+  </form>
+</div>
+
+<div id="toast" aria-live="polite"></div>
+
+<script src="config.js?v=20261119-1"></script>
+<script>
+const QUEUE_KEY = 'teamTracking.queue.v1';   // taps not yet saved to the sheet
+const UNDO_KEY  = 'teamTracking.undo.v1';    // recent taps from this device, newest last
+const DEV_KEY   = 'teamTracking.device';
+const TODAY_KEY = 'teamTracking.today';     // { d: 'yyyy-mm-dd', n } running total for the footer
+const BIG_QTY   = 100;                       // ask "are you sure?" above this
+const MAX_QTY   = 500;
+
+const $ = id => document.getElementById(id);
+const load = (k, d) => { try { const v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } };
+const save = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+const ymd = d => { const x = new Date(d); return x.getFullYear() + '-' + String(x.getMonth() + 1).padStart(2, '0') + '-' + String(x.getDate()).padStart(2, '0'); };
+
+let device = load(DEV_KEY, null);
+if (!device) { device = 'd' + uid().slice(-6); save(DEV_KEY, device); }
+let queue = load(QUEUE_KEY, []);                       // [{op:'add', id, key, qty, at} | {op:'undo', id}]
+let undo  = load(UNDO_KEY, []).filter(u => ymd(u.at) === ymd(Date.now()));   // only today's taps can be undone
+let today = load(TODAY_KEY, { d: '', n: 0 });
+function bumpToday(by) {
+  const d = ymd(Date.now());
+  if (today.d !== d) today = { d, n: 0 };
+  today.n = Math.max(0, today.n + by);
+  save(TODAY_KEY, today);
+}
+let nextQty = 1;
+let customArmed = false;
+
+/* ---------- build the buttons ---------- */
+function tapButton(key, label, icon, alt) {
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.className = 'tap' + (alt ? ' alt' : '');
+  b.innerHTML = (icon ? '<i class="fa-solid ' + icon + '" aria-hidden="true"></i>' : '') + '<span></span>';
+  b.querySelector('span').textContent = label;
+  b.dataset.key = key;
+  return b;
+}
+TT_GROUPS.forEach(g => {
+  const sec = document.createElement('section');
+  sec.className = 'card';
+  sec.innerHTML = '<h2><i class="fa-solid ' + g.icon + '" aria-hidden="true"></i> <span></span></h2><div class="grid"></div>';
+  sec.querySelector('h2 span').textContent = g.title;
+  const grid = sec.querySelector('.grid');
+  if (g.items.length === 3) grid.classList.add('three');
+  g.items.forEach(i => {
+    const b = tapButton(i.key, i.label);
+    b.setAttribute('aria-label', '+ ' + i.long);
+    b.addEventListener('click', () => record(i.key, b));
+    grid.appendChild(b);
+  });
+  $('groups').appendChild(sec);
+});
+
+let openChannel = null;
+TT_CHANNELS.forEach(c => {
+  const b = tapButton(c.key, c.label, c.icon, true);
+  b.addEventListener('click', () => {
+    openChannel = c;
+    $('sheetTitle').textContent = c.label + (nextQty > 1 ? ' ×' + nextQty : '') + ': what was it about?';
+    $('sheet').hidden = false;
+  });
+  $('channels').appendChild(b);
+});
+TT_SUBJECTS.forEach(s => {
+  const b = tapButton('', s.label);
+  b.addEventListener('click', () => {
+    const c = openChannel;
+    closeSheet();
+    if (c) record(c.key + '.' + s.key, document.querySelector('#channels [data-key="' + c.key + '"]'));
+  });
+  $('subjects').appendChild(b);
+});
+function closeSheet() { $('sheet').hidden = true; openChannel = null; }
+$('sheetCancel').addEventListener('click', closeSheet);
+$('sheet').addEventListener('click', e => { if (e.target === $('sheet')) closeSheet(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('sheet').hidden) closeSheet(); });
+
+/* ---------- quantity (one tap only, then back to 1) ---------- */
+function setQty(q, custom) {
+  nextQty = q; customArmed = !!custom;
+  document.querySelectorAll('.qty').forEach(b => {
+    const on = custom ? b.id === 'customQty' : Number(b.dataset.q) === q;
+    b.setAttribute('aria-pressed', String(on));
+  });
+  $('customQty').textContent = custom ? q : '#';
+  $('qtyHint').className = q > 1 ? 'armed' : '';
+  $('qtyHint').textContent = q > 1 ? 'Your next tap counts ' + q + '. Then it goes back to 1.'
+                                   : 'Each tap counts 1. For a stack, pick a number first.';
+}
+document.querySelectorAll('.qty').forEach(b => b.addEventListener('click', () => {
+  if (b.dataset.q !== 'custom') { setQty(Number(b.dataset.q) === nextQty && !customArmed ? 1 : Number(b.dataset.q)); return; }
+  const raw = prompt('How many? (1-' + MAX_QTY + ')', customArmed ? String(nextQty) : '');
+  if (raw == null) return;
+  const n = Math.floor(Number(raw));
+  if (!(n >= 1 && n <= MAX_QTY)) { toast('Enter a number from 1 to ' + MAX_QTY); return; }
+  setQty(n, n !== 1);
+}));
+
+/* ---------- record a tap ---------- */
+function record(key, btn) {
+  const qty = nextQty;
+  if (qty > BIG_QTY && !confirm('Log ' + qty + ' × ' + ttLabel(key) + '?')) return;
+  const entry = { op: 'add', id: uid(), key, qty, at: new Date().toISOString() };
+  queue.push(entry);
+  undo.push({ id: entry.id, key, qty, at: entry.at });
+  if (undo.length > 30) undo = undo.slice(-30);
+  save(QUEUE_KEY, queue); save(UNDO_KEY, undo);
+  bumpToday(qty);
+  setQty(1);
+  if (btn) { btn.classList.remove('hit'); void btn.offsetWidth; btn.classList.add('hit'); }
+  if (navigator.vibrate) navigator.vibrate(15);
+  toast('+' + qty + ' ' + ttLabel(key));
+  render();
+  scheduleFlush(600);
+}
+
+$('undoBtn').addEventListener('click', () => {
+  const last = undo.pop();
+  if (!last) return;
+  const i = queue.findIndex(o => o.op === 'add' && o.id === last.id && !inFlight.has(o));
+  if (i >= 0) queue.splice(i, 1);                    // never left this phone: just drop it
+  else queue.push({ op: 'undo', id: last.id });       // already sent (or sending): tell the sheet
+  save(QUEUE_KEY, queue); save(UNDO_KEY, undo);
+  bumpToday(-last.qty);
+  toast('Undid +' + last.qty + ' ' + ttLabel(last.key));
+  render();
+  scheduleFlush(300);
+});
+
+/* ---------- send to the sheet in the background ---------- */
+let inFlight = new Set();
+let flushTimer = null;
+let lastError = '';
+function scheduleFlush(ms) { clearTimeout(flushTimer); flushTimer = setTimeout(flush, ms); }
+
+async function flush(keepalive) {
+  if (inFlight.size || !queue.length || !ttGetPin() || !ttConfigured()) { render(); return; }
+  const batch = queue.slice(0, 100);
+  batch.forEach(o => inFlight.add(o));
+  render();
+  try {
+    const d = await ttPost({ action: 'log', device, ops: batch }, keepalive ? { keepalive: true } : null);
+    if (d.ok) {
+      queue = queue.filter(o => !inFlight.has(o));
+      lastError = '';
+      if (d.rejected && d.rejected.length) toast(d.rejected.length + ' tap(s) were not accepted by the sheet');
+    } else if (d.error === 'bad pin' || d.error === 'locked') {
+      lastError = 'pin';
+      gate.show(d.error === 'locked' ? 'Too many wrong tries. Wait 10 minutes.' : 'The PIN changed. Enter the new one. Your taps are saved on this phone.');
+    } else {
+      lastError = d.error || 'error';
+    }
+  } catch (e) {
+    lastError = 'offline';
+  } finally {
+    inFlight = new Set();
+    save(QUEUE_KEY, queue);
+    render();
+    if (queue.length) scheduleFlush(lastError ? 15000 : 200);
+  }
+}
+window.addEventListener('online', () => scheduleFlush(200));
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && queue.length) flush(true); });
+setInterval(() => { if (queue.length && !inFlight.size) flush(); }, 20000);
+
+/* ---------- screen ---------- */
+let toastTimer;
+function toast(t) {
+  $('toast').textContent = t;
+  $('toast').classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => $('toast').classList.remove('show'), 1400);
+}
+function render() {
+  const waiting = queue.length;
+  const s = $('status');
+  if (!waiting) { s.className = 'pill'; s.textContent = '✓ All saved'; }
+  else if (inFlight.size) { s.className = 'pill wait'; s.textContent = 'Saving ' + waiting + '…'; }
+  else if (lastError === 'offline') { s.className = 'pill wait'; s.textContent = 'Offline · ' + waiting + ' waiting'; }
+  else if (lastError) { s.className = 'pill err'; s.textContent = waiting + ' not saved yet'; }
+  else { s.className = 'pill wait'; s.textContent = waiting + ' waiting'; }
+  if (lastError && lastError !== 'offline' && lastError !== 'pin') s.title = 'Server said: ' + lastError;
+
+  const last = undo[undo.length - 1];
+  $('undoBtn').disabled = !last;
+  $('undoText').innerHTML = last ? 'Undo last entry<small></small>' : 'Nothing to undo';
+  if (last) $('undoText').querySelector('small').textContent = '+' + last.qty + ' ' + ttLabel(last.key) + ' · ' +
+    new Date(last.at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+
+  $('todayCount').textContent = today.d === ymd(Date.now()) && today.n ? 'This device today: ' + today.n + ' logged' : '';
+}
+
+const gate = ttPinGate(() => { render(); scheduleFlush(100); });
+$('lockBtn').addEventListener('click', () => gate.show());
+render();
+</script>
+</body>
+</html>
