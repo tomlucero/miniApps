@@ -3,8 +3,8 @@
 How the team tally tool works and how to set it up. Built the same way as the Supply Tracker and Pickup Reminders.
 
 **What it does:** student staff tap a big button on the department phone (or any computer) every time
-something happens: an order printed, shipped, packed or picked up, a cancellation request, a pending
-order, or a phone call / voicemail / email. Each tap becomes one row in a Google Sheet. The dashboard
+an order comes in (Shipping or Pick up at store, each split into Course Materials and Merchandise),
+a cancellation request, a pending order, or a phone call / voicemail / email. Each tap becomes one row in a Google Sheet. The dashboard
 shows today's totals and the week to date (the week restarts every Monday).
 
 Team counts only. No names, order numbers or customer details are stored.
@@ -26,6 +26,7 @@ Sheet tabs: **Log** (one row per tap, don't edit), **Daily Totals** and **Weekly
 **Tally page** (`https://tomlucero.github.io/miniApps/orderMetrics/log.html`)
 1. Enter the team PIN once. The device remembers it.
 2. Tap the button for what just happened. One tap = 1.
+   An order with both course materials and merch counts as **Course Materials**, since that's what brought them in.
 3. **Doing a stack?** Tap **5**, **10**, **25**, or **#** (type any number up to 500) first, then the button.
    The number only applies to that one tap, then it goes back to 1.
 4. **Phone call / Voicemail / Email:** tap the channel, then tap what it was about.
@@ -38,8 +39,8 @@ them when the connection comes back, even after the page is closed and reopened.
 Tip: on the department phone, open the tally page and use "Add to Home screen" so it opens like an app.
 
 **Dashboard** (`https://tomlucero.github.io/miniApps/orderMetrics/index.html`)
-- Shows **Today** and **Week to date** for Shipping (printed, shipped), Pickup (printed, packed, picked up),
-  Requests (cancellations, pending orders) and Customer contacts, plus a day-by-day table for the week,
+- Shows **Today** and **Week to date** for Shipping and Pick up at store (Course Materials, Merchandise
+  and a total for each), Requests (cancellations, pending orders) and Customer contacts, plus a day-by-day table for the week,
   contacts by subject, and activity by hour.
 - Refreshes itself every 2 minutes while it shows today.
 - Pick a date to see that day and its week (Monday through that day).
@@ -78,6 +79,9 @@ Buttons are listed in two places that must match:
 - `Code.gs`: `ITEMS`, `CHANNELS`, `SUBJECTS`. This is what the sheet accepts and the column names it writes.
 
 Rules:
+- **Retiring a button:** remove it from `TT_GROUPS`, move it to `TT_LEGACY` in `config.js`, and move it from
+  `ITEMS` to `LEGACY_ITEMS` in `Code.gs`. Old rows keep counting on the dashboard under "Before the split" for the weeks that have them.
+  (The original Printed / Shipped / Packed / Picked up buttons were retired this way on 2026-11-19.)
 - **Renaming a label** is safe any time. Old rows keep the old name in the Log, so the totals tabs would show two columns for a while.
 - **Never change a key** (the short `snake_case` id). The dashboard counts by key.
 - **Adding a button:** add it to both files with a new key, then redeploy the script (new version).
