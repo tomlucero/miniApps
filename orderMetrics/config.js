@@ -2,7 +2,7 @@
 
 // ---- EDIT THESE TWO LINES --------------------------------------------------------
 // The Apps Script web app URL (ends in /exec). The PIN does NOT go here: it lives only in the Apps Script.
-const TT_ENDPOINT = 'PASTE-YOUR-EXEC-URL-HERE';
+const TT_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwyj1KH1tdiMrBVF1MDP5ZSvG76bHFdcTLRZFq7wjA0cg34BWHpg0DSPYmuen-3ZyMC/exec';
 // Optional: the Google Sheet's address, so the dashboard shows an "Open sheet" button. Leave '' to hide it.
 const TT_SHEET_URL = '';
 // ---------------------------------------------------------------------------------
